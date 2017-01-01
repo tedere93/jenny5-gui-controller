@@ -9,11 +9,15 @@
 
 MainFrame *f_main;
 
+#include <vld.h>
+
 //------------------------------------------------------------------------
 void MainFrame::BuildInterface(void)
 {
-	wxButton *b_head_face_following = new wxButton(this, wxID_ANY, "Head follow face");
+	b_head_face_following = new wxButton(this, wxID_ANY, "Head follow face");
 	b_head_face_following->Bind(wxEVT_BUTTON, &MainFrame::on_head_face_follow_click, this);
+
+	Bind(wxEVT_CLOSE_WINDOW, &MainFrame::OnMainWindowClose, this);
 
 }
 //------------------------------------------------------------------------
@@ -25,14 +29,17 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 //------------------------------------------------------------------------
 void MainFrame::OnMainWindowClose(wxCloseEvent& WXUNUSED(event))
 {
+	delete b_head_face_following;
 
 	Destroy();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_head_face_follow_click(wxCommandEvent &event)
 {
+	int head_com_port = 9; // real port number
+
 	char error_string[1000];
-	if (head_face_follow(error_string) == -1) {
+	if (head_face_follow(head_controller, head_com_port, head_cam, face_classifier, error_string) == -1) {
 		wxMessageBox(error_string, "Error");
 	}
 }

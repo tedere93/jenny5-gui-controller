@@ -12,16 +12,12 @@
 
 using namespace cv;
 
-int head_face_follow(char *error_string)
+//----------------------------------------------------------------
+int head_face_follow(t_jenny5_arduino_controller head_controller, int head_com_port, VideoCapture head_cam, CascadeClassifier face_classifier, char *error_string)
 {
-	t_jenny5_arduino_controller head_controller;
-	VideoCapture head_cam;
-	CascadeClassifier face_classifier;
-
-
 	// initialization
 
-	if (!init_head(head_controller, head_cam, 5, error_string)) {
+	if (!init_head(head_controller, head_cam, head_com_port, error_string)) {
 		printf("%s\n", error_string);
 		printf("Press Enter to terminate ...");
 		getchar();
@@ -186,7 +182,8 @@ int head_face_follow(char *error_string)
 			}
 		}
 
-		if (waitKey(1) >= 0)  // break the loop
+		int key = waitKey(1);
+		if (key == VK_ESCAPE)  // break the loop
 			active = false;
 	}
 
@@ -195,5 +192,8 @@ int head_face_follow(char *error_string)
 
 	head_controller.close_connection();
 
+	destroyWindow("Head camera");
+
 	return 0;
 }
+//----------------------------------------------------------------
