@@ -17,7 +17,7 @@ int head_face_follow(t_jenny5_arduino_controller head_controller, int head_com_p
 {
 	// initialization
 
-	if (!init_head(head_controller, head_cam, head_com_port, error_string)) {
+	if (!connect_to_head(head_controller, head_cam, head_com_port, error_string)) {
 		printf("%s\n", error_string);
 		printf("Press Enter to terminate ...");
 		getchar();
