@@ -68,28 +68,24 @@ static void on_mouse(int event, int x, int y, int flags, void *userdata)
 	}
 }
 //----------------------------------------------------------------
-int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port, char *error_string)
+int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port, f_log_callback to_log)
 {
-
 	// setup
+	char error_string[1000];
 	if (!connect_to_lidar(LIDAR_controller, lidar_com_port, error_string)) {
-		printf("%s\n", error_string);
-		printf("Press Enter to terminate...");
-		getchar();
+		to_log(error_string);
 		return -1;
 	}
 	else
-		printf("Connection OK.\n");
+		to_log("Connection to LIDAR OK.\n");
 
 	// setup
 	if (!setup_lidar(LIDAR_controller, error_string)) {
-		printf("%s\n", error_string);
-		printf("Press Enter to terminate...");
-		getchar();
+		to_log(error_string);
 		return -1;
 	}
 	else
-		printf("Setup OK.\n");
+		to_log("Setup LIDAR OK.\n");
 
 	for (int i = 0; i < LIDAR_NUM_STEPS; i++)
 		lidar_distances[i] = 0;
@@ -121,7 +117,7 @@ int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port,
 	cv::Point text_position(10, 25);
 	cv::putText(lidar_image, text, text_position, font_face, 1, Scalar::all(255), 1, 8);
 
-	printf("Now running the main loop. Press Escape when want to exit!\n");
+	to_log("Now running the main loop. Press Escape when want to exit!\n");
 	bool active = true;
 
 	while (active) {        // starting infinit loop
@@ -144,7 +140,9 @@ int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port,
 			new_p.x = -distance * lidar_map_scale_factor * sin(motor_position / 100.0 * M_PI - M_PI / 2);
 			new_p.y = -distance * lidar_map_scale_factor * cos(motor_position / 100.0 * M_PI - M_PI / 2);
 			circle(lidar_image, center + new_p, 5, Scalar(0, 0, 255), 1, 8);
-			cout << "Motor position = " << motor_position << " LIDAR distance = " << distance << endl;
+			char tmp_s[100];
+			sprintf(tmp_s, "Motor position = %d LIDAR distance = %d", motor_position, distance);
+			to_log(tmp_s);
 		}
 
 		imshow("LIDAR map", lidar_image);
@@ -158,8 +156,6 @@ int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port,
 	LIDAR_controller.close_connection();
 
 	destroyWindow("LIDAR map");
-
-	printf("\n\nProgram over. Press Enter!");
 
 	return 0;
 }

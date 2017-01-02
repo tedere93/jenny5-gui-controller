@@ -24,7 +24,7 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 		return -1;
 	}
 	else
-		to_log("Head initialization succceded.\n");
+		to_log("Head connection succceded.\n");
 
 	// initialization
 	if (!init_face_classifier(face_classifier, error_string)) {
