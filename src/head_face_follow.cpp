@@ -13,49 +13,43 @@
 using namespace cv;
 
 //----------------------------------------------------------------
-int head_face_follow(t_jenny5_arduino_controller head_controller, int head_com_port, VideoCapture head_cam, CascadeClassifier face_classifier, char *error_string)
+int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_port, VideoCapture &head_cam, CascadeClassifier &face_classifier, f_log_callback to_log)
 {
 	// initialization
 
+	char error_string[1000];
+
 	if (!connect_to_head(head_controller, head_cam, head_com_port, error_string)) {
-		printf("%s\n", error_string);
-		printf("Press Enter to terminate ...");
-		getchar();
+		to_log(error_string);
 		return -1;
 	}
 	else
-		printf("Head initialization succceded.\n");
+		to_log("Head initialization succceded.\n");
 
 	// initialization
 	if (!init_face_classifier(face_classifier, error_string)) {
-		printf("%s\n", error_string);
-		printf("Press Enter to terminate ...");
-		getchar();
+		to_log(error_string);
 		return -1;
 	}
 	else
-		printf("Face classifier initialization succceded.\n");
+		to_log("Face classifier initialization succceded.\n");
 
 	// setup
 	if (!setup_head(head_controller, error_string)) {
-		printf("%s\n", error_string);
-		printf("Press Enter to terminate ...");
-		getchar();
+		to_log(error_string);
 		return -1;
 	}
 	else
-		printf("Head setup succceded.\n");
+		to_log("Head setup succceded.\n");
 
 
 	//  home
 	if (!home_head_motors(head_controller, error_string)) {
-		printf("%s\n", error_string);
-		printf("Press Enter to terminate ...");
-		getchar();
+		to_log(error_string);
 		return -1;
 	}
 	else
-		printf("Head home succceded.\n");
+		to_log("Head home succceded.\n");
 
 
 	Mat cam_frame; // images used in the proces
@@ -100,7 +94,7 @@ int head_face_follow(t_jenny5_arduino_controller head_controller, int head_com_p
 		if (head_controller.get_sonar_state(0) == COMMAND_DONE) {// I ping the sonar only if no ping was sent before
 			head_controller.send_get_sonar_distance(0);
 			head_controller.set_sonar_state(0, COMMAND_SENT);
-			printf("U0# - sent\n");
+			to_log("U0# - sent\n");
 		}
 
 		if (face_found) {// 
@@ -113,7 +107,9 @@ int head_face_follow(t_jenny5_arduino_controller head_controller, int head_com_p
 
 				head_controller.send_move_stepper_motor(HEAD_MOTOR_HORIZONTAL, num_steps_x);
 				head_controller.set_stepper_motor_state(HEAD_MOTOR_HORIZONTAL, COMMAND_SENT);
-				printf("M%d %d# - sent\n", HEAD_MOTOR_HORIZONTAL, num_steps_x);
+				char tmp_s[100];
+				sprintf(tmp_s, "M%d %d# - sent\n", HEAD_MOTOR_HORIZONTAL, num_steps_x);
+				to_log(tmp_s);
 
 				//	head_controller.set_sonar_state(0, COMMAND_DONE); // if the motor has been moved the previous distances become invalid
 			}
@@ -124,7 +120,9 @@ int head_face_follow(t_jenny5_arduino_controller head_controller, int head_com_p
 
 					head_controller.send_move_stepper_motor(HEAD_MOTOR_HORIZONTAL, num_steps_x);
 					head_controller.set_stepper_motor_state(HEAD_MOTOR_HORIZONTAL, COMMAND_SENT);
-					printf("M%d %d# - sent\n", HEAD_MOTOR_HORIZONTAL, num_steps_x);
+					char tmp_s[100];
+					sprintf(tmp_s, "M%d %d# - sent\n", HEAD_MOTOR_HORIZONTAL, num_steps_x);
+					to_log(tmp_s);
 
 					//	head_controller.set_sonar_state(0, COMMAND_DONE); // if the motor has been moved the previous distances become invalid
 				}
@@ -140,8 +138,10 @@ int head_face_follow(t_jenny5_arduino_controller head_controller, int head_com_p
 					int num_steps_y = angle_offset.degrees_from_center_y / 1.8 * 27.0;
 
 					head_controller.send_move_stepper_motor(HEAD_MOTOR_VERTICAL, num_steps_y);
-					head_controller.set_stepper_motor_state(HEAD_MOTOR_VERTICAL, COMMAND_SENT);
-					printf("M%d %d# - sent\n", HEAD_MOTOR_VERTICAL, num_steps_y);
+					head_controller.set_stepper_motor_state(HEAD_MOTOR_VERTICAL, COMMAND_SENT); 
+					char tmp_s[100];
+					sprintf(tmp_s, "M%d %d# - sent\n", HEAD_MOTOR_VERTICAL, num_steps_y);
+					to_log(tmp_s);
 					//	head_controller.set_sonar_state(0, COMMAND_DONE); // if the motor has been moved the previous distances become invalid
 				}
 				else
@@ -151,7 +151,9 @@ int head_face_follow(t_jenny5_arduino_controller head_controller, int head_com_p
 
 						head_controller.send_move_stepper_motor(HEAD_MOTOR_VERTICAL, num_steps_y);
 						head_controller.set_stepper_motor_state(HEAD_MOTOR_VERTICAL, COMMAND_SENT);
-						printf("M%d -%d# - sent\n", HEAD_MOTOR_VERTICAL, num_steps_y);
+						char tmp_s[100];
+						sprintf(tmp_s, "M%d -%d# - sent\n", HEAD_MOTOR_VERTICAL, num_steps_y);
+						to_log(tmp_s);
 						//		head_controller.set_sonar_state(0, COMMAND_DONE); // if the motor has been moved the previous distances become invalid
 					}
 
@@ -161,7 +163,9 @@ int head_face_follow(t_jenny5_arduino_controller head_controller, int head_com_p
 		if (head_controller.get_stepper_motor_state(HEAD_MOTOR_HORIZONTAL) == COMMAND_SENT) {// if a command has been sent
 			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_HORIZONTAL)) { // have we received the event from Serial ?
 				head_controller.set_stepper_motor_state(HEAD_MOTOR_VERTICAL, COMMAND_DONE);
-				printf("M%d# - done\n", HEAD_MOTOR_VERTICAL);
+				char tmp_s[100];
+				sprintf(tmp_s, "M%d# - done\n", HEAD_MOTOR_VERTICAL);
+				to_log(tmp_s);
 			}
 		}
 
@@ -169,7 +173,9 @@ int head_face_follow(t_jenny5_arduino_controller head_controller, int head_com_p
 		if (head_controller.get_stepper_motor_state(HEAD_MOTOR_VERTICAL) == COMMAND_SENT) {// if a command has been sent
 			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_VERTICAL)) { // have we received the event from Serial ?
 				head_controller.set_stepper_motor_state(HEAD_MOTOR_VERTICAL, COMMAND_DONE);
-				printf("M%d# - done\n", HEAD_MOTOR_VERTICAL);
+				char tmp_s[100];
+				sprintf(tmp_s, "M%d# - done\n", HEAD_MOTOR_VERTICAL);
+				to_log(tmp_s);
 			}
 		}
 
@@ -178,7 +184,10 @@ int head_face_follow(t_jenny5_arduino_controller head_controller, int head_com_p
 			int distance;
 			if (head_controller.query_for_event(SONAR_EVENT, 0, &distance)) { // have we received the event from Serial ?
 				head_controller.set_sonar_state(0, COMMAND_DONE);
-				printf("distance = %d cm\n", distance);
+				char tmp_s[100];
+				sprintf(tmp_s, "distance = %d cm\n", distance);
+				to_log(tmp_s);
+
 			}
 		}
 
