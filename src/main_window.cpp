@@ -16,15 +16,25 @@ MainFrame *f_main;
 //------------------------------------------------------------------------
 void MainFrame::BuildInterface(void)
 {
+	splitter_commands_log = new wxSplitterWindow(this);
+	splitter_commands_log->SetSplitMode(wxSPLIT_HORIZONTAL);
+	splitter_commands_log->SetMinimumPaneSize(100);
 
-	p_com_ports = new wxPanel(this);
-	p_predefined_tasks = new wxPanel(this);
-	p_free_moves = new wxPanel(this);
+	wxPanel *p_commands_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 300));
+	wxPanel *p_log_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 500));
 
-	wxBoxSizer* sizer_main = new wxBoxSizer(wxHORIZONTAL);
-	sizer_main->Add(p_com_ports);
-	sizer_main->Add(p_predefined_tasks, 0, wxLEFT, 10);
-	sizer_main->Add(p_free_moves, 0, wxLEFT, 10);
+	splitter_commands_log->SplitHorizontally(p_commands_panel, p_log_panel);
+
+	p_com_ports = new wxPanel(p_commands_panel);
+	p_predefined_tasks = new wxPanel(p_commands_panel);
+	p_free_moves = new wxPanel(p_commands_panel);
+
+	wxBoxSizer* sizer_commands = new wxBoxSizer(wxHORIZONTAL);
+	sizer_commands->Add(p_com_ports);
+	sizer_commands->Add(p_predefined_tasks, 0, wxLEFT, 10);
+	sizer_commands->Add(p_free_moves, 0, wxLEFT, 10);
+
+	p_commands_panel->SetSizer(sizer_commands);
 
 	wxBoxSizer* sizer_predefined_tasks = new wxBoxSizer(wxVERTICAL);
 
@@ -34,7 +44,6 @@ void MainFrame::BuildInterface(void)
 	b_lidar_map = new wxButton(p_predefined_tasks, wxID_ANY, "LIDAR map");
 	b_lidar_map->Bind(wxEVT_BUTTON, &MainFrame::on_lidar_map_click, this);
 	
-
 	sizer_predefined_tasks->Add(b_head_face_following);
 	sizer_predefined_tasks->Add(b_lidar_map);
 
@@ -66,9 +75,19 @@ void MainFrame::BuildInterface(void)
 
 	p_com_ports->SetSizer(sizer_com_ports);
 
+	tc_log = new wxTextCtrl(p_log_panel, -1, "Jenny 5 controller log\n", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+	wxBoxSizer* sizer_log = new wxBoxSizer(wxVERTICAL);
+	sizer_log->Add(tc_log, 1, wxEXPAND, 0);
+	p_log_panel->SetSizer(sizer_log);
+
+
 	Bind(wxEVT_CLOSE_WINDOW, &MainFrame::OnMainWindowClose, this);
 
-	SetSizer(sizer_main);
+	wxBoxSizer *main_sizer = new wxBoxSizer(wxVERTICAL);
+	main_sizer->Add(splitter_commands_log, 1, wxEXPAND, 0);
+
+	SetAutoLayout(true);
+	SetSizer(main_sizer);
 
 }
 //------------------------------------------------------------------------
@@ -85,13 +104,16 @@ void MainFrame::OnMainWindowClose(wxCloseEvent& WXUNUSED(event))
 	Destroy();
 }
 //------------------------------------------------------------------------
+void write_to_log(char* str)
+{
+	*(f_main->tc_log) << wxString(str);
+}//------------------------------------------------------------------------
 void MainFrame::on_head_face_follow_click(wxCommandEvent &event)
 {
 	int head_com_port = 9; // real port number
 
-	char error_string[1000];
-	if (head_face_follow(head_controller, head_com_port, head_cam, face_classifier, error_string) == -1) {
-		wxMessageBox(error_string, "Error");
+//	char error_string[1000];
+	if (head_face_follow(head_controller, head_com_port, head_cam, face_classifier, write_to_log) == -1) {
 	}
 }
 //------------------------------------------------------------------------
@@ -100,8 +122,9 @@ void MainFrame::on_lidar_map_click(wxCommandEvent &event)
 	int lidar_com_port = 8; // real port number
 
 	char error_string[1000];
-	if (lidar_map(head_controller, lidar_com_port, error_string) == -1) {
+	if (lidar_map(lidar_controller, lidar_com_port, error_string) == -1) {
 		wxMessageBox(error_string, "Error");
 	}
 }
+
 //------------------------------------------------------------------------
