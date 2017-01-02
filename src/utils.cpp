@@ -1,5 +1,6 @@
 
 #include "utils.h"
+#include <time.h>
 
 bool get_biggest_face(std::vector<cv::Rect> faces, t_CENTER_POINT &center)
 {
@@ -80,3 +81,19 @@ double determine_offset_angle(int position, double field_of_view, int number_of_
 	return offset_from_center * fov_one_percent;
 }
 //-----------------------------------------------------------------------
+char* current_time_to_string(void)
+{
+	char *result = new char[100];
+	strcpy(result, "");
+
+	time_t _current_time = time(NULL);
+
+	struct tm * ptm;
+
+	ptm = localtime(&_current_time);
+
+	strftime(result, 100, "%Y_%m_%d_%H_%M_%S", ptm);
+
+	return result;
+}
+//---------------------------------------------------------------------------
