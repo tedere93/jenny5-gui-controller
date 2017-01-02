@@ -66,10 +66,10 @@ void MainFrame::BuildInterface(void)
 
 	st_head_H_motor_position = new wxStaticText(p_head, wxID_ANY, "Horizontal motor");
 	tc_head_H_motor_position = new wxTextCtrl(p_head, wxID_ANY, "0");
-	s_head_H_motor_position = new wxSlider(p_head, -1, 0, 0, _head_horizontal_motor_potentiometer_max - _head_horizontal_motor_potentiometer_min);
+	s_head_H_motor_position = new wxSlider(p_head, -1, _head_horizontal_motor_potentiometer_min, _head_horizontal_motor_potentiometer_min, _head_horizontal_motor_potentiometer_max);
 	st_head_V_motor_position = new wxStaticText(p_head, wxID_ANY, "Vertical motor");
 	tc_head_V_motor_position = new wxTextCtrl(p_head, wxID_ANY, "0");
-	s_head_V_motor_position = new wxSlider(p_head, -1, 0, 0, _head_vertical_motor_potentiometer_max - _head_vertical_motor_potentiometer_min);
+	s_head_V_motor_position = new wxSlider(p_head, -1, _head_vertical_motor_potentiometer_min, _head_vertical_motor_potentiometer_min, _head_vertical_motor_potentiometer_max);
 	b_head_refresh = new wxButton(p_head, -1, "Refresh");
 	st_head_ultrasonic = new wxStaticText(p_head, wxID_ANY, "Ultrasonic");
 	tc_head_ultrasonic = new wxTextCtrl(p_head, wxID_ANY, "0");
@@ -167,7 +167,6 @@ void MainFrame::BuildInterface(void)
 
 	SetAutoLayout(true);
 	SetSizer(main_sizer);
-
 }
 //------------------------------------------------------------------------
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
@@ -290,11 +289,13 @@ void MainFrame::on_timer(wxTimerEvent& event)
 			sprintf(buffer, "Head pot position (%d) = %d\n", HEAD_POTENTIOMETER_HORIZONTAL_INDEX, pot_position);
 			write_to_log(buffer);
 			tc_head_H_motor_position->SetValue(wxString() << pot_position);
+			s_head_H_motor_position->SetValue(pot_position);
 		}
 		if (head_controller.query_for_event(POTENTIOMETER_EVENT, HEAD_POTENTIOMETER_VERTICAL_INDEX, &pot_position)) {
 			sprintf(buffer, "Head pot position (%d) = %d\n", HEAD_POTENTIOMETER_VERTICAL_INDEX, pot_position);
 			write_to_log(buffer);
 			tc_head_V_motor_position->SetValue(wxString() << pot_position);
+			s_head_V_motor_position->SetValue(pot_position);
 		}
 
 		int ultrasonic_distance;
