@@ -68,7 +68,7 @@ static void on_mouse(int event, int x, int y, int flags, void *userdata)
 	}
 }
 //----------------------------------------------------------------
-int lidar_map(t_jenny5_arduino_controller LIDAR_controller, int lidar_com_port, char *error_string)
+int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port, char *error_string)
 {
 
 	// setup

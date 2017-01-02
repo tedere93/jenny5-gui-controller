@@ -8,4 +8,4 @@ struct t_user_data
 	int image_width;
 };
 
-int lidar_map(t_jenny5_arduino_controller LIDAR_controller, int lidar_com_port, char *error_string);
+int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port, char *error_string);

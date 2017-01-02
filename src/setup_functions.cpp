@@ -63,7 +63,7 @@ bool connect_to_head(t_jenny5_arduino_controller &head_controller, VideoCapture 
 	return true;
 }
 //----------------------------------------------------------------
-bool connect_to_left_arm(t_jenny5_arduino_controller &left_arm_controller, VideoCapture left_hand_cam, int LEFT_ARM_COM_PORT, char* error_string)
+bool connect_to_left_arm(t_jenny5_arduino_controller &left_arm_controller, VideoCapture &left_hand_cam, int LEFT_ARM_COM_PORT, char* error_string)
 {
 	//-------------- START INITIALIZATION ------------------------------
 
@@ -180,10 +180,10 @@ bool setup_head(t_jenny5_arduino_controller &head_controller, char* error_string
 	int head_motors_enable_pins[2] = { 7, 4 };
 	head_controller.send_create_stepper_motors(2, head_motors_dir_pins, head_motors_step_pins, head_motors_enable_pins);
 
-	//int head_sonars_trig_pins[1] = { 8 };
-	//int head_sonars_echo_pins[1] = { 9 };
+	int head_sonars_trig_pins[1] = { 11 };
+	int head_sonars_echo_pins[1] = { 12 };
 
-	//head_controller.send_create_sonars(1, head_sonars_trig_pins, head_sonars_echo_pins);
+	head_controller.send_create_sonars(1, head_sonars_trig_pins, head_sonars_echo_pins);
 
 	int head_potentiometer_pins[2] = { 0, 1 };
 	head_controller.send_create_potentiometers(2, head_potentiometer_pins);
@@ -200,7 +200,7 @@ bool setup_head(t_jenny5_arduino_controller &head_controller, char* error_string
 		if (head_controller.query_for_event(STEPPER_MOTORS_CONTROLLER_CREATED_EVENT, 0))  // have we received the event from Serial ?
 			motors_controller_created = true;
 
-		//if (head_controller.query_for_event(SONARS_CONTROLLER_CREATED_EVENT, 0))  // have we received the event from Serial ?
+		if (head_controller.query_for_event(SONARS_CONTROLLER_CREATED_EVENT, 0))  // have we received the event from Serial ?
 		sonars_controller_created = true;
 
 		if (head_controller.query_for_event(POTENTIOMETERS_CONTROLLER_CREATED_EVENT, 0))  // have we received the event from Serial ?
