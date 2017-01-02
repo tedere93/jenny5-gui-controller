@@ -78,6 +78,10 @@ private:
 	void on_connect_to_right_arm_click(wxCommandEvent &event);
 	void on_connect_to_platform_click(wxCommandEvent &event);
 
+	wxTimer *t_timer;
+
+	void on_timer(wxTimerEvent& event);
+
 public:
 
 	wxTextCtrl *tc_log;

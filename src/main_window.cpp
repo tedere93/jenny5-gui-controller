@@ -11,7 +11,11 @@
 
 MainFrame *f_main;
 
-#include <vld.h>
+//#include <vld.h>
+
+#define TIMER_ID 1300
+
+#define timer_interval 100
 
 //------------------------------------------------------------------------
 void MainFrame::BuildInterface(void)
@@ -119,11 +123,17 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	: wxFrame(NULL, wxID_ANY, title, pos, size)
 {
 	BuildInterface();
+
+	t_timer = new wxTimer;
+	t_timer->SetOwner(this, TIMER_ID);
+	Bind(wxEVT_TIMER, &MainFrame::on_timer, this);
 }
 //------------------------------------------------------------------------
+
 void MainFrame::OnMainWindowClose(wxCloseEvent& WXUNUSED(event))
 {
 
+	delete t_timer;
 
 	Destroy();
 }
@@ -163,38 +173,46 @@ void  MainFrame::on_connect_to_head_click(wxCommandEvent &event)
 		b_connect_to_head->SetLabel("Disconnect head");
 		// show the firmware version number
 		head_controller.send_get_firmware_version();
-		Sleep(100);
-		char firmware_version[100];
-		strcpy(firmware_version, "Head firmware version: ");
-		head_controller.update_commands_from_serial();
-		if (head_controller.query_for_firmware_version_event(firmware_version + strlen(firmware_version))) {
-			strcat(firmware_version, "\n");
-			write_to_log(firmware_version);
-		}
+		t_timer->Start(timer_interval);
+
 	}
 	else {
+		t_timer->Stop();
 		head_controller.close_connection();
 		b_connect_to_head->SetLabel("Connect head");
 	}
 }
 //------------------------------------------------------------------------
-void  MainFrame::on_connect_to_lidar_click(wxCommandEvent &event)
+void MainFrame::on_connect_to_lidar_click(wxCommandEvent &event)
 {
 
 }
 //------------------------------------------------------------------------
-void  MainFrame::on_connect_to_left_arm_click(wxCommandEvent &event)
+void MainFrame::on_connect_to_left_arm_click(wxCommandEvent &event)
 {
 
 }
 //------------------------------------------------------------------------
-void  MainFrame::on_connect_to_right_arm_click(wxCommandEvent &event)
+void MainFrame::on_connect_to_right_arm_click(wxCommandEvent &event)
 {
 
 }
 //------------------------------------------------------------------------
-void  MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
+void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 {
 
+}
+//------------------------------------------------------------------------
+void MainFrame::on_timer(wxTimerEvent& event)
+{
+	head_controller.update_commands_from_serial();
+
+	char firmware_version[100];
+	strcpy(firmware_version, "Head firmware version: ");
+	
+	if (head_controller.query_for_firmware_version_event(firmware_version + strlen(firmware_version))) {
+		strcat(firmware_version, "\n");
+		write_to_log(firmware_version);
+	}
 }
 //------------------------------------------------------------------------
