@@ -92,7 +92,7 @@ char* current_time_to_string(void)
 
 	ptm = localtime(&_current_time);
 
-	strftime(result, 100, "%Y_%m_%d_%H_%M_%S", ptm);
+	strftime(result, 100, "%Y %m %d:%H %M %S", ptm);
 
 	return result;
 }

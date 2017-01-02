@@ -180,8 +180,8 @@ bool setup_head(t_jenny5_arduino_controller &head_controller, char* error_string
 	int head_motors_enable_pins[2] = { 7, 4 };
 	head_controller.send_create_stepper_motors(2, head_motors_dir_pins, head_motors_step_pins, head_motors_enable_pins);
 
-	int head_sonars_trig_pins[1] = { 11 };
-	int head_sonars_echo_pins[1] = { 12 };
+	int head_sonars_trig_pins[1] = { 10 };
+	int head_sonars_echo_pins[1] = { 11 };
 
 	head_controller.send_create_sonars(1, head_sonars_trig_pins, head_sonars_echo_pins);
 
