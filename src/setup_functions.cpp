@@ -20,7 +20,7 @@ bool connect_to_head(t_jenny5_arduino_controller &head_controller, VideoCapture 
 	//-------------- START INITIALIZATION ------------------------------
 
 	if (!head_controller.connect(HEAD_COM_PORT - 1, 115200)) { // real - 1
-		sprintf(error_string, "Error attaching to Jenny 5' head!");
+		sprintf(error_string, "Error attaching to Jenny 5' head!\n");
 		return false;
 	}
 
@@ -48,7 +48,7 @@ bool connect_to_head(t_jenny5_arduino_controller &head_controller, VideoCapture 
 		// if more than 3 seconds then game over
 		if (wait_time > NUM_SECONDS_TO_WAIT_FOR_CONNECTION) {
 			if (!head_responded)
-				sprintf(error_string, "Head does not respond! Game over!");
+				sprintf(error_string, "Head does not respond! Game over!\n");
 
 			return false;
 		}
@@ -58,15 +58,17 @@ bool connect_to_head(t_jenny5_arduino_controller &head_controller, VideoCapture 
 	head_cam.open(0);			// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
 	if (!head_cam.isOpened())	// check if we succeeded
 	{
-		sprintf(error_string, "Couldn't open head's video camera!");
+		sprintf(error_string, "Couldn't open head's video camera!\n");
 		head_controller.close_connection();
 		return false;
 	}
+	/*
 	else {
 		Mat frame;
 		head_cam >> frame;
 		printf("Head video size: %dx%d\n", frame.rows, frame.cols);
 	}
+	*/
 	return true;
 }
 //----------------------------------------------------------------
@@ -75,7 +77,7 @@ bool connect_to_left_arm(t_jenny5_arduino_controller &left_arm_controller, Video
 	//-------------- START INITIALIZATION ------------------------------
 
 	if (!left_arm_controller.connect(LEFT_ARM_COM_PORT - 1, 115200)) { // real - 1
-		sprintf(error_string, "Error attaching to Jenny 5' left arm!");
+		sprintf(error_string, "Error attaching to Jenny 5' left arm!\n");
 		return false;
 	}
 
@@ -102,7 +104,7 @@ bool connect_to_left_arm(t_jenny5_arduino_controller &left_arm_controller, Video
 		if (wait_time > NUM_SECONDS_TO_WAIT_FOR_CONNECTION) {
 
 			if (!left_arm_responded)
-				sprintf(error_string, "Left arm does not respond! Game over!");
+				sprintf(error_string, "Left arm does not respond! Game over!\n");
 
 			return false;
 		}
@@ -112,15 +114,17 @@ bool connect_to_left_arm(t_jenny5_arduino_controller &left_arm_controller, Video
 	left_hand_cam.open(0);			// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
 	if (!left_hand_cam.isOpened())	// check if we succeeded
 	{
-		sprintf(error_string, "Couldn't open left arm's video camera!");
+		sprintf(error_string, "Couldn't open left arm's video camera!\n");
 		left_arm_controller.close_connection();
 		return false;
 	}
+	/*
 	else {
 		Mat frame;
 		left_hand_cam >> frame;
 		printf("left arm video size: %dx%d\n", frame.rows, frame.cols);
 	}
+	*/
 	return true;
 }
 //----------------------------------------------------------------
@@ -131,7 +135,7 @@ bool init_face_classifier(CascadeClassifier &face_classifier, char* error_string
 	// create cascade for face reco
 	  // load haarcascade library
 	if (!face_classifier.load("haarcascade_frontalface_alt.xml")) {
-		sprintf(error_string, "Cannot load haarcascade! Please place the file in the correct folder!");
+		sprintf(error_string, "Cannot load haarcascade! Please place the file in the correct folder!\n");
 		return false;
 	}
 
@@ -143,7 +147,7 @@ bool connect_to_lidar(t_jenny5_arduino_controller &lidar_controller, int lidar_c
 	//-------------- START INITIALIZATION ------------------------------
 
 	if (!lidar_controller.connect(lidar_com_port - 1, 115200)) { // real number - 1
-		sprintf(error_string, "Error attaching to Jenny 5' LIDAR!");
+		sprintf(error_string, "Error attaching to Jenny 5' LIDAR!\n");
 		return false;
 	}
 
@@ -170,7 +174,7 @@ bool connect_to_lidar(t_jenny5_arduino_controller &lidar_controller, int lidar_c
 		// if more than 3 seconds then game over
 		if (wait_time > NUM_SECONDS_TO_WAIT_FOR_CONNECTION) {
 			if (!LIDAR_responded)
-				sprintf(error_string, "LIDAR does not respond! Game over!");
+				sprintf(error_string, "LIDAR does not respond! Game over!\n");
 			return false;
 		}
 	}
@@ -223,11 +227,11 @@ bool setup_head(t_jenny5_arduino_controller &head_controller, char* error_string
 		// if more than 3 seconds then game over
 		if (wait_time > NUM_SECONDS_TO_WAIT_FOR_CONNECTION) {
 			if (!motors_controller_created)
-				sprintf(error_string, "Cannot create head's motors controller! Game over!");
+				sprintf(error_string, "Cannot create head's motors controller! Game over!\n");
 			if (!sonars_controller_created)
-				sprintf(error_string, "Cannot create head's sonars controller! Game over!");
+				sprintf(error_string, "Cannot create head's sonars controller! Game over!\n");
 			if (!potentiometers_controller_created)
-				sprintf(error_string, "Cannot create head's potentiometers controller! Game over!");
+				sprintf(error_string, "Cannot create head's potentiometers controller! Game over!\n");
 			return false;
 		}
 	}
@@ -258,27 +262,26 @@ bool setup_head(t_jenny5_arduino_controller &head_controller, char* error_string
 		// if more than 3 seconds then game over
 		if (wait_time > NUM_SECONDS_TO_WAIT_FOR_CONNECTION) {
 			if (!HEAD_MOTOR_HORIZONTAL_set_speed_accell)
-				sprintf(error_string, "Cannot HEAD_MOTOR_HORIZONTAL_set_speed_accell! Game over!");
+				sprintf(error_string, "Cannot HEAD_MOTOR_HORIZONTAL_set_speed_accell! Game over!\n");
 			if (!HEAD_MOTOR_VERTICAL_set_speed_accell)
-				sprintf(error_string, "Cannot HEAD_MOTOR_VERTICAL_set_speed_accell! Game over!");
+				sprintf(error_string, "Cannot HEAD_MOTOR_VERTICAL_set_speed_accell! Game over!\n");
 			return false;
 		}
-
 	}
 
 	int potentiometer_index_head_horizontal_motor[1] = { 0 };
 	int potentiometer_index_head_vertical_motor[1] = { 1 };
 
 
-	int head_horizontal_motor_potentiometer_min[1] = { 329 };
-	int head_horizontal_motor_potentiometer_max[1] = { 829 };
-	int head_horizontal_motor_potentiometer_home[1] = { 529 };
+	int head_horizontal_motor_potentiometer_min[1] = { _head_horizontal_motor_potentiometer_min };
+	int head_horizontal_motor_potentiometer_max[1] = { _head_horizontal_motor_potentiometer_max };
+	int head_horizontal_motor_potentiometer_home[1] = { _head_horizontal_motor_potentiometer_home };
 	int head_horizontal_motor_potentiometer_dir[1] = { -1 };
 
 
-	int head_vertical_motor_potentiometer_min[1] = { 332 };
-	int head_vertical_motor_potentiometer_max[1] = { 832 };
-	int head_vertical_motor_potentiometer_home[1] = { 632 };
+	int head_vertical_motor_potentiometer_min[1] = { _head_vertical_motor_potentiometer_min };
+	int head_vertical_motor_potentiometer_max[1] = { _head_vertical_motor_potentiometer_max };
+	int head_vertical_motor_potentiometer_home[1] = { _head_vertical_motor_potentiometer_home };
 	int head_vertical_motor_potentiometer_dir[1] = { 1 };
 
 	head_controller.send_attach_sensors_to_stepper_motor(HEAD_MOTOR_HORIZONTAL, 1, potentiometer_index_head_horizontal_motor, head_horizontal_motor_potentiometer_min, head_horizontal_motor_potentiometer_max, head_horizontal_motor_potentiometer_home, head_horizontal_motor_potentiometer_dir, 0, NULL, 0, NULL);
@@ -340,13 +343,13 @@ bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* erro
 		// if more than 3 seconds then game over
 		if (wait_time > NUM_SECONDS_TO_WAIT_FOR_CONNECTION) {
 			if (!motors_controller_created)
-				sprintf(error_string, "Cannot create left arm's motors controller! Game over!");
+				sprintf(error_string, "Cannot create left arm's motors controller! Game over!\n");
 			if (!potentiometers_controller_created)
-				sprintf(error_string, "Cannot create left arm's potentiometers controller! Game over!");
+				sprintf(error_string, "Cannot create left arm's potentiometers controller! Game over!\n");
 			if (!infrared_controller_created)
-				sprintf(error_string, "Cannot create left arm's infrared controller! Game over!");
+				sprintf(error_string, "Cannot create left arm's infrared controller! Game over!\n");
 			if (!buttons_controller_created)
-				sprintf(error_string, "Cannot create left arm's buttons controller! Game over!");
+				sprintf(error_string, "Cannot create left arm's buttons controller! Game over!\n");
 			return false;
 		}
 	}
@@ -409,26 +412,25 @@ bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* erro
 		// if more than 3 seconds then game over
 		if (wait_time > NUM_SECONDS_TO_WAIT_FOR_CONNECTION) {
 			if (!LEFT_ARM_BODY_MOTOR_set_speed_accell)
-				sprintf(error_string, "Cannot LEFT_ARM_BODY_MOTOR_set_speed_accell! Game over!");
+				sprintf(error_string, "Cannot LEFT_ARM_BODY_MOTOR_set_speed_accell! Game over!\n");
 
 			if (!LEFT_ARM_SHOULDER_UP_DOWN_MOTOR_set_speed_accell)
-				sprintf(error_string, "Cannot LEFT_ARM_SHOULDER_UP_DOWN_MOTOR_set_speed_accell! Game over!");
+				sprintf(error_string, "Cannot LEFT_ARM_SHOULDER_UP_DOWN_MOTOR_set_speed_accell! Game over!\n");
 
 			if (!LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR_set_speed_accell)
-				sprintf(error_string, "Cannot LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR_set_speed_accell! Game over!");
+				sprintf(error_string, "Cannot LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR_set_speed_accell! Game over!\n");
 
 			if (!LEFT_ARM_ELBOW_MOTOR_set_speed_accell)
-				sprintf(error_string, "Cannot LEFT_ARM_ELBOW_MOTOR_set_speed_accell! Game over!");
+				sprintf(error_string, "Cannot LEFT_ARM_ELBOW_MOTOR_set_speed_accell! Game over!\n");
 
 			if (!LEFT_ARM_FOREARM_MOTOR_set_speed_accell)
-				sprintf(error_string, "Cannot LEFT_ARM_FOREARM_MOTOR_set_speed_accell! Game over!");
+				sprintf(error_string, "Cannot LEFT_ARM_FOREARM_MOTOR_set_speed_accell! Game over!\n");
 			/*
 			if (!LEFT_ARM_GRIPPER_MOTOR_set_speed_accell)
 			sprintf(error_string, "Cannot LEFT_ARM_GRIPPER_MOTOR_set_speed_accell! Game over!");
 			*/
 			return false;
 		}
-
 	}
 
 	int potentiometer_index_LEFT_ARM_BODY_MOTOR[1] = { 0 };
@@ -536,7 +538,7 @@ bool setup_lidar(t_jenny5_arduino_controller &LIDAR_controller, char* error_stri
 		// if more than 3 seconds then game over
 		if (wait_time > NUM_SECONDS_TO_WAIT_FOR_CONNECTION) {
 			if (!lidar_controller_created)
-				sprintf(error_string, "Cannot create LIDAR controller! Game over!");
+				sprintf(error_string, "Cannot create LIDAR controller! Game over!\n");
 			return false;
 		}
 	}
