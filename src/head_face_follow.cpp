@@ -109,7 +109,7 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 						 // horizontal movement motor
 
 						 // send a command to the module so that the face is in the center of the image
-			if (head_center.x < cam_frame.cols / 2 - TOLERANCE) {
+			if (head_center.x < cam_frame.cols / 2 - CAM_PIXELS_TOLERANCE) {
 				tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 				int num_steps_x = angle_offset.degrees_from_center_x / 1.8 * 27.0;
 
@@ -122,7 +122,7 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 				//	head_controller.set_sonar_state(0, COMMAND_DONE); // if the motor has been moved the previous distances become invalid
 			}
 			else
-				if (head_center.x > cam_frame.cols / 2 + TOLERANCE) {
+				if (head_center.x > cam_frame.cols / 2 + CAM_PIXELS_TOLERANCE) {
 					tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 					int num_steps_x = angle_offset.degrees_from_center_x / 1.8 * 27.0;
 
@@ -141,7 +141,7 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 
 				// vertical movement motor
 				// send a command to the module so that the face is in the center of the image
-				if (head_center.y < cam_frame.rows / 2 - TOLERANCE) {
+				if (head_center.y < cam_frame.rows / 2 - CAM_PIXELS_TOLERANCE) {
 					tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 					int num_steps_y = angle_offset.degrees_from_center_y / 1.8 * 27.0;
 
@@ -153,7 +153,7 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 					//	head_controller.set_sonar_state(0, COMMAND_DONE); // if the motor has been moved the previous distances become invalid
 				}
 				else
-					if (head_center.y > cam_frame.rows / 2 + TOLERANCE) {
+					if (head_center.y > cam_frame.rows / 2 + CAM_PIXELS_TOLERANCE) {
 						tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 						int num_steps_y = angle_offset.degrees_from_center_y / 1.8 * 27.0;
 
