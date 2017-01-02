@@ -2,6 +2,7 @@
 #include "utils.h"
 #include <time.h>
 
+//----------------------------------------------------------------
 bool get_biggest_face(std::vector<cv::Rect> faces, t_CENTER_POINT &center)
 {
 
@@ -92,7 +93,7 @@ char* current_time_to_string(void)
 
 	ptm = localtime(&_current_time);
 
-	strftime(result, 100, "%Y %m %d:%H %M %S", ptm);
+	strftime(result, 100, "%Y/%m/%d %H:%M:%S", ptm);
 
 	return result;
 }
