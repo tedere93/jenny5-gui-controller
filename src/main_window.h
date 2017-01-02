@@ -33,14 +33,23 @@ private:
 
 	wxStaticText *st_head_com_port;
 	wxTextCtrl *tc_head_com_port;
+	wxButton *b_connect_to_head;
+
 	wxStaticText *st_left_arm_com_port;
 	wxTextCtrl *tc_left_arm_com_port;
+	wxButton *b_connect_to_left_arm;
+
 	wxStaticText *st_right_arm_com_port;
 	wxTextCtrl *tc_right_arm_com_port;
+	wxButton *b_connect_to_right_arm;
+
 	wxStaticText *st_lidar_com_port;
 	wxTextCtrl *tc_lidar_com_port;
+	wxButton *b_connect_to_lidar;
+
 	wxStaticText *st_platform_com_port;
 	wxTextCtrl *tc_platform_com_port;
+	wxButton *b_connect_to_platform;
 
 	wxButton *b_head_face_following;
 	wxButton *b_lidar_map;
@@ -57,16 +66,23 @@ private:
 
 	cv::CascadeClassifier face_classifier;
 
-public:
 
-	wxTextCtrl *tc_log;
-
-	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 	void BuildInterface(void);
 	void OnMainWindowClose(wxCloseEvent& WXUNUSED(event));
 
 	void on_head_face_follow_click(wxCommandEvent &event);
 	void on_lidar_map_click(wxCommandEvent &event);
+	void on_connect_to_head_click(wxCommandEvent &event);
+	void on_connect_to_lidar_click(wxCommandEvent &event);
+	void on_connect_to_left_arm_click(wxCommandEvent &event);
+	void on_connect_to_right_arm_click(wxCommandEvent &event);
+	void on_connect_to_platform_click(wxCommandEvent &event);
+
+public:
+
+	wxTextCtrl *tc_log;
+	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+
 };
 //------------------------------------------------------------------------
 

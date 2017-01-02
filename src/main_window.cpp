@@ -20,10 +20,9 @@ void MainFrame::BuildInterface(void)
 	splitter_commands_log->SetSplitMode(wxSPLIT_HORIZONTAL);
 	splitter_commands_log->SetMinimumPaneSize(100);
 
-	wxPanel *p_commands_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 300));
-	wxPanel *p_log_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 500));
+	wxPanel *p_commands_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 500));
+	wxPanel *p_log_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 200));
 
-	splitter_commands_log->SplitHorizontally(p_commands_panel, p_log_panel);
 
 	p_com_ports = new wxPanel(p_commands_panel);
 	p_predefined_tasks = new wxPanel(p_commands_panel);
@@ -53,25 +52,48 @@ void MainFrame::BuildInterface(void)
 
 	st_head_com_port = new wxStaticText(p_com_ports, wxID_ANY, "Head COM port");
 	tc_head_com_port = new wxTextCtrl(p_com_ports, wxID_ANY, "9");
+	b_connect_to_head = new wxButton(p_com_ports, -1, "Connect to head");
+	b_connect_to_head->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_head_click, this);
+
 	st_left_arm_com_port = new wxStaticText(p_com_ports, wxID_ANY, "Left arm COM port");
 	tc_left_arm_com_port = new wxTextCtrl(p_com_ports, wxID_ANY, "1");
+	b_connect_to_left_arm = new wxButton(p_com_ports, -1, "Connect to left");
+	b_connect_to_left_arm->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_left_arm_click, this);
+
 	st_right_arm_com_port = new wxStaticText(p_com_ports, wxID_ANY, "Right COM port");
 	tc_right_arm_com_port = new wxTextCtrl(p_com_ports, wxID_ANY, "2");
+	b_connect_to_right_arm = new wxButton(p_com_ports, -1, "Connect to right");
+	b_connect_to_right_arm->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_right_arm_click, this);
+
 	st_lidar_com_port = new wxStaticText(p_com_ports, wxID_ANY, "Lidar COM port");
-	tc_lidar_com_port = new wxTextCtrl(p_com_ports, wxID_ANY, "3");
+	tc_lidar_com_port = new wxTextCtrl(p_com_ports, wxID_ANY, "8");
+	b_connect_to_lidar = new wxButton(p_com_ports, -1, "Connect to lidar");
+	b_connect_to_lidar->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_lidar_click, this);
+
 	st_platform_com_port = new wxStaticText(p_com_ports, wxID_ANY, "Platform COM port");
 	tc_platform_com_port = new wxTextCtrl(p_com_ports, wxID_ANY, "4");
+	b_connect_to_platform = new wxButton(p_com_ports, -1, "Connect to platform");
+	b_connect_to_platform->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_platform_click, this);
 
 	sizer_com_ports->Add(st_head_com_port, 0, wxTOP, 10);
 	sizer_com_ports->Add(tc_head_com_port);
+	sizer_com_ports->Add(b_connect_to_head);
+
 	sizer_com_ports->Add(st_left_arm_com_port, 0, wxTOP, 10);
 	sizer_com_ports->Add(tc_left_arm_com_port);
+	sizer_com_ports->Add(b_connect_to_left_arm);
+	
 	sizer_com_ports->Add(st_right_arm_com_port, 0, wxTOP, 10);
 	sizer_com_ports->Add(tc_right_arm_com_port);
+	sizer_com_ports->Add(b_connect_to_right_arm);
+	
 	sizer_com_ports->Add(st_lidar_com_port, 0, wxTOP, 10);
 	sizer_com_ports->Add(tc_lidar_com_port);
+	sizer_com_ports->Add(b_connect_to_lidar);
+	
 	sizer_com_ports->Add(st_platform_com_port, 0, wxTOP, 10);
 	sizer_com_ports->Add(tc_platform_com_port);
+	sizer_com_ports->Add(b_connect_to_platform);
 
 	p_com_ports->SetSizer(sizer_com_ports);
 
@@ -82,6 +104,8 @@ void MainFrame::BuildInterface(void)
 
 
 	Bind(wxEVT_CLOSE_WINDOW, &MainFrame::OnMainWindowClose, this);
+
+	splitter_commands_log->SplitHorizontally(p_commands_panel, p_log_panel);
 
 	wxBoxSizer *main_sizer = new wxBoxSizer(wxVERTICAL);
 	main_sizer->Add(splitter_commands_log, 1, wxEXPAND, 0);
@@ -106,11 +130,13 @@ void MainFrame::OnMainWindowClose(wxCloseEvent& WXUNUSED(event))
 //------------------------------------------------------------------------
 void write_to_log(char* str)
 {
-	*(f_main->tc_log) << wxString(str);
+	char *s = current_time_to_string();
+	*(f_main->tc_log) << wxString(s) + wxString(':') + wxString(str);
 }//------------------------------------------------------------------------
 void MainFrame::on_head_face_follow_click(wxCommandEvent &event)
 {
-	int head_com_port = 9; // real port number
+	long head_com_port;
+	tc_head_com_port->GetValue().ToLong(&head_com_port); // real port number
 
 //	char error_string[1000];
 	if (head_face_follow(head_controller, head_com_port, head_cam, face_classifier, write_to_log) == -1) {
@@ -119,12 +145,56 @@ void MainFrame::on_head_face_follow_click(wxCommandEvent &event)
 //------------------------------------------------------------------------
 void MainFrame::on_lidar_map_click(wxCommandEvent &event)
 {
-	int lidar_com_port = 8; // real port number
+	long lidar_com_port; // real port number
+	tc_lidar_com_port->GetValue().ToLong(&lidar_com_port); // real port number
 
-	char error_string[1000];
-	if (lidar_map(lidar_controller, lidar_com_port, error_string) == -1) {
-		wxMessageBox(error_string, "Error");
+	if (lidar_map(lidar_controller, lidar_com_port, write_to_log) == -1) {
+	
 	}
 }
+//------------------------------------------------------------------------
+void  MainFrame::on_connect_to_head_click(wxCommandEvent &event)
+{
+	char error_string[1000];
+	long head_com_port;
+	tc_head_com_port->GetValue().ToLong(&head_com_port); // real port number
 
+	if (connect_to_head(head_controller, head_cam, head_com_port, error_string)) {
+		b_connect_to_head->SetLabel("Disconnect head");
+		// show the firmware version number
+		head_controller.send_get_firmware_version();
+		Sleep(100);
+		char firmware_version[100];
+		strcpy(firmware_version, "Head firmware version: ");
+		head_controller.update_commands_from_serial();
+		if (head_controller.query_for_firmware_version_event(firmware_version + strlen(firmware_version))) {
+			strcat(firmware_version, "\n");
+			write_to_log(firmware_version);
+		}
+	}
+	else {
+		head_controller.close_connection();
+		b_connect_to_head->SetLabel("Connect head");
+	}
+}
+//------------------------------------------------------------------------
+void  MainFrame::on_connect_to_lidar_click(wxCommandEvent &event)
+{
+
+}
+//------------------------------------------------------------------------
+void  MainFrame::on_connect_to_left_arm_click(wxCommandEvent &event)
+{
+
+}
+//------------------------------------------------------------------------
+void  MainFrame::on_connect_to_right_arm_click(wxCommandEvent &event)
+{
+
+}
+//------------------------------------------------------------------------
+void  MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
+{
+
+}
 //------------------------------------------------------------------------
