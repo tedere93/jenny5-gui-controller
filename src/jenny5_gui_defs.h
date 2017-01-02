@@ -36,6 +36,8 @@
 
 #define LIDAR_NUM_STEPS 200
 
+
+// head
 #define _head_horizontal_motor_potentiometer_min 329
 #define _head_horizontal_motor_potentiometer_max 829
 #define _head_horizontal_motor_potentiometer_home 529
@@ -43,5 +45,27 @@
 #define _head_vertical_motor_potentiometer_min 332
 #define _head_vertical_motor_potentiometer_max 832
 #define _head_vertical_motor_potentiometer_home 632
+
+
+// left arm
+#define _potentiometer_min_LEFT_ARM_BODY_MOTOR 380
+#define _potentiometer_max_LEFT_ARM_BODY_MOTOR 800
+#define _potentiometer_home_LEFT_ARM_BODY_MOTOR 640
+
+#define _potentiometer_min_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR 170
+#define _potentiometer_max_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR 600
+#define _potentiometer_home_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR 500
+
+#define _potentiometer_min_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR 230
+#define _potentiometer_max_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR 760
+#define _potentiometer_home_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR 750
+
+#define _potentiometer_min_LEFT_ARM_ELBOW_MOTOR 440
+#define _potentiometer_max_LEFT_ARM_ELBOW_MOTOR 830
+#define _potentiometer_home_LEFT_ARM_ELBOW_MOTOR 630
+
+#define _potentiometer_min_LEFT_ARM_FOREARM_MOTOR 230
+#define _potentiometer_max_LEFT_ARM_FOREARM_MOTOR 720
+#define _potentiometer_home_LEFT_ARM_FOREARM_MOTOR 440
 
 //----------------------------------------------------------------

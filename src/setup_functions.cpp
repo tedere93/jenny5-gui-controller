@@ -441,31 +441,31 @@ bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* erro
 	int potentiometer_index_LEFT_ARM_GRIPPER_MOTOR[1] = { 5 };
 
 
-	int potentiometer_min_LEFT_ARM_BODY_MOTOR[1] = { 380 };
-	int potentiometer_max_LEFT_ARM_BODY_MOTOR[1] = { 800 };
-	int potentiometer_home_LEFT_ARM_BODY_MOTOR[1] = { 640 };
+	int potentiometer_min_LEFT_ARM_BODY_MOTOR[1] = { _potentiometer_min_LEFT_ARM_BODY_MOTOR };
+	int potentiometer_max_LEFT_ARM_BODY_MOTOR[1] = { _potentiometer_max_LEFT_ARM_BODY_MOTOR };
+	int potentiometer_home_LEFT_ARM_BODY_MOTOR[1] = { _potentiometer_home_LEFT_ARM_BODY_MOTOR };
 	int potentiometer_dir_LEFT_ARM_BODY_MOTOR[1] = { -1 };
 
 
-	int potentiometer_min_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR[1] = { 170 };
-	int potentiometer_max_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR[1] = { 600 };
-	int potentiometer_home_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR[1] = { 550 };
+	int potentiometer_min_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR[1] = { _potentiometer_min_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR };
+	int potentiometer_max_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR[1] = { _potentiometer_max_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR };
+	int potentiometer_home_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR[1] = { _potentiometer_home_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR };
 	int potentiometer_dir_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR[1] = { -1 };
 
 
-	int potentiometer_min_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR[1] = { 230 };
-	int potentiometer_max_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR[1] = { 760 };
-	int potentiometer_home_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR[1] = { 750 };
+	int potentiometer_min_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR[1] = { _potentiometer_min_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR };
+	int potentiometer_max_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR[1] = { _potentiometer_max_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR };
+	int potentiometer_home_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR[1] = { _potentiometer_home_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR };
 	int potentiometer_dir_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR[1] = { 1 };
 
-	int potentiometer_min_LEFT_ARM_ELBOW_MOTOR[1] = { 440 };
-	int potentiometer_max_LEFT_ARM_ELBOW_MOTOR[1] = { 830 };
+	int potentiometer_min_LEFT_ARM_ELBOW_MOTOR[1] = { _potentiometer_min_LEFT_ARM_ELBOW_MOTOR };
+	int potentiometer_max_LEFT_ARM_ELBOW_MOTOR[1] = { _potentiometer_max_LEFT_ARM_ELBOW_MOTOR };
 	int potentiometer_home_LEFT_ARM_ELBOW_MOTOR[1] = { 630 };
 	int potentiometer_dir_LEFT_ARM_ELBOW_MOTOR[1] = { 1 };
 
-	int potentiometer_min_LEFT_ARM_FOREARM_MOTOR[1] = { 230 };
-	int potentiometer_max_LEFT_ARM_FOREARM_MOTOR[1] = { 720 };
-	int potentiometer_home_LEFT_ARM_FOREARM_MOTOR[1] = { 440 };
+	int potentiometer_min_LEFT_ARM_FOREARM_MOTOR[1] = { _potentiometer_min_LEFT_ARM_FOREARM_MOTOR };
+	int potentiometer_max_LEFT_ARM_FOREARM_MOTOR[1] = { _potentiometer_max_LEFT_ARM_FOREARM_MOTOR };
+	int potentiometer_home_LEFT_ARM_FOREARM_MOTOR[1] = { _potentiometer_home_LEFT_ARM_FOREARM_MOTOR };
 	int potentiometer_dir_LEFT_ARM_FOREARM_MOTOR[1] = { 1 };
 
 
