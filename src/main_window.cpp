@@ -1,3 +1,11 @@
+// copyright Mihai Oltean, mihai.oltean@gmail.com
+// www.jenny5.org
+// www.tcreate.org
+// source code: https://github.com/jenny5-robot
+
+// MIT License
+// ---------------------------------------------------------------------------
+
 #include <opencv2\imgproc\imgproc.hpp>
 
 #include "main_window.h"
@@ -127,12 +135,11 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	t_timer = new wxTimer;
 	t_timer->SetOwner(this, TIMER_ID);
 	Bind(wxEVT_TIMER, &MainFrame::on_timer, this);
+	t_timer->Start(timer_interval);
 }
 //------------------------------------------------------------------------
-
 void MainFrame::OnMainWindowClose(wxCloseEvent& WXUNUSED(event))
 {
-
 	delete t_timer;
 
 	Destroy();
@@ -148,7 +155,6 @@ void MainFrame::on_head_face_follow_click(wxCommandEvent &event)
 	long head_com_port;
 	tc_head_com_port->GetValue().ToLong(&head_com_port); // real port number
 
-//	char error_string[1000];
 	if (head_face_follow(head_controller, head_com_port, head_cam, face_classifier, write_to_log) == -1) {
 	}
 }
@@ -169,15 +175,25 @@ void  MainFrame::on_connect_to_head_click(wxCommandEvent &event)
 	long head_com_port;
 	tc_head_com_port->GetValue().ToLong(&head_com_port); // real port number
 
-	if (connect_to_head(head_controller, head_cam, head_com_port, error_string)) {
-		b_connect_to_head->SetLabel("Disconnect head");
-		// show the firmware version number
-		head_controller.send_get_firmware_version();
-		t_timer->Start(timer_interval);
+	if (!head_controller.is_open()) {
+		if (connect_to_head(head_controller, head_cam, head_com_port, error_string)) {
+			b_connect_to_head->SetLabel("Disconnect head");
+			// show the firmware version number
+			head_controller.send_get_firmware_version();
 
-	}
+			if (!setup_head(head_controller, error_string)) {
+				write_to_log(error_string);
+			}
+			else {
+				head_controller.send_get_potentiometer_position(0);
+				head_controller.send_get_potentiometer_position(1);
+			}
+		}
+		else {
+			write_to_log(error_string);
+		}
+	}// is open, so just disconect
 	else {
-		t_timer->Stop();
 		head_controller.close_connection();
 		b_connect_to_head->SetLabel("Connect head");
 	}
@@ -205,14 +221,27 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 //------------------------------------------------------------------------
 void MainFrame::on_timer(wxTimerEvent& event)
 {
-	head_controller.update_commands_from_serial();
+	if (head_controller.is_open()) {
+		head_controller.update_commands_from_serial();
 
-	char firmware_version[100];
-	strcpy(firmware_version, "Head firmware version: ");
-	
-	if (head_controller.query_for_firmware_version_event(firmware_version + strlen(firmware_version))) {
-		strcat(firmware_version, "\n");
-		write_to_log(firmware_version);
+		char firmware_version[100];
+		strcpy(firmware_version, "Head firmware version: ");
+
+		if (head_controller.query_for_firmware_version_event(firmware_version + strlen(firmware_version))) {
+			strcat(firmware_version, "\n");
+			write_to_log(firmware_version);
+		}
+
+		int pot_position;
+		char buffer[100];
+		if (head_controller.query_for_event(POTENTIOMETER_EVENT, HEAD_POTENTIOMETER_HORIZONTAL_INDEX, &pot_position)) {
+			sprintf(buffer, "Pot position (%d) = %d\n", HEAD_POTENTIOMETER_HORIZONTAL_INDEX, pot_position);
+			write_to_log(buffer);
+		}
+		if (head_controller.query_for_event(POTENTIOMETER_EVENT, HEAD_POTENTIOMETER_VERTICAL_INDEX, &pot_position)) {
+			sprintf(buffer, "Pot position (%d) = %d\n", HEAD_POTENTIOMETER_VERTICAL_INDEX, pot_position);
+			write_to_log(buffer);
+		}
 	}
 }
 //------------------------------------------------------------------------
