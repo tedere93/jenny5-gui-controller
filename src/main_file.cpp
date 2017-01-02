@@ -1,3 +1,11 @@
+// copyright Mihai Oltean, mihai.oltean@gmail.com
+// www.jenny5.org
+// www.tcreate.org
+// source code: https://github.com/jenny5-robot
+
+// MIT License
+// ---------------------------------------------------------------------------
+
 #include "main_file.h"
 #include "main_window.h"
 
@@ -8,6 +16,7 @@
 
 //#include "about.h"
 
+#include <vld.h>
 
 wxIMPLEMENT_APP(jenny5_gui_controller_app);
 

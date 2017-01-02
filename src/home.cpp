@@ -1,7 +1,13 @@
+// copyright Mihai Oltean, mihai.oltean@gmail.com
+// www.jenny5.org
+// www.tcreate.org
+// source code: https://github.com/jenny5-robot
+
+// MIT License
+// ---------------------------------------------------------------------------
 
 #include "home.h"
 #include "jenny5_gui_defs.h"
-
 
 //----------------------------------------------------------------
 bool home_head_motors(t_jenny5_arduino_controller &head_controller, char* error_string)

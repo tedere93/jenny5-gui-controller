@@ -1,3 +1,11 @@
+// copyright Mihai Oltean, mihai.oltean@gmail.com
+// www.jenny5.org
+// www.tcreate.org
+// source code: https://github.com/jenny5-robot
+
+// MIT License
+// ---------------------------------------------------------------------------
+
 #define _USE_MATH_DEFINES
 
 #include <opencv2\objdetect\objdetect.hpp>
