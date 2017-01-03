@@ -236,8 +236,8 @@ bool setup_head(t_jenny5_arduino_controller &head_controller, char* error_string
 		}
 	}
 
-	head_controller.send_set_stepper_motor_speed_and_acceleration(HEAD_MOTOR_HORIZONTAL, 1500, 500);
-	head_controller.send_set_stepper_motor_speed_and_acceleration(HEAD_MOTOR_VERTICAL, 1500, 500);
+	head_controller.send_set_stepper_motor_speed_and_acceleration(HEAD_MOTOR_NECK, 1500, 500);
+	head_controller.send_set_stepper_motor_speed_and_acceleration(HEAD_MOTOR_FACE, 1500, 500);
 
 	bool HEAD_MOTOR_HORIZONTAL_set_speed_accell = false;
 	bool HEAD_MOTOR_VERTICAL_set_speed_accell = false;
@@ -248,9 +248,9 @@ bool setup_head(t_jenny5_arduino_controller &head_controller, char* error_string
 		if (!head_controller.update_commands_from_serial())
 			Sleep(5); // no new data from serial ... we make a little pause so that we don't kill the processor
 
-		if (head_controller.query_for_event(STEPPER_MOTOR_SET_SPEED_ACCELL_EVENT, HEAD_MOTOR_HORIZONTAL))  // have we received the event from Serial ?
+		if (head_controller.query_for_event(STEPPER_MOTOR_SET_SPEED_ACCELL_EVENT, HEAD_MOTOR_NECK))  // have we received the event from Serial ?
 			HEAD_MOTOR_HORIZONTAL_set_speed_accell = true;
-		if (head_controller.query_for_event(STEPPER_MOTOR_SET_SPEED_ACCELL_EVENT, HEAD_MOTOR_VERTICAL))  // have we received the event from Serial ?
+		if (head_controller.query_for_event(STEPPER_MOTOR_SET_SPEED_ACCELL_EVENT, HEAD_MOTOR_FACE))  // have we received the event from Serial ?
 			HEAD_MOTOR_VERTICAL_set_speed_accell = true;
 
 		if (HEAD_MOTOR_HORIZONTAL_set_speed_accell && HEAD_MOTOR_VERTICAL_set_speed_accell)
@@ -284,8 +284,8 @@ bool setup_head(t_jenny5_arduino_controller &head_controller, char* error_string
 	int head_vertical_motor_potentiometer_home[1] = { _head_vertical_motor_potentiometer_home };
 	int head_vertical_motor_potentiometer_dir[1] = { 1 };
 
-	head_controller.send_attach_sensors_to_stepper_motor(HEAD_MOTOR_HORIZONTAL, 1, potentiometer_index_head_horizontal_motor, head_horizontal_motor_potentiometer_min, head_horizontal_motor_potentiometer_max, head_horizontal_motor_potentiometer_home, head_horizontal_motor_potentiometer_dir, 0, NULL, 0, NULL);
-	head_controller.send_attach_sensors_to_stepper_motor(HEAD_MOTOR_VERTICAL, 1, potentiometer_index_head_vertical_motor, head_vertical_motor_potentiometer_min, head_vertical_motor_potentiometer_max, head_vertical_motor_potentiometer_home, head_vertical_motor_potentiometer_dir, 0, NULL, 0, NULL);
+	head_controller.send_attach_sensors_to_stepper_motor(HEAD_MOTOR_NECK, 1, potentiometer_index_head_horizontal_motor, head_horizontal_motor_potentiometer_min, head_horizontal_motor_potentiometer_max, head_horizontal_motor_potentiometer_home, head_horizontal_motor_potentiometer_dir, 0, NULL, 0, NULL);
+	head_controller.send_attach_sensors_to_stepper_motor(HEAD_MOTOR_FACE, 1, potentiometer_index_head_vertical_motor, head_vertical_motor_potentiometer_min, head_vertical_motor_potentiometer_max, head_vertical_motor_potentiometer_home, head_vertical_motor_potentiometer_dir, 0, NULL, 0, NULL);
 
 	return true;
 }
