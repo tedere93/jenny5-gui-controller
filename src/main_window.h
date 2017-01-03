@@ -37,16 +37,19 @@ private:
 	wxSplitterWindow * splitter_commands_log;
 
 	wxPanel *p_predefined_tasks;
-	wxPanel *p_head;
-	wxPanel *p_left_arm;
+	
+	
 	wxPanel *p_right_arm;
 	wxPanel *p_lidar;
 	wxPanel *p_platform;
-
+	//----------------------------------------------
+	wxPanel *p_head; 
+	
 	wxStaticText *st_head;
 	wxStaticText *st_head_com_port;
 	wxTextCtrl *tc_head_com_port;
 	wxButton *b_connect_to_head;
+	void on_connect_to_head_click(wxCommandEvent &event);
 
 	wxStaticText *st_head_neck_motor_position;
 	wxTextCtrl *tc_head_neck_motor_position;
@@ -68,15 +71,37 @@ private:
 	wxTextCtrl *tc_head_ultrasonic;
 	
 	wxButton *b_head_refresh;
+	void on_head_refresh_data_click(wxCommandEvent &event);
 	wxButton *b_head_home_all;
+	void on_head_home_all_click(wxCommandEvent &event);
 
+	void handle_head_events(void);
+	//--------------------------------------------------------------
+
+	wxPanel *p_left_arm;
 	wxStaticText *st_left_arm;
 	wxStaticText *st_left_arm_com_port;
 	wxTextCtrl *tc_left_arm_com_port;
 	wxButton *b_connect_to_left_arm;
 
-	wxButton *b_left_arm_refresh;
+	wxStaticText *st_left_arm_body_motor_position;
+	wxTextCtrl *tc_left_arm_body_motor_position;
+	wxSlider *s_left_arm_body_motor_position;
+	wxButton *b_left_arm_body_home;
+	void on_left_arm_body_home_click(wxCommandEvent &event);
+	wxButton *b_left_arm_body_move;
+	void on_left_arm_body_move_click(wxCommandEvent &event);
 
+	
+
+	wxButton *b_left_arm_refresh;
+	void on_left_arm_refresh_data_click(wxCommandEvent &event);
+	wxButton *b_left_arm_home_all;
+	void on_left_arm_home_all_click(wxCommandEvent &event);
+
+	void handle_left_arm_events(void);
+
+	//--------------------------------------------------------------
 	wxStaticText *st_right_arm;
 	wxStaticText *st_right_arm_com_port;
 	wxTextCtrl *tc_right_arm_com_port;
@@ -114,9 +139,6 @@ private:
 	void on_head_face_follow_click(wxCommandEvent &event);
 	void on_lidar_map_click(wxCommandEvent &event);
 	
-	void on_connect_to_head_click(wxCommandEvent &event);
-	void on_head_refresh_data_click(wxCommandEvent &event);
-	void on_head_home_all_click(wxCommandEvent &event);
 
 	void on_connect_to_lidar_click(wxCommandEvent &event);
 	void on_connect_to_left_arm_click(wxCommandEvent &event);
