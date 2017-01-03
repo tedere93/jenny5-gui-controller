@@ -64,30 +64,57 @@ void MainFrame::BuildInterface(void)
 	b_connect_to_head = new wxButton(p_head, -1, "Connect");
 	b_connect_to_head->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_head_click, this);
 
-	st_head_H_motor_position = new wxStaticText(p_head, wxID_ANY, "Horizontal motor");
-	tc_head_H_motor_position = new wxTextCtrl(p_head, wxID_ANY, "0");
-	s_head_H_motor_position = new wxSlider(p_head, -1, _head_horizontal_motor_potentiometer_min, _head_horizontal_motor_potentiometer_min, _head_horizontal_motor_potentiometer_max);
-	st_head_V_motor_position = new wxStaticText(p_head, wxID_ANY, "Vertical motor");
-	tc_head_V_motor_position = new wxTextCtrl(p_head, wxID_ANY, "0");
-	s_head_V_motor_position = new wxSlider(p_head, -1, _head_vertical_motor_potentiometer_min, _head_vertical_motor_potentiometer_min, _head_vertical_motor_potentiometer_max);
-	b_head_refresh = new wxButton(p_head, -1, "Refresh");
+	wxPanel *p_head_neck_position = new wxPanel(p_head);
+	st_head_neck_motor_position = new wxStaticText(p_head, wxID_ANY, "Neck motor");
+	tc_head_neck_motor_position = new wxTextCtrl(p_head_neck_position, wxID_ANY, "0", wxDefaultPosition, wxSize(40, -1));
+	b_head_neck_home = new wxButton(p_head_neck_position, -1, "Home", wxDefaultPosition, wxSize(40, -1));
+	b_head_neck_move = new wxButton(p_head_neck_position, -1, "Move", wxDefaultPosition, wxSize(40, -1));
+
+	wxBoxSizer *sizer_neck = new wxBoxSizer(wxHORIZONTAL);
+	sizer_neck->Add(tc_head_neck_motor_position);
+	sizer_neck->Add(b_head_neck_move);
+	sizer_neck->Add(b_head_neck_home);
+	p_head_neck_position->SetSizer(sizer_neck);
+
+	s_head_neck_motor_position = new wxSlider(p_head, -1, _head_horizontal_motor_potentiometer_min, _head_horizontal_motor_potentiometer_min, _head_horizontal_motor_potentiometer_max);
+
+	wxPanel *p_head_face_position = new wxPanel(p_head);
+	st_head_face_motor_position = new wxStaticText(p_head, wxID_ANY, "Face motor");
+	tc_head_face_motor_position = new wxTextCtrl(p_head_face_position, wxID_ANY, "0", wxDefaultPosition, wxSize(40, -1));
+	s_head_face_motor_position = new wxSlider(p_head, -1, _head_vertical_motor_potentiometer_min, _head_vertical_motor_potentiometer_min, _head_vertical_motor_potentiometer_max);
+	b_head_face_home = new wxButton(p_head_face_position, -1, "Home", wxDefaultPosition, wxSize(40, -1));
+	b_head_face_move = new wxButton(p_head_face_position, -1, "Move", wxDefaultPosition, wxSize(40, -1));
+
+	wxBoxSizer *sizer_face = new wxBoxSizer(wxHORIZONTAL);
+	sizer_face->Add(tc_head_face_motor_position);
+	sizer_face->Add(b_head_face_move);
+	sizer_face->Add(b_head_face_home);
+	p_head_face_position->SetSizer(sizer_face);
+
 	st_head_ultrasonic = new wxStaticText(p_head, wxID_ANY, "Ultrasonic");
 	tc_head_ultrasonic = new wxTextCtrl(p_head, wxID_ANY, "0");
 	tc_head_ultrasonic->SetEditable(false);
-	b_head_refresh->Bind(wxEVT_BUTTON, &MainFrame::on_refresh_head_click, this);
+	
+	b_head_refresh = new wxButton(p_head, -1, "Refresh");
+	b_head_refresh->Bind(wxEVT_BUTTON, &MainFrame::on_head_refresh_data_click, this);
+
+	b_head_home_all = new wxButton(p_head, -1, "Home All");
+	b_head_home_all->Bind(wxEVT_BUTTON, &MainFrame::on_head_home_all_click, this);
+	
 
 	sizer_head->Add(st_head, 0, wxTOP, 10);
 	sizer_head->Add(st_head_com_port, 0, wxTOP, 10);
 	sizer_head->Add(tc_head_com_port);
 	sizer_head->Add(b_connect_to_head, 0, wxTOP, 10);
-	sizer_head->Add(st_head_H_motor_position, 0, wxTOP, 10);
-	sizer_head->Add(tc_head_H_motor_position);
-	sizer_head->Add(s_head_H_motor_position);
-	sizer_head->Add(st_head_V_motor_position, 0, wxTOP, 10);
-	sizer_head->Add(tc_head_V_motor_position);
-	sizer_head->Add(s_head_V_motor_position);
+	sizer_head->Add(st_head_neck_motor_position, 0, wxTOP, 10);
+	sizer_head->Add(p_head_neck_position);
+	sizer_head->Add(s_head_neck_motor_position);
+	sizer_head->Add(st_head_face_motor_position, 0, wxTOP, 10);
+	sizer_head->Add(p_head_face_position);
+	sizer_head->Add(s_head_face_motor_position);
 	sizer_head->Add(st_head_ultrasonic, 0, wxTOP, 10);
 	sizer_head->Add(tc_head_ultrasonic);
+	sizer_head->Add(b_head_home_all, 0, wxTOP, 10);
 	sizer_head->Add(b_head_refresh, 0, wxTOP, 10);
 
 	p_head->SetSizer(sizer_head);
@@ -288,14 +315,14 @@ void MainFrame::on_timer(wxTimerEvent& event)
 		if (head_controller.query_for_event(POTENTIOMETER_EVENT, HEAD_POTENTIOMETER_HORIZONTAL_INDEX, &pot_position)) {
 			sprintf(buffer, "Head pot position (%d) = %d\n", HEAD_POTENTIOMETER_HORIZONTAL_INDEX, pot_position);
 			write_to_log(buffer);
-			tc_head_H_motor_position->SetValue(wxString() << pot_position);
-			s_head_H_motor_position->SetValue(pot_position);
+			tc_head_neck_motor_position->SetValue(wxString() << pot_position);
+			s_head_neck_motor_position->SetValue(pot_position);
 		}
 		if (head_controller.query_for_event(POTENTIOMETER_EVENT, HEAD_POTENTIOMETER_VERTICAL_INDEX, &pot_position)) {
 			sprintf(buffer, "Head pot position (%d) = %d\n", HEAD_POTENTIOMETER_VERTICAL_INDEX, pot_position);
 			write_to_log(buffer);
-			tc_head_V_motor_position->SetValue(wxString() << pot_position);
-			s_head_V_motor_position->SetValue(pot_position);
+			tc_head_face_motor_position->SetValue(wxString() << pot_position);
+			s_head_face_motor_position->SetValue(pot_position);
 		}
 
 		int ultrasonic_distance;
@@ -309,10 +336,36 @@ void MainFrame::on_timer(wxTimerEvent& event)
 	}
 }
 //------------------------------------------------------------------------
-void MainFrame::on_refresh_head_click(wxCommandEvent &event)
+void MainFrame::on_head_refresh_data_click(wxCommandEvent &event)
 {
 	head_controller.send_get_potentiometer_position(0);
 	head_controller.send_get_potentiometer_position(1);
 	head_controller.send_get_sonar_distance(0);
+}
+//------------------------------------------------------------------------
+void MainFrame::on_head_home_all_click(wxCommandEvent &event)
+{
+	head_controller.send_go_home_dc_motor(0);
+	head_controller.send_go_home_dc_motor(1);
+}
+//------------------------------------------------------------------------
+void MainFrame::on_head_neck_home_click(wxCommandEvent &event)
+{
+	head_controller.send_go_home_dc_motor(0);
+}
+//------------------------------------------------------------------------
+void MainFrame::on_head_neck_move_click(wxCommandEvent &event)
+{
+
+}
+//------------------------------------------------------------------------
+void MainFrame::on_head_face_home_click(wxCommandEvent &event)
+{
+	head_controller.send_go_home_dc_motor(1);
+}
+//------------------------------------------------------------------------
+void MainFrame::on_head_face_move_click(wxCommandEvent &event)
+{
+
 }
 //------------------------------------------------------------------------

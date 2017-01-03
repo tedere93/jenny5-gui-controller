@@ -47,20 +47,35 @@ private:
 	wxStaticText *st_head_com_port;
 	wxTextCtrl *tc_head_com_port;
 	wxButton *b_connect_to_head;
-	wxStaticText *st_head_H_motor_position;
-	wxTextCtrl *tc_head_H_motor_position;
-	wxSlider *s_head_H_motor_position;
-	wxStaticText *st_head_V_motor_position;
-	wxTextCtrl *tc_head_V_motor_position;
-	wxSlider *s_head_V_motor_position;
+
+	wxStaticText *st_head_neck_motor_position;
+	wxTextCtrl *tc_head_neck_motor_position;
+	wxSlider *s_head_neck_motor_position;
+	wxButton *b_head_neck_home;
+	void on_head_neck_home_click(wxCommandEvent &event);
+	wxButton *b_head_neck_move;
+	void on_head_neck_move_click(wxCommandEvent &event);
+
+	wxStaticText *st_head_face_motor_position;
+	wxTextCtrl *tc_head_face_motor_position;
+	wxSlider *s_head_face_motor_position;
+	wxButton *b_head_face_home;
+	void on_head_face_home_click(wxCommandEvent &event);
+	wxButton *b_head_face_move;
+	void on_head_face_move_click(wxCommandEvent &event);
+	
 	wxStaticText *st_head_ultrasonic;
 	wxTextCtrl *tc_head_ultrasonic;
+	
 	wxButton *b_head_refresh;
+	wxButton *b_head_home_all;
 
 	wxStaticText *st_left_arm;
 	wxStaticText *st_left_arm_com_port;
 	wxTextCtrl *tc_left_arm_com_port;
 	wxButton *b_connect_to_left_arm;
+
+	wxButton *b_left_arm_refresh;
 
 	wxStaticText *st_right_arm;
 	wxStaticText *st_right_arm_com_port;
@@ -100,7 +115,8 @@ private:
 	void on_lidar_map_click(wxCommandEvent &event);
 	
 	void on_connect_to_head_click(wxCommandEvent &event);
-	void on_refresh_head_click(wxCommandEvent &event);
+	void on_head_refresh_data_click(wxCommandEvent &event);
+	void on_head_home_all_click(wxCommandEvent &event);
 
 	void on_connect_to_lidar_click(wxCommandEvent &event);
 	void on_connect_to_left_arm_click(wxCommandEvent &event);
