@@ -14,8 +14,7 @@
 #include "jenny5_gui_defs.h"
 #include  "utils.h"
 
-#include "head_face_follow.h"
-#include "lidar_map.h"
+
 
 
 MainFrame *f_main;
@@ -27,154 +26,25 @@ MainFrame *f_main;
 #define timer_interval 100
 
 //------------------------------------------------------------------------
-void MainFrame::BuildInterface(void)
+void MainFrame::build_interface(void)
 {
 	splitter_commands_log = new wxSplitterWindow(this);
 	splitter_commands_log->SetSplitMode(wxSPLIT_HORIZONTAL);
 	splitter_commands_log->SetMinimumPaneSize(100);
 
-	wxPanel *p_commands_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 500));
-	wxPanel *p_log_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 200));
+	p_commands_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 500));
+	p_log_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 200));
 
 
-	p_predefined_tasks = new wxPanel(p_commands_panel);
-	p_head = new wxPanel(p_commands_panel);
-	p_left_arm = new wxPanel(p_commands_panel);
-	p_right_arm = new wxPanel(p_commands_panel);
-	p_lidar = new wxPanel(p_commands_panel);
-	p_platform = new wxPanel(p_commands_panel);
-
-	wxBoxSizer* sizer_predefined_tasks = new wxBoxSizer(wxVERTICAL);
-	st_predefined_tasks = new wxStaticText(p_predefined_tasks, -1, "Predefined tasks");
-	b_head_face_following = new wxButton(p_predefined_tasks, wxID_ANY, "Head follow face");
-	b_head_face_following->Bind(wxEVT_BUTTON, &MainFrame::on_head_face_follow_click, this);
-	b_lidar_map = new wxButton(p_predefined_tasks, wxID_ANY, "LIDAR map");
-	b_lidar_map->Bind(wxEVT_BUTTON, &MainFrame::on_lidar_map_click, this);
-	
-	sizer_predefined_tasks->Add(st_predefined_tasks, 0, wxTOP, 10);
-	sizer_predefined_tasks->Add(b_head_face_following, 0, wxTOP, 10);
-	sizer_predefined_tasks->Add(b_lidar_map, 0, wxTOP, 10);
-
-	p_predefined_tasks->SetSizer(sizer_predefined_tasks);
 	//--------------------------------------------------------
-	wxBoxSizer* sizer_head = new wxBoxSizer(wxVERTICAL);
-	st_head = new wxStaticText(p_head, wxID_ANY, "Head");
-	st_head_com_port = new wxStaticText(p_head, wxID_ANY, "COM port");
-	tc_head_com_port = new wxTextCtrl(p_head, wxID_ANY, "9");
-	b_connect_to_head = new wxButton(p_head, -1, "Connect");
-	b_connect_to_head->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_head_click, this);
-
-	wxPanel *p_head_neck_position = new wxPanel(p_head);
-	st_head_neck_motor_position = new wxStaticText(p_head, wxID_ANY, "Neck motor");
-	tc_head_neck_motor_position = new wxTextCtrl(p_head_neck_position, wxID_ANY, "0", wxDefaultPosition, wxSize(40, -1));
-	b_head_neck_home = new wxButton(p_head_neck_position, -1, "Home", wxDefaultPosition, wxSize(40, -1));
-	b_head_neck_move = new wxButton(p_head_neck_position, -1, "Move", wxDefaultPosition, wxSize(40, -1));
-
-	wxBoxSizer *sizer_neck = new wxBoxSizer(wxHORIZONTAL);
-	sizer_neck->Add(tc_head_neck_motor_position);
-	sizer_neck->Add(b_head_neck_move);
-	sizer_neck->Add(b_head_neck_home);
-	p_head_neck_position->SetSizer(sizer_neck);
-
-	s_head_neck_motor_position = new wxSlider(p_head, -1, _head_horizontal_motor_potentiometer_min, _head_horizontal_motor_potentiometer_min, _head_horizontal_motor_potentiometer_max);
-
-	wxPanel *p_head_face_position = new wxPanel(p_head);
-	st_head_face_motor_position = new wxStaticText(p_head, wxID_ANY, "Face motor");
-	tc_head_face_motor_position = new wxTextCtrl(p_head_face_position, wxID_ANY, "0", wxDefaultPosition, wxSize(40, -1));
-	s_head_face_motor_position = new wxSlider(p_head, -1, _head_vertical_motor_potentiometer_min, _head_vertical_motor_potentiometer_min, _head_vertical_motor_potentiometer_max);
-	b_head_face_home = new wxButton(p_head_face_position, -1, "Home", wxDefaultPosition, wxSize(40, -1));
-	b_head_face_move = new wxButton(p_head_face_position, -1, "Move", wxDefaultPosition, wxSize(40, -1));
-
-	wxBoxSizer *sizer_face = new wxBoxSizer(wxHORIZONTAL);
-	sizer_face->Add(tc_head_face_motor_position);
-	sizer_face->Add(b_head_face_move);
-	sizer_face->Add(b_head_face_home);
-	p_head_face_position->SetSizer(sizer_face);
-
-	st_head_ultrasonic = new wxStaticText(p_head, wxID_ANY, "Ultrasonic");
-	tc_head_ultrasonic = new wxTextCtrl(p_head, wxID_ANY, "0");
-	tc_head_ultrasonic->SetEditable(false);
-	
-	b_head_refresh = new wxButton(p_head, -1, "Refresh");
-	b_head_refresh->Bind(wxEVT_BUTTON, &MainFrame::on_head_refresh_data_click, this);
-
-	b_head_home_all = new wxButton(p_head, -1, "Home All");
-	b_head_home_all->Bind(wxEVT_BUTTON, &MainFrame::on_head_home_all_click, this);
-	
-	
-	sizer_head->Add(st_head, 0, wxTOP, 10);
-	sizer_head->Add(st_head_com_port, 0, wxTOP, 10);
-	sizer_head->Add(tc_head_com_port);
-	sizer_head->Add(b_connect_to_head, 0, wxTOP, 10);
-	sizer_head->Add(st_head_neck_motor_position, 0, wxTOP, 10);
-	sizer_head->Add(p_head_neck_position);
-	sizer_head->Add(s_head_neck_motor_position);
-	sizer_head->Add(st_head_face_motor_position, 0, wxTOP, 10);
-	sizer_head->Add(p_head_face_position);
-	sizer_head->Add(s_head_face_motor_position);
-	sizer_head->Add(st_head_ultrasonic, 0, wxTOP, 10);
-	sizer_head->Add(tc_head_ultrasonic);
-	sizer_head->Add(b_head_home_all, 0, wxTOP, 10);
-	sizer_head->Add(b_head_refresh, 0, wxTOP, 10);
-
-	p_head->SetSizer(sizer_head);
+	build_head_interface();
 	//----------------------------------------------------------------------
-	wxBoxSizer* sizer_left_arm = new wxBoxSizer(wxVERTICAL);
-	st_left_arm = new wxStaticText(p_left_arm, wxID_ANY, "Left arm");
-	st_left_arm_com_port = new wxStaticText(p_left_arm, wxID_ANY, "COM port");
-	tc_left_arm_com_port = new wxTextCtrl(p_left_arm, wxID_ANY, "1");
-	b_connect_to_left_arm = new wxButton(p_left_arm, -1, "Connect");
-	b_connect_to_left_arm->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_left_arm_click, this);
-
-	wxPanel *p_left_arm_body_position = new wxPanel(p_left_arm);
-	st_left_arm_body_motor_position = new wxStaticText(p_left_arm, wxID_ANY, "Body motor");
-	tc_left_arm_body_motor_position = new wxTextCtrl(p_left_arm_body_position, wxID_ANY, "0", wxDefaultPosition, wxSize(40, -1));
-	b_left_arm_body_home = new wxButton(p_left_arm_body_position, -1, "Home", wxDefaultPosition, wxSize(40, -1));
-	b_left_arm_body_move = new wxButton(p_left_arm_body_position, -1, "Move", wxDefaultPosition, wxSize(40, -1));
-
-	wxBoxSizer *sizer_left_arm_body = new wxBoxSizer(wxHORIZONTAL);
-	sizer_left_arm_body->Add(tc_left_arm_body_motor_position);
-	sizer_left_arm_body->Add(b_left_arm_body_move);
-	sizer_left_arm_body->Add(b_left_arm_body_home);
-	p_left_arm_body_position->SetSizer(sizer_left_arm_body);
-
-	s_left_arm_body_motor_position = new wxSlider(p_left_arm, -1, _potentiometer_min_LEFT_ARM_BODY_MOTOR, _potentiometer_min_LEFT_ARM_BODY_MOTOR, _potentiometer_max_LEFT_ARM_BODY_MOTOR);
-
-	b_left_arm_refresh = new wxButton(p_left_arm, -1, "Refresh");
-	b_left_arm_refresh->Bind(wxEVT_BUTTON, &MainFrame::on_left_arm_refresh_data_click, this);
-
-	b_left_arm_home_all = new wxButton(p_left_arm, -1, "Home All");
-	b_left_arm_home_all->Bind(wxEVT_BUTTON, &MainFrame::on_left_arm_home_all_click, this);
-
-
-	sizer_left_arm->Add(st_left_arm, 0, wxTOP, 10);
-	sizer_left_arm->Add(st_left_arm_com_port, 0, wxTOP, 10);
-	sizer_left_arm->Add(tc_left_arm_com_port);
-	sizer_left_arm->Add(b_connect_to_left_arm, 0, wxTOP, 10);
-
-	sizer_left_arm->Add(st_left_arm_body_motor_position, 0, wxTOP, 10);
-	sizer_left_arm->Add(p_left_arm_body_position);
-	sizer_left_arm->Add(s_left_arm_body_motor_position);
-
-	sizer_left_arm->Add(b_left_arm_home_all, 0, wxTOP, 10);
-	sizer_left_arm->Add(b_left_arm_refresh, 0, wxTOP, 10);
-
-	p_left_arm->SetSizer(sizer_left_arm);
-
+	build_left_arm_interface();
 	//----------------------------------------------------------------------
-	wxBoxSizer* sizer_right_arm = new wxBoxSizer(wxVERTICAL);
-	st_right_arm = new wxStaticText(p_right_arm, wxID_ANY, "Right arm");
-	st_right_arm_com_port = new wxStaticText(p_right_arm, wxID_ANY, "COM port");
-	tc_right_arm_com_port = new wxTextCtrl(p_right_arm, wxID_ANY, "2");
-	b_connect_to_right_arm = new wxButton(p_right_arm, -1, "Connect");
-	b_connect_to_right_arm->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_right_arm_click, this);
-	sizer_right_arm->Add(st_right_arm, 0, wxTOP, 10);
-	sizer_right_arm->Add(st_right_arm_com_port, 0, wxTOP, 10);
-	sizer_right_arm->Add(tc_right_arm_com_port);
-	sizer_right_arm->Add(b_connect_to_right_arm, 0, wxTOP, 10);
-	p_right_arm->SetSizer(sizer_right_arm);
-
+	build_right_arm_interface();
 	//----------------------------------------------------------------------
+	p_platform = new wxPanel(p_commands_panel);
+	p_lidar = new wxPanel(p_commands_panel);
 	wxBoxSizer* sizer_lidar = new wxBoxSizer(wxVERTICAL);
 	st_lidar = new wxStaticText(p_lidar, wxID_ANY, "LIDAR");
 	st_lidar_com_port = new wxStaticText(p_lidar, wxID_ANY, "COM port");
@@ -233,7 +103,7 @@ void MainFrame::BuildInterface(void)
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 	: wxFrame(NULL, wxID_ANY, title, pos, size)
 {
-	BuildInterface();
+	build_interface();
 
 	t_timer = new wxTimer;
 	t_timer->SetOwner(this, TIMER_ID);
@@ -260,92 +130,8 @@ void write_to_log(char* str)
 	char *s = current_time_to_string();
 	*(f_main->tc_log) << wxString(s) + wxString(':') + wxString(str);
 }//------------------------------------------------------------------------
-void MainFrame::on_head_face_follow_click(wxCommandEvent &event)
-{
-	long head_com_port;
-	tc_head_com_port->GetValue().ToLong(&head_com_port); // real port number
-
-	if (head_face_follow(head_controller, head_com_port, head_cam, face_classifier, write_to_log) == -1) {
-	}
-}
-//------------------------------------------------------------------------
-void MainFrame::on_lidar_map_click(wxCommandEvent &event)
-{
-	long lidar_com_port; // real port number
-	tc_lidar_com_port->GetValue().ToLong(&lidar_com_port); // real port number
-
-	if (lidar_map(lidar_controller, lidar_com_port, write_to_log) == -1) {
-	
-	}
-}
-//------------------------------------------------------------------------
-void  MainFrame::on_connect_to_head_click(wxCommandEvent &event)
-{
-	char error_string[1000];
-	long head_com_port;
-	tc_head_com_port->GetValue().ToLong(&head_com_port); // real port number
-
-	if (!head_controller.is_open()) {
-		if (connect_to_head(head_controller, head_cam, head_com_port, error_string)) {
-			b_connect_to_head->SetLabel("Disconnect");
-			// show the firmware version number
-			head_controller.send_get_firmware_version();
-
-			if (!setup_head(head_controller, error_string)) {
-				write_to_log(error_string);
-			}
-			else {
-				head_controller.send_get_potentiometer_position(0);
-				head_controller.send_get_potentiometer_position(1);
-				head_controller.send_get_sonar_distance(0);
-			}
-		}
-		else {
-			write_to_log(error_string);
-		}
-	}// is open, so just disconect
-	else {
-		write_to_log("Disconnected from head");
-		head_controller.close_connection();
-		b_connect_to_head->SetLabel("Connect");
-	}
-}
-//------------------------------------------------------------------------
 void MainFrame::on_connect_to_lidar_click(wxCommandEvent &event)
 {
-
-}
-//------------------------------------------------------------------------
-void MainFrame::on_connect_to_left_arm_click(wxCommandEvent &event)
-{
-	char error_string[1000];
-	long left_arm_com_port;
-	tc_left_arm_com_port->GetValue().ToLong(&left_arm_com_port); // real port number
-
-	if (!left_arm_controller.is_open()) {
-		if (connect_to_left_arm(left_arm_controller, left_arm_cam, left_arm_com_port, error_string)) {
-			b_connect_to_left_arm->SetLabel("Disconnect");
-			// show the firmware version number
-			left_arm_controller.send_get_firmware_version();
-
-			if (!setup_left_arm(left_arm_controller, error_string)) {
-				write_to_log(error_string);
-			}
-			else {
-				left_arm_controller.send_get_potentiometer_position(0);
-				left_arm_controller.send_get_potentiometer_position(1);
-				
-			}
-		}
-		else {
-			write_to_log(error_string);
-		}
-	}// is open, so just disconect
-	else {
-		write_to_log("Disconnected from left arm");
-		left_arm_controller.close_connection();
-		b_connect_to_left_arm->SetLabel("Connect");
-	}
 
 }
 //------------------------------------------------------------------------
@@ -359,138 +145,9 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 
 }
 //------------------------------------------------------------------------
-void MainFrame::handle_head_events(void)
-{
-	if (head_controller.is_open()) {
-		head_controller.update_commands_from_serial();
-
-		char firmware_version[100];
-		strcpy(firmware_version, "Head firmware version: ");
-
-		if (head_controller.query_for_firmware_version_event(firmware_version + strlen(firmware_version))) {
-			strcat(firmware_version, "\n");
-			write_to_log(firmware_version);
-		}
-
-		int pot_position;
-		char buffer[100];
-		if (head_controller.query_for_event(POTENTIOMETER_EVENT, HEAD_POTENTIOMETER_NECK_INDEX, &pot_position)) {
-			sprintf(buffer, "Head pot position (%d) = %d\n", HEAD_POTENTIOMETER_NECK_INDEX, pot_position);
-			write_to_log(buffer);
-			tc_head_neck_motor_position->SetValue(wxString() << pot_position);
-			s_head_neck_motor_position->SetValue(pot_position);
-		}
-		if (head_controller.query_for_event(POTENTIOMETER_EVENT, HEAD_POTENTIOMETER_FACE_INDEX, &pot_position)) {
-			sprintf(buffer, "Head pot position (%d) = %d\n", HEAD_POTENTIOMETER_FACE_INDEX, pot_position);
-			write_to_log(buffer);
-			tc_head_face_motor_position->SetValue(wxString() << pot_position);
-			s_head_face_motor_position->SetValue(pot_position);
-		}
-
-		int ultrasonic_distance;
-		if (head_controller.query_for_event(SONAR_EVENT, 0, &ultrasonic_distance)) {
-			sprintf(buffer, "Head ultrasonic distance = %d\n", ultrasonic_distance);
-			write_to_log(buffer);
-			tc_head_ultrasonic->SetValue(wxString() << ultrasonic_distance);
-		}
-	}
-}
-//------------------------------------------------------------------------
-void MainFrame::handle_left_arm_events(void)
-{
-	if (left_arm_controller.is_open()) {
-		left_arm_controller.update_commands_from_serial();
-
-		char firmware_version[100];
-		strcpy(firmware_version, "Left arm firmware version: ");
-
-		if (left_arm_controller.query_for_firmware_version_event(firmware_version + strlen(firmware_version))) {
-			strcat(firmware_version, "\n");
-			write_to_log(firmware_version);
-		}
-
-		int pot_position;
-		char buffer[100];
-		if (left_arm_controller.query_for_event(POTENTIOMETER_EVENT, HEAD_POTENTIOMETER_NECK_INDEX, &pot_position)) {
-			sprintf(buffer, "Left arm body pot position (%d) = %d\n", HEAD_POTENTIOMETER_NECK_INDEX, pot_position);
-			write_to_log(buffer);
-			tc_left_arm_body_motor_position->SetValue(wxString() << pot_position);
-			s_left_arm_body_motor_position->SetValue(pot_position);
-		}
-		/*
-		if (left_arm_controller.query_for_event(POTENTIOMETER_EVENT, HEAD_POTENTIOMETER_FACE_INDEX, &pot_position)) {
-			sprintf(buffer, "Left arm pot position (%d) = %d\n", HEAD_POTENTIOMETER_FACE_INDEX, pot_position);
-			write_to_log(buffer);
-			tc_head_face_motor_position->SetValue(wxString() << pot_position);
-			s_head_face_motor_position->SetValue(pot_position);
-		}
-		*/
-		/*
-		int button_state;
-		if (left_arm_controller.query_for_event(BUTTON_EVENT, 0, &button_state)) {
-			sprintf(buffer, "Button state = %d\n", button_state);
-			write_to_log(buffer);
-			tc_head_ultrasonic->SetValue(wxString() << button_state);
-		}
-		*/
-	}
-}
-//------------------------------------------------------------------------
 void MainFrame::on_timer(wxTimerEvent& event)
 {
 	handle_head_events();
-}
-//------------------------------------------------------------------------
-void MainFrame::on_head_refresh_data_click(wxCommandEvent &event)
-{
-	head_controller.send_get_potentiometer_position(HEAD_POTENTIOMETER_NECK_INDEX);
-	head_controller.send_get_potentiometer_position(HEAD_POTENTIOMETER_FACE_INDEX);
-	head_controller.send_get_sonar_distance(HEAD_ULTRASONIC_FACE_INDEX);
-}
-//------------------------------------------------------------------------
-void MainFrame::on_head_home_all_click(wxCommandEvent &event)
-{
-	head_controller.send_go_home_dc_motor(HEAD_MOTOR_NECK);
-	head_controller.send_go_home_dc_motor(HEAD_MOTOR_FACE);
-}
-//------------------------------------------------------------------------
-void MainFrame::on_head_neck_home_click(wxCommandEvent &event)
-{
-	head_controller.send_go_home_dc_motor(HEAD_MOTOR_FACE);
-}
-//------------------------------------------------------------------------
-void MainFrame::on_head_neck_move_click(wxCommandEvent &event)
-{
-
-}
-//------------------------------------------------------------------------
-void MainFrame::on_head_face_home_click(wxCommandEvent &event)
-{
-	head_controller.send_go_home_dc_motor(HEAD_MOTOR_FACE);
-}
-//------------------------------------------------------------------------
-void MainFrame::on_head_face_move_click(wxCommandEvent &event)
-{
-
-}
-//------------------------------------------------------------------------
-void MainFrame::on_left_arm_refresh_data_click(wxCommandEvent &event)
-{
-	left_arm_controller.send_get_potentiometer_position(LEFT_ARM_BODY_POTENTIOMETER_INDEX);
-	left_arm_controller.send_get_potentiometer_position(LEFT_ARM_SHOULDER_UP_DOWN_POTENTIOMETER_INDEX);
-	left_arm_controller.send_get_potentiometer_position(LEFT_ARM_SHOULDER_LEFT_RIGHT_POTENTIOMETER_INDEX);
-	left_arm_controller.send_get_potentiometer_position(LEFT_ARM_ELBOW_POTENTIOMETER_INDEX);
-	left_arm_controller.send_get_potentiometer_position(LEFT_ARM_FOREARM_POTENTIOMETER_INDEX);
-	left_arm_controller.send_get_button_state(LEFT_ARM_GRIPPER_BUTTON_INDEX);
-}
-//------------------------------------------------------------------------
-void MainFrame::on_left_arm_home_all_click(wxCommandEvent &event)
-{
-	left_arm_controller.send_go_home_dc_motor(LEFT_ARM_BODY_MOTOR);
-	left_arm_controller.send_go_home_dc_motor(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR);
-	left_arm_controller.send_go_home_dc_motor(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR);
-	left_arm_controller.send_go_home_dc_motor(LEFT_ARM_ELBOW_MOTOR);
-	left_arm_controller.send_go_home_dc_motor(LEFT_ARM_FOREARM_MOTOR);
-	left_arm_controller.send_go_home_dc_motor(LEFT_ARM_GRIPPER_MOTOR);
+	handle_left_arm_events();
 }
 //------------------------------------------------------------------------
