@@ -133,7 +133,8 @@ int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port,
 		if (!LIDAR_controller.update_commands_from_serial())
 			Sleep(5); // no new data from serial ... we make a little pause so that we don't kill the processor
 
-		int motor_position, distance;
+		int motor_position;
+		intptr_t distance;
 		while (LIDAR_controller.query_for_event(LIDAR_READ_EVENT, &motor_position, &distance)) {  // have we received the event from Serial ?
 
 																								  // delete old distance
@@ -149,7 +150,7 @@ int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port,
 			new_p.y = -distance * lidar_map_scale_factor * cos(motor_position / 100.0 * M_PI - M_PI / 2);
 			circle(lidar_image, center + new_p, 5, Scalar(0, 0, 255), 1, 8);
 			char tmp_s[100];
-			sprintf(tmp_s, "Motor position = %d LIDAR distance = %d", motor_position, distance);
+			sprintf(tmp_s, "Motor position = %d LIDAR distance = %d", motor_position, (int)distance);
 			to_log(tmp_s);
 		}
 
