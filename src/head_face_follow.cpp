@@ -113,10 +113,10 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 				tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 				int num_steps_x = angle_offset.degrees_from_center_x / 1.8 * 27.0;
 
-				head_controller.send_move_stepper_motor(HEAD_MOTOR_HORIZONTAL, num_steps_x);
-				head_controller.set_stepper_motor_state(HEAD_MOTOR_HORIZONTAL, COMMAND_SENT);
+				head_controller.send_move_stepper_motor(HEAD_MOTOR_NECK, num_steps_x);
+				head_controller.set_stepper_motor_state(HEAD_MOTOR_NECK, COMMAND_SENT);
 				char tmp_s[100];
-				sprintf(tmp_s, "M%d %d# - sent\n", HEAD_MOTOR_HORIZONTAL, num_steps_x);
+				sprintf(tmp_s, "M%d %d# - sent\n", HEAD_MOTOR_NECK, num_steps_x);
 				to_log(tmp_s);
 
 				//	head_controller.set_sonar_state(0, COMMAND_DONE); // if the motor has been moved the previous distances become invalid
@@ -126,10 +126,10 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 					tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 					int num_steps_x = angle_offset.degrees_from_center_x / 1.8 * 27.0;
 
-					head_controller.send_move_stepper_motor(HEAD_MOTOR_HORIZONTAL, num_steps_x);
-					head_controller.set_stepper_motor_state(HEAD_MOTOR_HORIZONTAL, COMMAND_SENT);
+					head_controller.send_move_stepper_motor(HEAD_MOTOR_NECK, num_steps_x);
+					head_controller.set_stepper_motor_state(HEAD_MOTOR_NECK, COMMAND_SENT);
 					char tmp_s[100];
-					sprintf(tmp_s, "M%d %d# - sent\n", HEAD_MOTOR_HORIZONTAL, num_steps_x);
+					sprintf(tmp_s, "M%d %d# - sent\n", HEAD_MOTOR_NECK, num_steps_x);
 					to_log(tmp_s);
 
 					//	head_controller.set_sonar_state(0, COMMAND_DONE); // if the motor has been moved the previous distances become invalid
@@ -145,10 +145,10 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 					tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 					int num_steps_y = angle_offset.degrees_from_center_y / 1.8 * 27.0;
 
-					head_controller.send_move_stepper_motor(HEAD_MOTOR_VERTICAL, num_steps_y);
-					head_controller.set_stepper_motor_state(HEAD_MOTOR_VERTICAL, COMMAND_SENT); 
+					head_controller.send_move_stepper_motor(HEAD_MOTOR_FACE, num_steps_y);
+					head_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_SENT);
 					char tmp_s[100];
-					sprintf(tmp_s, "M%d %d# - sent\n", HEAD_MOTOR_VERTICAL, num_steps_y);
+					sprintf(tmp_s, "M%d %d# - sent\n", HEAD_MOTOR_FACE, num_steps_y);
 					to_log(tmp_s);
 					//	head_controller.set_sonar_state(0, COMMAND_DONE); // if the motor has been moved the previous distances become invalid
 				}
@@ -157,10 +157,10 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 						tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 						int num_steps_y = angle_offset.degrees_from_center_y / 1.8 * 27.0;
 
-						head_controller.send_move_stepper_motor(HEAD_MOTOR_VERTICAL, num_steps_y);
-						head_controller.set_stepper_motor_state(HEAD_MOTOR_VERTICAL, COMMAND_SENT);
+						head_controller.send_move_stepper_motor(HEAD_MOTOR_FACE, num_steps_y);
+						head_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_SENT);
 						char tmp_s[100];
-						sprintf(tmp_s, "M%d -%d# - sent\n", HEAD_MOTOR_VERTICAL, num_steps_y);
+						sprintf(tmp_s, "M%d -%d# - sent\n", HEAD_MOTOR_FACE, num_steps_y);
 						to_log(tmp_s);
 						//		head_controller.set_sonar_state(0, COMMAND_DONE); // if the motor has been moved the previous distances become invalid
 					}
@@ -168,28 +168,28 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 		}
 
 		// now extract the executed moves from the queue ... otherwise they will just stay there
-		if (head_controller.get_stepper_motor_state(HEAD_MOTOR_HORIZONTAL) == COMMAND_SENT) {// if a command has been sent
-			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_HORIZONTAL)) { // have we received the event from Serial ?
-				head_controller.set_stepper_motor_state(HEAD_MOTOR_VERTICAL, COMMAND_DONE);
+		if (head_controller.get_stepper_motor_state(HEAD_MOTOR_NECK) == COMMAND_SENT) {// if a command has been sent
+			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_NECK)) { // have we received the event from Serial ?
+				head_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_DONE);
 				char tmp_s[100];
-				sprintf(tmp_s, "M%d# - done\n", HEAD_MOTOR_VERTICAL);
+				sprintf(tmp_s, "M%d# - done\n", HEAD_MOTOR_FACE);
 				to_log(tmp_s);
 			}
 		}
 
 		// now extract the moves done from the queue
-		if (head_controller.get_stepper_motor_state(HEAD_MOTOR_VERTICAL) == COMMAND_SENT) {// if a command has been sent
-			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_VERTICAL)) { // have we received the event from Serial ?
-				head_controller.set_stepper_motor_state(HEAD_MOTOR_VERTICAL, COMMAND_DONE);
+		if (head_controller.get_stepper_motor_state(HEAD_MOTOR_FACE) == COMMAND_SENT) {// if a command has been sent
+			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_FACE)) { // have we received the event from Serial ?
+				head_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_DONE);
 				char tmp_s[100];
-				sprintf(tmp_s, "M%d# - done\n", HEAD_MOTOR_VERTICAL);
+				sprintf(tmp_s, "M%d# - done\n", HEAD_MOTOR_FACE);
 				to_log(tmp_s);
 			}
 		}
 
 		// read to see if there is any distance received from sonar
 		if (head_controller.get_sonar_state(0) == COMMAND_SENT) {// if a command has been sent
-			int distance;
+			intptr_t distance;
 			if (head_controller.query_for_event(SONAR_EVENT, 0, &distance)) { // have we received the event from Serial ?
 				head_controller.set_sonar_state(0, COMMAND_DONE);
 				char tmp_s[100];
@@ -204,8 +204,8 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 			active = false;
 	}
 
-	head_controller.send_move_stepper_motor(HEAD_MOTOR_HORIZONTAL, 0);
-	head_controller.send_move_stepper_motor(HEAD_MOTOR_VERTICAL, 0);
+	head_controller.send_move_stepper_motor(HEAD_MOTOR_NECK, 0);
+	head_controller.send_move_stepper_motor(HEAD_MOTOR_FACE, 0);
 
 	head_controller.close_connection();
 

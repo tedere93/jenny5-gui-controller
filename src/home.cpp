@@ -13,8 +13,8 @@
 bool home_head_motors(t_jenny5_arduino_controller &head_controller, char* error_string)
 {
 	// must home the head
-	head_controller.send_go_home_stepper_motor(HEAD_MOTOR_HORIZONTAL);
-	head_controller.send_go_home_stepper_motor(HEAD_MOTOR_VERTICAL);
+	head_controller.send_go_home_stepper_motor(HEAD_MOTOR_NECK);
+	head_controller.send_go_home_stepper_motor(HEAD_MOTOR_FACE);
 
 	printf("Head motors home started ...");
 	clock_t start_time = clock();
@@ -26,11 +26,11 @@ bool home_head_motors(t_jenny5_arduino_controller &head_controller, char* error_
 			Sleep(5); // no new data from serial ... we make a little pause so that we don't kill the processor
 
 		if (!horizontal_motor_homed)
-			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_HORIZONTAL))  // have we received the event from Serial ?
+			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_NECK))  // have we received the event from Serial ?
 				horizontal_motor_homed = true;
 
 		if (!vertical_motor_homed)
-			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_VERTICAL))  // have we received the event from Serial ?
+			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_FACE))  // have we received the event from Serial ?
 				vertical_motor_homed = true;
 
 		if (horizontal_motor_homed && vertical_motor_homed)
