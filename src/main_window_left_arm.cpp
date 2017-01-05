@@ -14,7 +14,7 @@ void MainFrame::build_left_arm_interface(void)
 	tc_left_arm_com_port = new wxTextCtrl(p_left_arm, wxID_ANY, "1");
 	b_connect_to_left_arm = new wxButton(p_left_arm, -1, "Connect");
 	b_connect_to_left_arm->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_left_arm_click, this);
-
+//-------
 	wxPanel *p_left_arm_body_position = new wxPanel(p_left_arm);
 	st_left_arm_body_motor_position = new wxStaticText(p_left_arm, wxID_ANY, "Body motor");
 	tc_left_arm_body_motor_position = new wxTextCtrl(p_left_arm_body_position, wxID_ANY, "0", wxDefaultPosition, wxSize(40, -1));
@@ -28,6 +28,67 @@ void MainFrame::build_left_arm_interface(void)
 	p_left_arm_body_position->SetSizer(sizer_left_arm_body);
 
 	s_left_arm_body_motor_position = new wxSlider(p_left_arm, -1, _potentiometer_min_LEFT_ARM_BODY_MOTOR, _potentiometer_min_LEFT_ARM_BODY_MOTOR, _potentiometer_max_LEFT_ARM_BODY_MOTOR);
+	//-------
+	wxPanel *p_left_arm_SHOULDER_UP_DOWN_position = new wxPanel(p_left_arm);
+	st_left_arm_SHOULDER_UP_DOWN_motor_position = new wxStaticText(p_left_arm, wxID_ANY, "Shoulder up down motor");
+	tc_left_arm_SHOULDER_UP_DOWN_motor_position = new wxTextCtrl(p_left_arm_SHOULDER_UP_DOWN_position, wxID_ANY, "0", wxDefaultPosition, wxSize(40, -1));
+	b_left_arm_SHOULDER_UP_DOWN_home = new wxButton(p_left_arm_SHOULDER_UP_DOWN_position, -1, "Home", wxDefaultPosition, wxSize(40, -1));
+	b_left_arm_SHOULDER_UP_DOWN_move = new wxButton(p_left_arm_SHOULDER_UP_DOWN_position, -1, "Move", wxDefaultPosition, wxSize(40, -1));
+
+	wxBoxSizer *sizer_left_arm_SHOULDER_UP_DOWN = new wxBoxSizer(wxHORIZONTAL);
+	sizer_left_arm_SHOULDER_UP_DOWN->Add(tc_left_arm_SHOULDER_UP_DOWN_motor_position);
+	sizer_left_arm_SHOULDER_UP_DOWN->Add(b_left_arm_SHOULDER_UP_DOWN_move);
+	sizer_left_arm_SHOULDER_UP_DOWN->Add(b_left_arm_SHOULDER_UP_DOWN_home);
+	p_left_arm_SHOULDER_UP_DOWN_position->SetSizer(sizer_left_arm_SHOULDER_UP_DOWN);
+
+	s_left_arm_SHOULDER_UP_DOWN_motor_position = new wxSlider(p_left_arm, -1, _potentiometer_min_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, _potentiometer_min_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, _potentiometer_max_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR);
+	//-------
+	wxPanel *p_left_arm_SHOULDER_LEFT_RIGHT_position = new wxPanel(p_left_arm);
+	st_left_arm_SHOULDER_LEFT_RIGHT_motor_position = new wxStaticText(p_left_arm, wxID_ANY, "Shoulder left right motor");
+	tc_left_arm_SHOULDER_LEFT_RIGHT_motor_position = new wxTextCtrl(p_left_arm_SHOULDER_LEFT_RIGHT_position, wxID_ANY, "0", wxDefaultPosition, wxSize(40, -1));
+	b_left_arm_SHOULDER_LEFT_RIGHT_home = new wxButton(p_left_arm_SHOULDER_LEFT_RIGHT_position, -1, "Home", wxDefaultPosition, wxSize(40, -1));
+	b_left_arm_SHOULDER_LEFT_RIGHT_move = new wxButton(p_left_arm_SHOULDER_LEFT_RIGHT_position, -1, "Move", wxDefaultPosition, wxSize(40, -1));
+
+	wxBoxSizer *sizer_left_arm_SHOULDER_LEFT_RIGHT = new wxBoxSizer(wxHORIZONTAL);
+	sizer_left_arm_SHOULDER_LEFT_RIGHT->Add(tc_left_arm_SHOULDER_LEFT_RIGHT_motor_position);
+	sizer_left_arm_SHOULDER_LEFT_RIGHT->Add(b_left_arm_SHOULDER_LEFT_RIGHT_move);
+	sizer_left_arm_SHOULDER_LEFT_RIGHT->Add(b_left_arm_SHOULDER_LEFT_RIGHT_home);
+	p_left_arm_SHOULDER_LEFT_RIGHT_position->SetSizer(sizer_left_arm_SHOULDER_LEFT_RIGHT);
+
+	s_left_arm_SHOULDER_LEFT_RIGHT_motor_position = new wxSlider(p_left_arm, -1, _potentiometer_min_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, _potentiometer_min_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, _potentiometer_max_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR);
+	//-------
+	wxPanel *p_left_arm_ELBOW_position = new wxPanel(p_left_arm);
+	st_left_arm_ELBOW_motor_position = new wxStaticText(p_left_arm, wxID_ANY, "Elbow motor");
+	tc_left_arm_ELBOW_motor_position = new wxTextCtrl(p_left_arm_ELBOW_position, wxID_ANY, "0", wxDefaultPosition, wxSize(40, -1));
+	b_left_arm_ELBOW_home = new wxButton(p_left_arm_ELBOW_position, -1, "Home", wxDefaultPosition, wxSize(40, -1));
+	b_left_arm_ELBOW_move = new wxButton(p_left_arm_ELBOW_position, -1, "Move", wxDefaultPosition, wxSize(40, -1));
+
+	wxBoxSizer *sizer_left_arm_ELBOW = new wxBoxSizer(wxHORIZONTAL);
+	sizer_left_arm_ELBOW->Add(tc_left_arm_ELBOW_motor_position);
+	sizer_left_arm_ELBOW->Add(b_left_arm_ELBOW_move);
+	sizer_left_arm_ELBOW->Add(b_left_arm_ELBOW_home);
+	p_left_arm_ELBOW_position->SetSizer(sizer_left_arm_ELBOW);
+
+	s_left_arm_ELBOW_motor_position = new wxSlider(p_left_arm, -1, _potentiometer_min_LEFT_ARM_ELBOW_MOTOR, _potentiometer_min_LEFT_ARM_ELBOW_MOTOR, _potentiometer_max_LEFT_ARM_ELBOW_MOTOR);
+	//-------
+	wxPanel *p_left_arm_FOREARM_position = new wxPanel(p_left_arm);
+	st_left_arm_FOREARM_motor_position = new wxStaticText(p_left_arm, wxID_ANY, "Forearm motor");
+	tc_left_arm_FOREARM_motor_position = new wxTextCtrl(p_left_arm_FOREARM_position, wxID_ANY, "0", wxDefaultPosition, wxSize(40, -1));
+	b_left_arm_FOREARM_home = new wxButton(p_left_arm_FOREARM_position, -1, "Home", wxDefaultPosition, wxSize(40, -1));
+	b_left_arm_FOREARM_move = new wxButton(p_left_arm_FOREARM_position, -1, "Move", wxDefaultPosition, wxSize(40, -1));
+
+	wxBoxSizer *sizer_left_arm_FOREARM = new wxBoxSizer(wxHORIZONTAL);
+	sizer_left_arm_FOREARM->Add(tc_left_arm_FOREARM_motor_position);
+	sizer_left_arm_FOREARM->Add(b_left_arm_FOREARM_move);
+	sizer_left_arm_FOREARM->Add(b_left_arm_FOREARM_home);
+	p_left_arm_FOREARM_position->SetSizer(sizer_left_arm_FOREARM);
+
+	s_left_arm_FOREARM_motor_position = new wxSlider(p_left_arm, -1, _potentiometer_min_LEFT_ARM_FOREARM_MOTOR, _potentiometer_min_LEFT_ARM_FOREARM_MOTOR, _potentiometer_max_LEFT_ARM_FOREARM_MOTOR);
+
+
+
+
+
 
 	b_left_arm_refresh = new wxButton(p_left_arm, -1, "Refresh");
 	b_left_arm_refresh->Bind(wxEVT_BUTTON, &MainFrame::on_left_arm_refresh_data_click, this);
@@ -44,6 +105,22 @@ void MainFrame::build_left_arm_interface(void)
 	sizer_left_arm->Add(st_left_arm_body_motor_position, 0, wxTOP, 10);
 	sizer_left_arm->Add(p_left_arm_body_position);
 	sizer_left_arm->Add(s_left_arm_body_motor_position);
+
+	sizer_left_arm->Add(st_left_arm_SHOULDER_UP_DOWN_motor_position, 0, wxTOP, 10);
+	sizer_left_arm->Add(p_left_arm_SHOULDER_UP_DOWN_position);
+	sizer_left_arm->Add(s_left_arm_SHOULDER_UP_DOWN_motor_position);
+
+	sizer_left_arm->Add(st_left_arm_SHOULDER_LEFT_RIGHT_motor_position, 0, wxTOP, 10);
+	sizer_left_arm->Add(p_left_arm_SHOULDER_LEFT_RIGHT_position);
+	sizer_left_arm->Add(s_left_arm_SHOULDER_LEFT_RIGHT_motor_position);
+
+	sizer_left_arm->Add(st_left_arm_ELBOW_motor_position, 0, wxTOP, 10);
+	sizer_left_arm->Add(p_left_arm_ELBOW_position);
+	sizer_left_arm->Add(s_left_arm_ELBOW_motor_position);
+
+	sizer_left_arm->Add(st_left_arm_FOREARM_motor_position, 0, wxTOP, 10);
+	sizer_left_arm->Add(p_left_arm_FOREARM_position);
+	sizer_left_arm->Add(s_left_arm_FOREARM_motor_position);
 
 	sizer_left_arm->Add(b_left_arm_home_all, 0, wxTOP, 10);
 	sizer_left_arm->Add(b_left_arm_refresh, 0, wxTOP, 10);
@@ -150,6 +227,46 @@ void MainFrame::on_left_arm_body_home_click(wxCommandEvent &event)
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_body_move_click(wxCommandEvent &event)
+{
+
+}
+//------------------------------------------------------------------------
+void MainFrame::on_left_arm_SHOULDER_UP_DOWN_home_click(wxCommandEvent &event)
+{
+
+}
+//------------------------------------------------------------------------
+void MainFrame::on_left_arm_SHOULDER_UP_DOWN_move_click(wxCommandEvent &event)
+{
+
+}
+//------------------------------------------------------------------------
+void MainFrame::on_left_arm_SHOULDER_LEFT_RIGHT_home_click(wxCommandEvent &event)
+{
+
+}
+//------------------------------------------------------------------------
+void MainFrame::on_left_arm_SHOULDER_LEFT_RIGHT_move_click(wxCommandEvent &event)
+{
+
+}
+//------------------------------------------------------------------------
+void MainFrame::on_left_arm_ELBOW_home_click(wxCommandEvent &event)
+{
+
+}
+//------------------------------------------------------------------------
+void MainFrame::on_left_arm_ELBOW_move_click(wxCommandEvent &event)
+{
+
+}
+//------------------------------------------------------------------------
+void MainFrame::on_left_arm_FOREARM_home_click(wxCommandEvent &event)
+{
+
+}
+//------------------------------------------------------------------------
+void MainFrame::on_left_arm_FOREARM_move_click(wxCommandEvent &event)
 {
 
 }

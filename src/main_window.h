@@ -108,6 +108,38 @@ private:
 	wxButton *b_left_arm_body_move;
 	void on_left_arm_body_move_click(wxCommandEvent &event);
 
+	wxStaticText *st_left_arm_SHOULDER_UP_DOWN_motor_position;
+	wxTextCtrl *tc_left_arm_SHOULDER_UP_DOWN_motor_position;
+	wxSlider *s_left_arm_SHOULDER_UP_DOWN_motor_position;
+	wxButton *b_left_arm_SHOULDER_UP_DOWN_home;
+	void on_left_arm_SHOULDER_UP_DOWN_home_click(wxCommandEvent &event);
+	wxButton *b_left_arm_SHOULDER_UP_DOWN_move;
+	void on_left_arm_SHOULDER_UP_DOWN_move_click(wxCommandEvent &event);
+
+	wxStaticText *st_left_arm_SHOULDER_LEFT_RIGHT_motor_position;
+	wxTextCtrl *tc_left_arm_SHOULDER_LEFT_RIGHT_motor_position;
+	wxSlider *s_left_arm_SHOULDER_LEFT_RIGHT_motor_position;
+	wxButton *b_left_arm_SHOULDER_LEFT_RIGHT_home;
+	void on_left_arm_SHOULDER_LEFT_RIGHT_home_click(wxCommandEvent &event);
+	wxButton *b_left_arm_SHOULDER_LEFT_RIGHT_move;
+	void on_left_arm_SHOULDER_LEFT_RIGHT_move_click(wxCommandEvent &event);
+
+	wxStaticText *st_left_arm_ELBOW_motor_position;
+	wxTextCtrl *tc_left_arm_ELBOW_motor_position;
+	wxSlider *s_left_arm_ELBOW_motor_position;
+	wxButton *b_left_arm_ELBOW_home;
+	void on_left_arm_ELBOW_home_click(wxCommandEvent &event);
+	wxButton *b_left_arm_ELBOW_move;
+	void on_left_arm_ELBOW_move_click(wxCommandEvent &event);
+
+	wxStaticText *st_left_arm_FOREARM_motor_position;
+	wxTextCtrl *tc_left_arm_FOREARM_motor_position;
+	wxSlider *s_left_arm_FOREARM_motor_position;
+	wxButton *b_left_arm_FOREARM_home;
+	void on_left_arm_FOREARM_home_click(wxCommandEvent &event);
+	wxButton *b_left_arm_FOREARM_move;
+	void on_left_arm_FOREARM_move_click(wxCommandEvent &event);
+
 	wxButton *b_left_arm_refresh;
 	void on_left_arm_refresh_data_click(wxCommandEvent &event);
 	wxButton *b_left_arm_home_all;

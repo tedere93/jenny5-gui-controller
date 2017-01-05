@@ -32,10 +32,11 @@ void MainFrame::build_interface(void)
 	splitter_commands_log->SetSplitMode(wxSPLIT_HORIZONTAL);
 	splitter_commands_log->SetMinimumPaneSize(100);
 
-	p_commands_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 500));
+	p_commands_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 600));
 	p_log_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 200));
 
-
+	//--------------------------------------------------------
+	build_predefined_task_interface();
 	//--------------------------------------------------------
 	build_head_interface();
 	//----------------------------------------------------------------------
@@ -43,7 +44,6 @@ void MainFrame::build_interface(void)
 	//----------------------------------------------------------------------
 	build_right_arm_interface();
 	//----------------------------------------------------------------------
-	p_platform = new wxPanel(p_commands_panel);
 	p_lidar = new wxPanel(p_commands_panel);
 	wxBoxSizer* sizer_lidar = new wxBoxSizer(wxVERTICAL);
 	st_lidar = new wxStaticText(p_lidar, wxID_ANY, "LIDAR");
@@ -58,6 +58,8 @@ void MainFrame::build_interface(void)
 	p_lidar->SetSizer(sizer_lidar);
 
 	//----------------------------------------------------------------------
+	p_platform = new wxPanel(p_commands_panel);
+
 	wxBoxSizer* sizer_platform = new wxBoxSizer(wxVERTICAL);
 	st_platform = new wxStaticText(p_platform, wxID_ANY, "Platform");
 	st_platform_com_port = new wxStaticText(p_platform, wxID_ANY, "COM port");
