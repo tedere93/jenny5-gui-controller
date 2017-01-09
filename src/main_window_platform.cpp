@@ -35,6 +35,7 @@ void MainFrame::build_platform_interface(void)
 	b_run_platform_motors = new wxButton(p_platform, -1, "Run");
 	b_run_platform_motors->Bind(wxEVT_LEFT_DOWN, &MainFrame::on_platform_run_motors_mouse_down, this);
 	b_run_platform_motors->Bind(wxEVT_LEFT_UP, &MainFrame::on_platform_run_motors_mouse_up, this);
+	b_run_platform_motors->Enable(false);
 
 	sizer_platform->Add(st_platform, 0, wxTOP, 10);
 	sizer_platform->Add(st_platform_com_port, 0, wxTOP, 10);
@@ -71,6 +72,8 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 			// show the firmware version number
 			double battery_voltage = platform_controller.get_main_battery_voltage();
 			tc_platform_battery_voltage->SetValue(wxString() << battery_voltage);
+
+			b_run_platform_motors->Enable(true);
 		}
 		else {
 			write_to_log(error_string);
@@ -80,6 +83,7 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 		write_to_log("Disconnected from platform\n");
 		platform_controller.close_connection();
 		b_connect_to_platform->SetLabel("Connect");
+		b_run_platform_motors->Enable(false);
 	}
 }
 //------------------------------------------------------------------------
@@ -90,14 +94,16 @@ void MainFrame::on_platform_run_motors_mouse_down(wxMouseEvent &event)
 	tc_platform_left_motor_speed->GetValue().ToLong(&platform_left_motor_speed);
 	tc_platform_right_motor_speed->GetValue().ToLong(&platform_right_motor_speed);
 
-	platform_controller.drive_M1_with_signed_duty_and_acceleration(platform_left_motor_speed, 1);
-	platform_controller.drive_M2_with_signed_duty_and_acceleration(-platform_right_motor_speed, 1);
+	platform_controller.drive_M1_with_signed_duty_and_acceleration(-platform_right_motor_speed * 100, 1);
+	platform_controller.drive_M2_with_signed_duty_and_acceleration(-platform_left_motor_speed * 100, 1);
+	b_run_platform_motors->SetLabel("Running");
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_run_motors_mouse_up(wxMouseEvent &event)
 {
 	platform_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
 	platform_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+	b_run_platform_motors->SetLabel("Run");
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_left_motor_slider_move(wxCommandEvent& event)
