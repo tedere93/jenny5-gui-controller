@@ -29,11 +29,14 @@ void MainFrame::build_head_interface(void)
 	p_head_neck_position->SetSizer(sizer_neck);
 
 	s_head_neck_motor_position = new wxSlider(p_head, -1, _head_horizontal_motor_potentiometer_min, _head_horizontal_motor_potentiometer_min, _head_horizontal_motor_potentiometer_max);
+	s_head_neck_motor_position->Bind(wxEVT_SLIDER, &MainFrame::on_head_neck_slider_move, this);
 
 	wxPanel *p_head_face_position = new wxPanel(p_head);
 	st_head_face_motor_position = new wxStaticText(p_head, wxID_ANY, "Face motor");
 	tc_head_face_motor_position = new wxTextCtrl(p_head_face_position, wxID_ANY, "0", wxDefaultPosition, wxSize(40, -1));
 	s_head_face_motor_position = new wxSlider(p_head, -1, _head_vertical_motor_potentiometer_min, _head_vertical_motor_potentiometer_min, _head_vertical_motor_potentiometer_max);
+	s_head_face_motor_position->Bind(wxEVT_SLIDER, &MainFrame::on_head_face_slider_move, this);
+
 	b_head_face_home = new wxButton(p_head_face_position, -1, "Home", wxDefaultPosition, wxSize(40, -1));
 	b_head_face_move = new wxButton(p_head_face_position, -1, "Move", wxDefaultPosition, wxSize(40, -1));
 
@@ -126,13 +129,13 @@ void MainFrame::on_head_neck_home_click(wxCommandEvent &event)
 void MainFrame::on_head_neck_move_click(wxCommandEvent &event)
 {
 	long head_neck_new_position;
-	tc_head_neck_motor_position->GetValue().ToLong(&head_neck_new_position); // real port number
+	tc_head_neck_motor_position->GetValue().ToLong(&head_neck_new_position);
 	head_controller.send_stepper_motor_goto_sensor_position(HEAD_MOTOR_NECK, head_neck_new_position);
 }
 //------------------------------------------------------------------------
-void MainFrame::on_head_neck_slider_move(wxScrollEvent& event)
+void MainFrame::on_head_neck_slider_move(wxCommandEvent& event)
 {
-	long head_neck_new_position = s_head_neck_motor_position->GetValue(); // real port number
+	long head_neck_new_position = s_head_neck_motor_position->GetValue();
 	head_controller.send_stepper_motor_goto_sensor_position(HEAD_MOTOR_NECK, head_neck_new_position);
 }
 //------------------------------------------------------------------------
@@ -148,7 +151,7 @@ void MainFrame::on_head_face_move_click(wxCommandEvent &event)
 	head_controller.send_stepper_motor_goto_sensor_position(HEAD_MOTOR_FACE, head_face_new_position);
 }
 //------------------------------------------------------------------------
-void MainFrame::on_head_face_slider_move(wxScrollEvent& event)
+void MainFrame::on_head_face_slider_move(wxCommandEvent& event)
 {
 	long head_face_new_position = s_head_face_motor_position->GetValue(); // real port number
 	head_controller.send_stepper_motor_goto_sensor_position(HEAD_MOTOR_FACE, head_face_new_position);
