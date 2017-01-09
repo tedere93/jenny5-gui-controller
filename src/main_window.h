@@ -68,7 +68,7 @@ private:
 	void on_head_neck_home_click(wxCommandEvent &event);
 	wxButton *b_head_neck_move;
 	void on_head_neck_move_click(wxCommandEvent &event);
-	void on_head_neck_slider_move(wxScrollEvent& event);
+	void on_head_neck_slider_move(wxCommandEvent& event);
 
 	wxStaticText *st_head_face_motor_position;
 	wxTextCtrl *tc_head_face_motor_position;
@@ -77,7 +77,7 @@ private:
 	void on_head_face_home_click(wxCommandEvent &event);
 	wxButton *b_head_face_move;
 	void on_head_face_move_click(wxCommandEvent &event);
-	void on_head_face_slider_move(wxScrollEvent& event);
+	void on_head_face_slider_move(wxCommandEvent& event);
 	
 	wxStaticText *st_head_ultrasonic;
 	wxTextCtrl *tc_head_ultrasonic;
@@ -178,6 +178,25 @@ private:
 	wxTextCtrl *tc_platform_com_port;
 	wxButton *b_connect_to_platform;
 	void on_connect_to_platform_click(wxCommandEvent &event);
+
+	wxStaticText *st_platform_left_motor_speed;
+	wxSlider *s_platform_left_motor_speed;
+	void on_platform_left_motor_slider_move(wxCommandEvent & event);
+	wxTextCtrl *tc_platform_left_motor_speed;
+
+	wxStaticText *st_platform_right_motor_speed;
+	wxSlider *s_platform_right_motor_speed;
+	void on_platform_right_motor_slider_move(wxCommandEvent & event);
+	wxTextCtrl *tc_platform_right_motor_speed;
+
+	wxStaticText *st_platform_battery_voltage;
+	wxTextCtrl *tc_platform_battery_voltage;
+
+	wxButton *b_run_platform_motors;
+	void on_platform_run_motors_mouse_down(wxMouseEvent &event);
+	void on_platform_run_motors_mouse_up(wxMouseEvent &event);
+
+	void build_platform_interface(void);
 
 	//--------------------------------------------------------------
 	

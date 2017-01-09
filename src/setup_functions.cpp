@@ -128,6 +128,15 @@ bool connect_to_left_arm(t_jenny5_arduino_controller &left_arm_controller, Video
 	return true;
 }
 //----------------------------------------------------------------
+bool connect_to_platform(t_roboclaw_controller &platform_controller, int platform_com_port, char* error_string)
+{
+	if (!platform_controller.connect(platform_com_port - 1, 38400)) {
+		sprintf(error_string, "Error attaching to Jenny 5' platform!\n");
+		return false;
+	}
+	return true;
+}
+//----------------------------------------------------------------
 bool init_face_classifier(CascadeClassifier &face_classifier, char* error_string)
 {
 	//-------------- START INITIALIZATION ------------------------------

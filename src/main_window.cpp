@@ -44,6 +44,9 @@ void MainFrame::build_interface(void)
 	//----------------------------------------------------------------------
 	build_right_arm_interface();
 	//----------------------------------------------------------------------
+	build_platform_interface();
+	//----------------------------------------------------------------------
+
 	p_lidar = new wxPanel(p_commands_panel);
 	wxBoxSizer* sizer_lidar = new wxBoxSizer(wxVERTICAL);
 	st_lidar = new wxStaticText(p_lidar, wxID_ANY, "LIDAR");
@@ -58,19 +61,6 @@ void MainFrame::build_interface(void)
 	p_lidar->SetSizer(sizer_lidar);
 
 	//----------------------------------------------------------------------
-	p_platform = new wxPanel(p_commands_panel);
-
-	wxBoxSizer* sizer_platform = new wxBoxSizer(wxVERTICAL);
-	st_platform = new wxStaticText(p_platform, wxID_ANY, "Platform");
-	st_platform_com_port = new wxStaticText(p_platform, wxID_ANY, "COM port");
-	tc_platform_com_port = new wxTextCtrl(p_platform, wxID_ANY, "4");
-	b_connect_to_platform = new wxButton(p_platform, -1, "Connect");
-	b_connect_to_platform->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_platform_click, this);
-	sizer_platform->Add(st_platform, 0, wxTOP, 10);
-	sizer_platform->Add(st_platform_com_port, 0, wxTOP, 10);
-	sizer_platform->Add(tc_platform_com_port);
-	sizer_platform->Add(b_connect_to_platform, 0, wxTOP, 10);
-	p_platform->SetSizer(sizer_platform);
 
 	//----------------------------------------------------------------------
 	wxBoxSizer* sizer_commands = new wxBoxSizer(wxHORIZONTAL);
@@ -138,11 +128,6 @@ void MainFrame::on_connect_to_lidar_click(wxCommandEvent &event)
 }
 //------------------------------------------------------------------------
 void MainFrame::on_connect_to_right_arm_click(wxCommandEvent &event)
-{
-
-}
-//------------------------------------------------------------------------
-void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 {
 
 }
