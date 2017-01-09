@@ -87,6 +87,8 @@ private:
 	wxButton *b_head_home_all;
 	void on_head_home_all_click(wxCommandEvent &event);
 
+	void head_set_enable_all(bool new_state);
+
 	void handle_head_events(void);
 	void build_head_interface(void);
 	//--------------------------------------------------------------

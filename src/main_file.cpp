@@ -16,10 +16,8 @@
 
 //#include "about.h"
 
-#include <vld.h>
 
 wxIMPLEMENT_APP(jenny5_gui_controller_app);
-
 
 bool jenny5_gui_controller_app::OnInit()
 {
