@@ -91,6 +91,9 @@ private:
 
 	void handle_head_events(void);
 	void build_head_interface(void);
+	
+	wxButton *b_show_head_camera;
+	void on_show_head_camera_click(wxCommandEvent &event);
 	//--------------------------------------------------------------
 
 	t_jenny5_arduino_controller left_arm_controller;
@@ -105,6 +108,7 @@ private:
 	wxStaticText *st_left_arm_body_motor_position;
 	wxTextCtrl *tc_left_arm_body_motor_position;
 	wxSlider *s_left_arm_body_motor_position;
+	void on_left_arm_body_slider_move(wxCommandEvent& event);
 	wxButton *b_left_arm_body_home;
 	void on_left_arm_body_home_click(wxCommandEvent &event);
 	wxButton *b_left_arm_body_move;
@@ -113,6 +117,7 @@ private:
 	wxStaticText *st_left_arm_SHOULDER_UP_DOWN_motor_position;
 	wxTextCtrl *tc_left_arm_SHOULDER_UP_DOWN_motor_position;
 	wxSlider *s_left_arm_SHOULDER_UP_DOWN_motor_position;
+	void on_left_arm_SHOULDER_UP_DOWN_slider_move(wxCommandEvent& event);
 	wxButton *b_left_arm_SHOULDER_UP_DOWN_home;
 	void on_left_arm_SHOULDER_UP_DOWN_home_click(wxCommandEvent &event);
 	wxButton *b_left_arm_SHOULDER_UP_DOWN_move;
@@ -121,6 +126,7 @@ private:
 	wxStaticText *st_left_arm_SHOULDER_LEFT_RIGHT_motor_position;
 	wxTextCtrl *tc_left_arm_SHOULDER_LEFT_RIGHT_motor_position;
 	wxSlider *s_left_arm_SHOULDER_LEFT_RIGHT_motor_position;
+	void on_left_arm_SHOULDER_LEFT_RIGHT_slider_move(wxCommandEvent& event);
 	wxButton *b_left_arm_SHOULDER_LEFT_RIGHT_home;
 	void on_left_arm_SHOULDER_LEFT_RIGHT_home_click(wxCommandEvent &event);
 	wxButton *b_left_arm_SHOULDER_LEFT_RIGHT_move;
@@ -129,6 +135,7 @@ private:
 	wxStaticText *st_left_arm_ELBOW_motor_position;
 	wxTextCtrl *tc_left_arm_ELBOW_motor_position;
 	wxSlider *s_left_arm_ELBOW_motor_position;
+	void on_left_arm_ELBOW_slider_move(wxCommandEvent& event);
 	wxButton *b_left_arm_ELBOW_home;
 	void on_left_arm_ELBOW_home_click(wxCommandEvent &event);
 	wxButton *b_left_arm_ELBOW_move;
@@ -137,10 +144,23 @@ private:
 	wxStaticText *st_left_arm_FOREARM_motor_position;
 	wxTextCtrl *tc_left_arm_FOREARM_motor_position;
 	wxSlider *s_left_arm_FOREARM_motor_position;
+	void on_left_arm_FOREARM_slider_move(wxCommandEvent& event);
 	wxButton *b_left_arm_FOREARM_home;
 	void on_left_arm_FOREARM_home_click(wxCommandEvent &event);
 	wxButton *b_left_arm_FOREARM_move;
 	void on_left_arm_FOREARM_move_click(wxCommandEvent &event);
+
+	wxStaticText *st_left_arm_gripper_IR_signal_strength;
+	wxTextCtrl *tc_left_arm_gripper_IR_signal_strength;
+
+	wxCheckBox* cb_left_arm_gripper_closed;
+
+	wxButton *b_left_arm_close_gripper;
+	void on_left_arm_close_gripper_click(wxCommandEvent &event);
+
+	wxButton *b_left_arm_open_gripper;
+	void on_left_arm_open_gripper_click(wxCommandEvent &event);
+
 
 	wxButton *b_left_arm_refresh;
 	void on_left_arm_refresh_data_click(wxCommandEvent &event);
@@ -150,6 +170,10 @@ private:
 	void handle_left_arm_events(void);
 	void build_left_arm_interface(void);
 	void on_connect_to_left_arm_click(wxCommandEvent &event);
+	void left_arm_set_enable_all(bool new_state);
+
+	wxButton *b_show_left_arm_camera;
+	void on_show_left_arm_camera_click(wxCommandEvent &event);
 	//--------------------------------------------------------------
 	t_jenny5_arduino_controller right_arm_controller;
 	cv::VideoCapture right_arm_cam;
