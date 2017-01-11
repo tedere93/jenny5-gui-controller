@@ -55,20 +55,14 @@ bool connect_to_head(t_jenny5_arduino_controller &head_controller, VideoCapture 
 	}
 	// connect to video camera
 
-	head_cam.open(0);			// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
+	head_cam.open(HEAD_CAMERA_INDEX);	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
 	if (!head_cam.isOpened())	// check if we succeeded
 	{
 		sprintf(error_string, "Couldn't open head's video camera!\n");
 		head_controller.close_connection();
 		return false;
 	}
-	/*
-	else {
-		Mat frame;
-		head_cam >> frame;
-		printf("Head video size: %dx%d\n", frame.rows, frame.cols);
-	}
-	*/
+
 	return true;
 }
 //----------------------------------------------------------------
@@ -315,7 +309,7 @@ bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* erro
 
 	left_arm_controller.send_create_infrared_sensors(1, gripper_infrared_pins);
 
-	int gripper_button_pins[1] = { 1 };
+	int gripper_button_pins[1] = { LEFT_ARM_GRIPPER_BUTTON_PIN };
 
 	left_arm_controller.send_create_buttons(1, gripper_button_pins);
 
@@ -363,17 +357,17 @@ bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* erro
 		}
 	}
 
-	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_BODY_MOTOR, 1000, 500);
+	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_BODY_MOTOR, 500, 500);
 
-	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, 1000, 500);
-
-
-	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, 1000, 500);
+	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, 500, 500);
 
 
-	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_ELBOW_MOTOR, 1000, 500);
+	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, 500, 500);
 
-	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_FOREARM_MOTOR, 1000, 500);
+
+	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_ELBOW_MOTOR, 500, 500);
+
+	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_FOREARM_MOTOR, 500, 500);
 	/*
 	Sleep(100);
 	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_GRIPPER_MOTOR, 1000, 500);
