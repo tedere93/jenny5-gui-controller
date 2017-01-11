@@ -120,7 +120,9 @@ void MainFrame::build_left_arm_interface(void)
 	b_left_arm_home_all->Bind(wxEVT_BUTTON, &MainFrame::on_left_arm_home_all_click, this);
 	//-------
 
-	wxButton *b_show_left_arm_camera;
+	b_show_left_arm_camera = new wxButton(p_left_arm, -1, "View camera");
+	b_show_left_arm_camera->Bind(wxEVT_BUTTON, &MainFrame::on_show_left_arm_camera_click, this);
+
 
 
 	sizer_left_arm->Add(st_left_arm, 0, wxTOP, 10);
@@ -159,6 +161,8 @@ void MainFrame::build_left_arm_interface(void)
 
 	sizer_left_arm->Add(b_left_arm_home_all, 0, wxTOP, 10);
 	sizer_left_arm->Add(b_left_arm_refresh, 0, wxTOP, 10);
+
+	sizer_left_arm->Add(b_show_left_arm_camera, 0, wxTOP, 10);
 
 	p_left_arm->SetSizer(sizer_left_arm);
 	left_arm_set_enable_all(false);
@@ -205,7 +209,7 @@ void MainFrame::on_connect_to_left_arm_click(wxCommandEvent &event)
 	tc_left_arm_com_port->GetValue().ToLong(&left_arm_com_port); // real port number
 
 	if (!left_arm_controller.is_open()) {
-		if (connect_to_left_arm(left_arm_controller, left_arm_cam, left_arm_com_port, error_string)) {
+		if (connect_to_left_arm(left_arm_controller, left_arm_com_port, error_string)) {
 			b_connect_to_left_arm->SetLabel("Disconnect");
 			// show the firmware version number
 			left_arm_controller.send_get_firmware_version();
@@ -237,42 +241,6 @@ void MainFrame::on_connect_to_left_arm_click(wxCommandEvent &event)
 		left_arm_set_enable_all(false);
 	}
 
-}
-//------------------------------------------------------------------------
-void MainFrame::on_show_left_arm_camera_click(wxCommandEvent &event)
-{
-	char error_string[1000];
-	if (head_cam.isOpened()) {
-		sprintf(error_string, "Head video camera already open!\n");
-		write_to_log(error_string);
-		return;
-	}
-	head_cam.open(LEFT_ARM_CAMERA_INDEX);	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
-	if (!head_cam.isOpened())	// check if we succeeded
-	{
-		sprintf(error_string, "Couldn't open head's video camera!\n");
-		write_to_log(error_string);
-		head_controller.close_connection();
-		return;
-	}
-
-	Mat cam_frame; // images used in the proces
-
-	namedWindow("Head camera", WINDOW_AUTOSIZE); // window to display the results
-
-	bool active = true;
-	while (active) {        // starting infinit loop
-		head_cam >> cam_frame; // put captured-image frame in frame
-
-		imshow("Head camera", cam_frame); // display the result
-
-		int key = waitKey(1);
-		if (key == VK_ESCAPE)  // break the loop
-			active = false;
-	}
-
-	destroyWindow("Head camera");
-	head_cam.release();
 }
 //------------------------------------------------------------------------
 void MainFrame::handle_left_arm_events(void)
@@ -474,5 +442,38 @@ void MainFrame::on_left_arm_close_gripper_click(wxCommandEvent &event)
 void MainFrame::on_left_arm_open_gripper_click(wxCommandEvent &event)
 {
 
+}
+//------------------------------------------------------------------------
+void MainFrame::on_show_left_arm_camera_click(wxCommandEvent &event)
+{
+	char error_string[1000];
+	if (left_arm_cam.isOpened()) {
+		sprintf(error_string, "Left arm video camera already open!\n");
+		write_to_log(error_string);
+		return;
+	}
+	if (!left_arm_cam.open(LEFT_ARM_CAMERA_INDEX)){	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
+		sprintf(error_string, "Couldn't open left arm's video camera!\n");
+		write_to_log(error_string);
+		return;
+	}
+
+	Mat cam_frame; // images used in the proces
+
+	namedWindow("Left arm camera", WINDOW_AUTOSIZE); // window to display the results
+
+	bool active = true;
+	while (active) {        // starting infinit loop
+		left_arm_cam >> cam_frame; // put captured-image frame in frame
+
+		imshow("Left arm camera", cam_frame); // display the result
+
+		int key = waitKey(1);
+		if (key == VK_ESCAPE)  // break the loop
+			active = false;
+	}
+
+	destroyWindow("Left arm camera");
+	left_arm_cam.release();
 }
 //------------------------------------------------------------------------
