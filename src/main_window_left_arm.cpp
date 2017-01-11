@@ -101,7 +101,7 @@ void MainFrame::build_left_arm_interface(void)
 	s_left_arm_FOREARM_motor_position = new wxSlider(p_left_arm, -1, _potentiometer_min_LEFT_ARM_FOREARM_MOTOR, _potentiometer_min_LEFT_ARM_FOREARM_MOTOR, _potentiometer_max_LEFT_ARM_FOREARM_MOTOR);
 	s_left_arm_FOREARM_motor_position->Bind(wxEVT_SLIDER, &MainFrame::on_left_arm_FOREARM_slider_move, this);
 	//-------
-	st_left_arm_gripper_IR_signal_strength = new wxStaticText(p_left_arm, wxID_ANY, "IR signal");
+	st_left_arm_gripper_IR_signal_strength = new wxStaticText(p_left_arm, wxID_ANY, "Gripper IR signal");
 	tc_left_arm_gripper_IR_signal_strength = new wxTextCtrl(p_left_arm, wxID_ANY, "0");
 	tc_left_arm_gripper_IR_signal_strength->SetEditable(false);
 
@@ -109,8 +109,10 @@ void MainFrame::build_left_arm_interface(void)
 	cb_left_arm_gripper_closed->Enable(false);
 
 	b_left_arm_close_gripper = new wxButton(p_left_arm, -1, "Close Gripper");
-	
+	b_left_arm_close_gripper->Bind(wxEVT_BUTTON, &MainFrame::on_left_arm_close_gripper_click, this);
+
 	b_left_arm_open_gripper = new wxButton(p_left_arm, -1, "Open Gripper");
+	b_left_arm_open_gripper->Bind(wxEVT_BUTTON, &MainFrame::on_left_arm_open_gripper_click, this);
 
 	//-------
 	b_left_arm_refresh = new wxButton(p_left_arm, -1, "Refresh");
@@ -436,12 +438,12 @@ void MainFrame::on_left_arm_FOREARM_slider_move(wxCommandEvent& event)
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_close_gripper_click(wxCommandEvent &event)
 {
-
+	left_arm_controller.send_go_home_stepper_motor(LEFT_ARM_GRIPPER_MOTOR);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_open_gripper_click(wxCommandEvent &event)
 {
-
+	left_arm_controller.send_move_stepper_motor(LEFT_ARM_GRIPPER_MOTOR, -500);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_show_left_arm_camera_click(wxCommandEvent &event)

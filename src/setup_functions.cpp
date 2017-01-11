@@ -263,8 +263,11 @@ bool setup_head(t_jenny5_arduino_controller &head_controller, char* error_string
 	int head_vertical_motor_potentiometer_home[1] = { _head_vertical_motor_potentiometer_home };
 	int head_vertical_motor_potentiometer_dir[1] = { 1 };
 
-	head_controller.send_attach_sensors_to_stepper_motor(HEAD_MOTOR_NECK, 1, potentiometer_index_head_horizontal_motor, head_horizontal_motor_potentiometer_min, head_horizontal_motor_potentiometer_max, head_horizontal_motor_potentiometer_home, head_horizontal_motor_potentiometer_dir, 0, NULL, 0, NULL);
-	head_controller.send_attach_sensors_to_stepper_motor(HEAD_MOTOR_FACE, 1, potentiometer_index_head_vertical_motor, head_vertical_motor_potentiometer_min, head_vertical_motor_potentiometer_max, head_vertical_motor_potentiometer_home, head_vertical_motor_potentiometer_dir, 0, NULL, 0, NULL);
+	head_controller.send_attach_sensors_to_stepper_motor(HEAD_MOTOR_NECK, 
+		1, potentiometer_index_head_horizontal_motor, head_horizontal_motor_potentiometer_min, head_horizontal_motor_potentiometer_max, head_horizontal_motor_potentiometer_home, head_horizontal_motor_potentiometer_dir, 
+		0, NULL, 0, NULL, NULL);
+	head_controller.send_attach_sensors_to_stepper_motor(HEAD_MOTOR_FACE, 1, potentiometer_index_head_vertical_motor, head_vertical_motor_potentiometer_min, head_vertical_motor_potentiometer_max, head_vertical_motor_potentiometer_home, head_vertical_motor_potentiometer_dir, 
+		0, NULL, 0, NULL, NULL);
 
 	return true;
 }
@@ -275,7 +278,7 @@ bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* erro
 	int left_arm_motors_dir_pins[6] = { 12, 10, 8, 6, 4, 2 };
 	int left_arm_motors_step_pins[6] = { 13, 11, 9, 7, 5, 3 };
 	int left_arm_motors_enable_pins[6] = { 14, 14, 14, 14, 14, 14 };
-	left_arm_controller.send_create_stepper_motors(5, left_arm_motors_dir_pins, left_arm_motors_step_pins, left_arm_motors_enable_pins);
+	left_arm_controller.send_create_stepper_motors(6, left_arm_motors_dir_pins, left_arm_motors_step_pins, left_arm_motors_enable_pins);
 
 
 	int left_arm_potentiometer_pins[5] = { 2, 3, 4, 5, 6 };
@@ -333,22 +336,21 @@ bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* erro
 		}
 	}
 
+	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_GRIPPER_MOTOR, 500, 500); 
+	
 	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_BODY_MOTOR, 500, 500);
-
+	
 	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, 500, 500);
-
-
+	
 	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, 500, 500);
-
-
+	
 	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_ELBOW_MOTOR, 500, 500);
-
+	
 	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_FOREARM_MOTOR, 500, 500);
-	/*
-	Sleep(100);
-	left_arm_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_GRIPPER_MOTOR, 1000, 500);
-	Sleep(100);
-	*/
+	
+	
+
+//	Sleep(100);
 	bool LEFT_ARM_BODY_MOTOR_set_speed_accell = false;
 	bool LEFT_ARM_SHOULDER_UP_DOWN_MOTOR_set_speed_accell = false;
 	bool LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR_set_speed_accell = false;
@@ -376,13 +378,13 @@ bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* erro
 
 		if (left_arm_controller.query_for_event(STEPPER_MOTOR_SET_SPEED_ACCELL_EVENT, LEFT_ARM_FOREARM_MOTOR))  // have we received the event from Serial ?
 			LEFT_ARM_FOREARM_MOTOR_set_speed_accell = true;
-		/*
+		
 		if (left_arm_controller.query_for_event(STEPPER_MOTOR_SET_SPEED_ACCELL_EVENT, LEFT_ARM_GRIPPER_MOTOR))  // have we received the event from Serial ?
-		LEFT_ARM_GRIPPER_MOTOR_set_speed_accell = true;
-		*/
+		  LEFT_ARM_GRIPPER_MOTOR_set_speed_accell = true;
+		
 
 		if (LEFT_ARM_BODY_MOTOR_set_speed_accell && LEFT_ARM_SHOULDER_UP_DOWN_MOTOR_set_speed_accell && LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR_set_speed_accell &&
-			LEFT_ARM_ELBOW_MOTOR_set_speed_accell && LEFT_ARM_FOREARM_MOTOR_set_speed_accell)// && LEFT_ARM_GRIPPER_MOTOR_set_speed_accell)
+			LEFT_ARM_ELBOW_MOTOR_set_speed_accell && LEFT_ARM_FOREARM_MOTOR_set_speed_accell && LEFT_ARM_GRIPPER_MOTOR_set_speed_accell)
 			break;
 
 		clock_t end_time = clock();
@@ -404,10 +406,10 @@ bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* erro
 
 			if (!LEFT_ARM_FOREARM_MOTOR_set_speed_accell)
 				sprintf(error_string, "Cannot LEFT_ARM_FOREARM_MOTOR_set_speed_accell! Game over!\n");
-			/*
+			
 			if (!LEFT_ARM_GRIPPER_MOTOR_set_speed_accell)
-			sprintf(error_string, "Cannot LEFT_ARM_GRIPPER_MOTOR_set_speed_accell! Game over!");
-			*/
+			sprintf(error_string, "Cannot LEFT_ARM_GRIPPER_MOTOR_set_speed_accell! Game over!\n");
+			
 			return false;
 		}
 	}
@@ -419,18 +421,15 @@ bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* erro
 	int potentiometer_index_LEFT_ARM_FOREARM_MOTOR[1] = { 4 };
 	int potentiometer_index_LEFT_ARM_GRIPPER_MOTOR[1] = { 5 };
 
-
 	int potentiometer_min_LEFT_ARM_BODY_MOTOR[1] = { _potentiometer_min_LEFT_ARM_BODY_MOTOR };
 	int potentiometer_max_LEFT_ARM_BODY_MOTOR[1] = { _potentiometer_max_LEFT_ARM_BODY_MOTOR };
 	int potentiometer_home_LEFT_ARM_BODY_MOTOR[1] = { _potentiometer_home_LEFT_ARM_BODY_MOTOR };
 	int potentiometer_dir_LEFT_ARM_BODY_MOTOR[1] = { -1 };
 
-
 	int potentiometer_min_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR[1] = { _potentiometer_min_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR };
 	int potentiometer_max_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR[1] = { _potentiometer_max_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR };
 	int potentiometer_home_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR[1] = { _potentiometer_home_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR };
 	int potentiometer_dir_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR[1] = { -1 };
-
 
 	int potentiometer_min_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR[1] = { _potentiometer_min_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR };
 	int potentiometer_max_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR[1] = { _potentiometer_max_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR };
@@ -447,6 +446,8 @@ bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* erro
 	int potentiometer_home_LEFT_ARM_FOREARM_MOTOR[1] = { _potentiometer_home_LEFT_ARM_FOREARM_MOTOR };
 	int potentiometer_dir_LEFT_ARM_FOREARM_MOTOR[1] = { 1 };
 
+	int button_index_LEFT_ARM_GRIPPER_MOTOR[1] = { 0 };
+	int button_direction_LEFT_ARM_GRIPPER_MOTOR[1] = { 1 };
 
 	left_arm_controller.send_attach_sensors_to_stepper_motor(LEFT_ARM_BODY_MOTOR, 1,
 		potentiometer_index_LEFT_ARM_BODY_MOTOR,
@@ -454,39 +455,38 @@ bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* erro
 		potentiometer_max_LEFT_ARM_BODY_MOTOR,
 		potentiometer_home_LEFT_ARM_BODY_MOTOR,
 		potentiometer_dir_LEFT_ARM_BODY_MOTOR,
-		0, NULL, 0, NULL);
-
+		0, NULL, 0, NULL, NULL);
 
 	left_arm_controller.send_attach_sensors_to_stepper_motor(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, 1,
 		potentiometer_index_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR,
 		potentiometer_min_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR,
 		potentiometer_max_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR,
 		potentiometer_home_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR,
-		potentiometer_dir_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, 0, NULL, 0, NULL);
-
+		potentiometer_dir_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, 0, NULL, 0, NULL, NULL);
 
 	left_arm_controller.send_attach_sensors_to_stepper_motor(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, 1,
 		potentiometer_index_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR,
 		potentiometer_min_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR,
 		potentiometer_max_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR,
 		potentiometer_home_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR,
-		potentiometer_dir_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, 0, NULL, 0, NULL);
-
+		potentiometer_dir_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, 0, NULL, 0, NULL, NULL);
 
 	left_arm_controller.send_attach_sensors_to_stepper_motor(LEFT_ARM_ELBOW_MOTOR, 1,
 		potentiometer_index_LEFT_ARM_ELBOW_MOTOR,
 		potentiometer_min_LEFT_ARM_ELBOW_MOTOR,
 		potentiometer_max_LEFT_ARM_ELBOW_MOTOR,
 		potentiometer_home_LEFT_ARM_ELBOW_MOTOR,
-		potentiometer_dir_LEFT_ARM_ELBOW_MOTOR, 0, NULL, 0, NULL);
+		potentiometer_dir_LEFT_ARM_ELBOW_MOTOR, 0, NULL, 0, NULL, NULL);
 
 	left_arm_controller.send_attach_sensors_to_stepper_motor(LEFT_ARM_FOREARM_MOTOR, 1,
 		potentiometer_index_LEFT_ARM_FOREARM_MOTOR,
 		potentiometer_min_LEFT_ARM_FOREARM_MOTOR,
 		potentiometer_max_LEFT_ARM_FOREARM_MOTOR,
 		potentiometer_home_LEFT_ARM_FOREARM_MOTOR,
-		potentiometer_dir_LEFT_ARM_FOREARM_MOTOR, 0, NULL, 0, NULL);
-	Sleep(100);
+		potentiometer_dir_LEFT_ARM_FOREARM_MOTOR, 0, NULL, 0, NULL, NULL);
+
+	left_arm_controller.send_attach_sensors_to_stepper_motor(LEFT_ARM_GRIPPER_MOTOR, 0,
+		NULL, NULL, NULL, NULL, NULL, 0, NULL, 1, button_index_LEFT_ARM_GRIPPER_MOTOR, button_direction_LEFT_ARM_GRIPPER_MOTOR);
 
 	return true;
 }
