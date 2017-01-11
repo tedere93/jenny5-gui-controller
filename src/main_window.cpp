@@ -32,7 +32,7 @@ void MainFrame::build_interface(void)
 	splitter_commands_log->SetSplitMode(wxSPLIT_HORIZONTAL);
 	splitter_commands_log->SetMinimumPaneSize(100);
 
-	p_commands_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 600));
+	p_commands_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 800));
 	p_log_panel = new wxPanel(splitter_commands_log, wxID_ANY, wxDefaultPosition, wxSize(-1, 200));
 
 	//--------------------------------------------------------
