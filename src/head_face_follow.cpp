@@ -27,12 +27,19 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 
 	char error_string[1000];
 
-	if (!connect_to_head(head_controller, head_cam, head_com_port, error_string)) {
+	if (!connect_to_head(head_controller, head_com_port, error_string)) {
 		to_log(error_string);
 		return -1;
 	}
 	else
 		to_log("Head connection succceded.\n");
+
+	if (!head_cam.open(HEAD_CAMERA_INDEX)) {	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
+		to_log("Couldn't open head's video camera!\n");
+		return -1;
+	}
+	else
+		to_log("Head camera connection succceded.\n");
 
 	// initialization
 	if (!init_face_classifier(face_classifier, error_string)) {
@@ -193,7 +200,7 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 			if (head_controller.query_for_event(SONAR_EVENT, 0, &distance)) { // have we received the event from Serial ?
 				head_controller.set_sonar_state(0, COMMAND_DONE);
 				char tmp_s[100];
-				sprintf(tmp_s, "distance = %d cm\n", distance);
+				sprintf(tmp_s, "distance = %Id cm\n", distance);
 				to_log(tmp_s);
 
 			}
