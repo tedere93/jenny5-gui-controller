@@ -43,10 +43,14 @@ private:
 	wxPanel *p_predefined_tasks;
 	wxStaticText *st_predefined_tasks;
 	wxButton *b_head_face_following;
-	wxButton *b_lidar_map;
-	void build_predefined_task_interface(void);
 	void on_head_face_follow_click(wxCommandEvent &event);
+
+	wxButton *b_lidar_map;
 	void on_lidar_map_click(wxCommandEvent &event);
+	wxButton *b_follow_person;
+	void on_follow_person_click(wxCommandEvent &event);
+
+	void build_predefined_task_interface(void);
 
 	//----------------------------------------------
 	cv::VideoCapture head_cam; 
