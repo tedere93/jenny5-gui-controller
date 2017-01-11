@@ -12,7 +12,7 @@ void MainFrame::build_head_interface(void)
 	wxBoxSizer* sizer_head = new wxBoxSizer(wxVERTICAL);
 	st_head = new wxStaticText(p_head, wxID_ANY, "Head");
 	st_head_com_port = new wxStaticText(p_head, wxID_ANY, "COM port");
-	tc_head_com_port = new wxTextCtrl(p_head, wxID_ANY, "9");
+	tc_head_com_port = new wxTextCtrl(p_head, wxID_ANY, "13");
 	b_connect_to_head = new wxButton(p_head, -1, "Connect");
 	b_connect_to_head->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_head_click, this);
 
@@ -49,6 +49,7 @@ void MainFrame::build_head_interface(void)
 	b_head_face_move = new wxButton(p_head_face_position, -1, "Move", wxDefaultPosition, wxSize(40, -1));
 	b_head_face_move->Bind(wxEVT_BUTTON, &MainFrame::on_head_face_move_click, this);
 	
+	
 
 	wxBoxSizer *sizer_face = new wxBoxSizer(wxHORIZONTAL);
 	sizer_face->Add(tc_head_face_motor_position);
@@ -67,6 +68,8 @@ void MainFrame::build_head_interface(void)
 	b_head_home_all = new wxButton(p_head, -1, "Home All");
 	b_head_home_all->Bind(wxEVT_BUTTON, &MainFrame::on_head_home_all_click, this);
 	
+	b_show_head_camera = new wxButton(p_head, -1, "View camera");
+	b_show_head_camera->Bind(wxEVT_BUTTON, &MainFrame::on_show_head_camera_click, this);
 
 	sizer_head->Add(st_head, 0, wxTOP, 10);
 	sizer_head->Add(st_head_com_port, 0, wxTOP, 10);
@@ -82,6 +85,7 @@ void MainFrame::build_head_interface(void)
 	sizer_head->Add(tc_head_ultrasonic);
 	sizer_head->Add(b_head_home_all, 0, wxTOP, 10);
 	sizer_head->Add(b_head_refresh, 0, wxTOP, 10);
+	sizer_head->Add(b_show_head_camera, 0, wxTOP, 10);
 
 	head_set_enable_all(false);
 
@@ -222,5 +226,41 @@ void MainFrame::handle_head_events(void)
 			tc_head_ultrasonic->SetValue(wxString() << ultrasonic_distance);
 		}
 	}
+}
+//------------------------------------------------------------------------
+void MainFrame::on_show_head_camera_click(wxCommandEvent &event)
+{
+	char error_string[1000];
+	if (head_cam.isOpened()) {
+		sprintf(error_string, "Head video camera already open!\n");
+		write_to_log(error_string);
+		return;
+	}
+	head_cam.open(HEAD_CAMERA_INDEX);	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
+	if (!head_cam.isOpened())	// check if we succeeded
+	{
+		sprintf(error_string, "Couldn't open head's video camera!\n");
+		write_to_log(error_string);
+		head_controller.close_connection();
+		return;
+	}
+
+	Mat cam_frame; // images used in the proces
+
+	namedWindow("Head camera", WINDOW_AUTOSIZE); // window to display the results
+
+	bool active = true;
+	while (active) {        // starting infinit loop
+		head_cam >> cam_frame; // put captured-image frame in frame
+
+		imshow("Head camera", cam_frame); // display the result
+
+		int key = waitKey(1);
+		if (key == VK_ESCAPE)  // break the loop
+			active = false;
+	}
+
+	destroyWindow("Head camera");
+	head_cam.release();
 }
 //------------------------------------------------------------------------
