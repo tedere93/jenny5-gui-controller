@@ -15,7 +15,7 @@
 
 
 //----------------------------------------------------------------
-bool connect_to_head(t_jenny5_arduino_controller &head_controller, VideoCapture &head_cam, int HEAD_COM_PORT, char* error_string)
+bool connect_to_head(t_jenny5_arduino_controller &head_controller, int HEAD_COM_PORT, char* error_string)
 {
 	//-------------- START INITIALIZATION ------------------------------
 
@@ -53,20 +53,11 @@ bool connect_to_head(t_jenny5_arduino_controller &head_controller, VideoCapture 
 			return false;
 		}
 	}
-	// connect to video camera
-
-	head_cam.open(HEAD_CAMERA_INDEX);	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
-	if (!head_cam.isOpened())	// check if we succeeded
-	{
-		sprintf(error_string, "Couldn't open head's video camera!\n");
-		head_controller.close_connection();
-		return false;
-	}
 
 	return true;
 }
 //----------------------------------------------------------------
-bool connect_to_left_arm(t_jenny5_arduino_controller &left_arm_controller, VideoCapture &left_hand_cam, int LEFT_ARM_COM_PORT, char* error_string)
+bool connect_to_left_arm(t_jenny5_arduino_controller &left_arm_controller, int LEFT_ARM_COM_PORT, char* error_string)
 {
 	//-------------- START INITIALIZATION ------------------------------
 
@@ -103,22 +94,7 @@ bool connect_to_left_arm(t_jenny5_arduino_controller &left_arm_controller, Video
 			return false;
 		}
 	}
-	// connect to video camera
 
-	left_hand_cam.open(0);			// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
-	if (!left_hand_cam.isOpened())	// check if we succeeded
-	{
-		sprintf(error_string, "Couldn't open left arm's video camera!\n");
-		left_arm_controller.close_connection();
-		return false;
-	}
-	/*
-	else {
-		Mat frame;
-		left_hand_cam >> frame;
-		printf("left arm video size: %dx%d\n", frame.rows, frame.cols);
-	}
-	*/
 	return true;
 }
 //----------------------------------------------------------------

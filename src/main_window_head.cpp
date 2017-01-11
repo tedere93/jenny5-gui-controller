@@ -114,7 +114,7 @@ void  MainFrame::on_connect_to_head_click(wxCommandEvent &event)
 	tc_head_com_port->GetValue().ToLong(&head_com_port); // real port number
 
 	if (!head_controller.is_open()) {
-		if (connect_to_head(head_controller, head_cam, head_com_port, error_string)) {
+		if (connect_to_head(head_controller, head_com_port, error_string)) {
 			b_connect_to_head->SetLabel("Disconnect");
 			// show the firmware version number
 			head_controller.send_get_firmware_version();
@@ -236,12 +236,9 @@ void MainFrame::on_show_head_camera_click(wxCommandEvent &event)
 		write_to_log(error_string);
 		return;
 	}
-	head_cam.open(HEAD_CAMERA_INDEX);	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
-	if (!head_cam.isOpened())	// check if we succeeded
-	{
+	if (!head_cam.open(HEAD_CAMERA_INDEX)){	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
 		sprintf(error_string, "Couldn't open head's video camera!\n");
 		write_to_log(error_string);
-		head_controller.close_connection();
 		return;
 	}
 
