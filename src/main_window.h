@@ -201,6 +201,7 @@ private:
 	wxTextCtrl *tc_lidar_com_port;
 	wxButton *b_connect_to_lidar;
 	void on_connect_to_lidar_click(wxCommandEvent &event);
+	void build_lidar_interface(void);
 
 	//--------------------------------------------------------------
 	t_roboclaw_controller platform_controller;
