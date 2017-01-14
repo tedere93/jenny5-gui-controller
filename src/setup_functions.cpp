@@ -107,6 +107,15 @@ bool connect_to_platform(t_roboclaw_controller &platform_controller, int platfor
 	return true;
 }
 //----------------------------------------------------------------
+bool connect_to_foot(t_roboclaw_controller &foot_controller, int foot_com_port, char* error_string)
+{
+	if (!foot_controller.connect(foot_com_port - 1, 38400)) {
+		sprintf(error_string, "Error attaching to Jenny 5' foot!\n");
+		return false;
+	}
+	return true;
+}
+//----------------------------------------------------------------
 bool init_face_classifier(CascadeClassifier &face_classifier, char* error_string)
 {
 	//-------------- START INITIALIZATION ------------------------------

@@ -46,6 +46,8 @@ void MainFrame::build_interface(void)
 	//----------------------------------------------------------------------
 	build_platform_interface();
 	//----------------------------------------------------------------------
+	build_foot_interface();
+	//----------------------------------------------------------------------
 
 	p_lidar = new wxPanel(p_commands_panel);
 	wxBoxSizer* sizer_lidar = new wxBoxSizer(wxVERTICAL);
@@ -69,6 +71,7 @@ void MainFrame::build_interface(void)
 	sizer_commands->Add(p_head, 0, wxLEFT, 10);
 	sizer_commands->Add(p_lidar, 0, wxLEFT, 10);
 	sizer_commands->Add(p_platform, 0, wxLEFT, 10);
+	sizer_commands->Add(p_foot, 0, wxLEFT, 10);
 	sizer_commands->Add(p_left_arm, 0, wxLEFT, 10);
 	sizer_commands->Add(p_right_arm, 0, wxLEFT, 10);
 

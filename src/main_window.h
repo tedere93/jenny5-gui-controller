@@ -98,6 +98,8 @@ private:
 	
 	wxButton *b_show_head_camera;
 	void on_show_head_camera_click(wxCommandEvent &event);
+
+	void head_get_sensors_value(void);
 	//--------------------------------------------------------------
 
 	t_jenny5_arduino_controller left_arm_controller;
@@ -230,6 +232,45 @@ private:
 
 	//--------------------------------------------------------------
 	
+	t_roboclaw_controller foot_controller;
+	wxPanel *p_foot;
+	wxStaticText *st_foot;
+	wxStaticText *st_foot_com_port;
+	wxTextCtrl *tc_foot_com_port;
+	wxButton *b_connect_to_foot;
+	void on_connect_to_foot_click(wxCommandEvent &event);
+
+	wxButton *b_expand_foot;
+	void on_foot_expand_mouse_down(wxMouseEvent &event);
+	void on_foot_expand_mouse_up(wxMouseEvent &event);
+
+	wxButton *b_contract_foot;
+	void on_foot_contract_mouse_down(wxMouseEvent &event);
+	void on_foot_contract_mouse_up(wxMouseEvent &event);
+
+	wxButton *b_expand_top_foot_motor;
+	void on_foot_expand_top_motor_mouse_down(wxMouseEvent &event);
+	void on_foot_expand_top_motor_mouse_up(wxMouseEvent &event);
+
+	wxButton *b_contract_top_foot_motor;
+	void on_foot_contract_top_motor_mouse_down(wxMouseEvent &event);
+	void on_foot_contract_top_motor_mouse_up(wxMouseEvent &event);
+
+	wxButton *b_expand_bottom_foot_motor;
+	void on_foot_expand_bottom_motor_mouse_down(wxMouseEvent &event);
+	void on_foot_expand_bottom_motor_mouse_up(wxMouseEvent &event);
+
+	wxButton *b_contract_bottom_foot_motor;
+	void on_foot_contract_bottom_motor_mouse_down(wxMouseEvent &event);
+	void on_foot_contract_bottom_motor_mouse_up(wxMouseEvent &event);
+
+
+	void foot_set_enable_all(bool new_state);
+
+	void build_foot_interface(void);
+
+	//--------------------------------------------------------------
+
 	void build_interface(void);
 	void OnMainWindowClose(wxCloseEvent& WXUNUSED(event));
 
