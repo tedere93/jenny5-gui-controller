@@ -106,7 +106,14 @@ void MainFrame::head_set_enable_all(bool new_state)
 	b_head_refresh->Enable(new_state);
 	b_head_home_all->Enable(new_state);
 }
-//------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+void MainFrame::head_get_sensors_value(void)
+{
+	head_controller.send_get_potentiometer_position(HEAD_POTENTIOMETER_NECK_INDEX);
+	head_controller.send_get_potentiometer_position(HEAD_POTENTIOMETER_FACE_INDEX);
+	head_controller.send_get_sonar_distance(HEAD_ULTRASONIC_FACE_INDEX);
+}
+//--------------------------------------------------------------------------
 void  MainFrame::on_connect_to_head_click(wxCommandEvent &event)
 {
 	char error_string[1000];
@@ -123,9 +130,7 @@ void  MainFrame::on_connect_to_head_click(wxCommandEvent &event)
 				write_to_log(error_string);
 			}
 			else {
-				head_controller.send_get_potentiometer_position(0);
-				head_controller.send_get_potentiometer_position(1);
-				head_controller.send_get_sonar_distance(0);
+				head_get_sensors_value();
 
 				head_set_enable_all(true);
 			}
@@ -144,9 +149,7 @@ void  MainFrame::on_connect_to_head_click(wxCommandEvent &event)
 //------------------------------------------------------------------------
 void MainFrame::on_head_refresh_data_click(wxCommandEvent &event)
 {
-	head_controller.send_get_potentiometer_position(HEAD_POTENTIOMETER_NECK_INDEX);
-	head_controller.send_get_potentiometer_position(HEAD_POTENTIOMETER_FACE_INDEX);
-	head_controller.send_get_sonar_distance(HEAD_ULTRASONIC_FACE_INDEX);
+	head_get_sensors_value();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_head_home_all_click(wxCommandEvent &event)
@@ -207,13 +210,14 @@ void MainFrame::handle_head_events(void)
 		intptr_t pot_position;
 		char buffer[100];
 		if (head_controller.query_for_event(POTENTIOMETER_EVENT, HEAD_POTENTIOMETER_NECK_INDEX, &pot_position)) {
-			sprintf(buffer, "Head pot position (%d) = %d\n", HEAD_POTENTIOMETER_NECK_INDEX, (int)pot_position);
+			sprintf(buffer, "Head neck position = %d\n", (int)pot_position);
 			write_to_log(buffer);
 			tc_head_neck_motor_position->SetValue(wxString() << pot_position);
 			s_head_neck_motor_position->SetValue(pot_position);
 		}
+
 		if (head_controller.query_for_event(POTENTIOMETER_EVENT, HEAD_POTENTIOMETER_FACE_INDEX, &pot_position)) {
-			sprintf(buffer, "Head pot position (%d) = %d\n", HEAD_POTENTIOMETER_FACE_INDEX, (int)pot_position);
+			sprintf(buffer, "Head face position = %d\n", (int)pot_position);
 			write_to_log(buffer);
 			tc_head_face_motor_position->SetValue(wxString() << pot_position);
 			s_head_face_motor_position->SetValue(pot_position);
@@ -225,6 +229,20 @@ void MainFrame::handle_head_events(void)
 			write_to_log(buffer);
 			tc_head_ultrasonic->SetValue(wxString() << ultrasonic_distance);
 		}
+
+		intptr_t motor_steps_left_to_move;
+		if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_NECK, &motor_steps_left_to_move)) {
+			//sprintf(buffer, "Head pot position (%d) = %d\n", HEAD_POTENTIOMETER_NECK_INDEX, (int)pot_position);
+			write_to_log(buffer);
+			head_controller.send_get_potentiometer_position(HEAD_POTENTIOMETER_NECK_INDEX); // request potentiometer position
+		}
+
+		if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_FACE, &motor_steps_left_to_move)) {
+			//sprintf(buffer, "Head pot position (%d) = %d\n", HEAD_POTENTIOMETER_FACE_INDEX, (int)pot_position);
+			write_to_log(buffer);
+			head_controller.send_get_potentiometer_position(HEAD_POTENTIOMETER_FACE_INDEX); // request potentiometer position
+		}
+
 	}
 }
 //------------------------------------------------------------------------
