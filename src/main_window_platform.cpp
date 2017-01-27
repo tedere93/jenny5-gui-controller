@@ -12,7 +12,7 @@ void MainFrame::build_platform_interface(void)
 	wxBoxSizer* sizer_platform = new wxBoxSizer(wxVERTICAL);
 	st_platform = new wxStaticText(p_platform, wxID_ANY, "Platform");
 	st_platform_com_port = new wxStaticText(p_platform, wxID_ANY, "COM port");
-	tc_platform_com_port = new wxTextCtrl(p_platform, wxID_ANY, "11");
+	tc_platform_com_port = new wxTextCtrl(p_platform, wxID_ANY, "19");
 	b_connect_to_platform = new wxButton(p_platform, -1, "Connect");
 	b_connect_to_platform->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_platform_click, this);
 
@@ -37,6 +37,18 @@ void MainFrame::build_platform_interface(void)
 	b_run_platform_motors->Bind(wxEVT_LEFT_UP, &MainFrame::on_platform_run_motors_mouse_up, this);
 	b_run_platform_motors->Enable(false);
 
+
+	st_platform_rotate_speed = new wxStaticText(p_platform, wxID_ANY, "Rotate speed");
+	s_platform_rotate_speed = new wxSlider(p_platform, -1, 0, -100, 100);
+	s_platform_rotate_speed->Bind(wxEVT_SLIDER, &MainFrame::on_platform_rotate_speed_slider_move, this);
+	tc_platform_rotate_speed = new wxTextCtrl(p_platform, -1, "0");
+
+	b_rotate_platform = new wxButton(p_platform, -1, "Rotate");
+	b_rotate_platform->Bind(wxEVT_LEFT_DOWN, &MainFrame::on_platform_rotate_mouse_down, this);
+	b_rotate_platform->Bind(wxEVT_LEFT_UP, &MainFrame::on_platform_rotate_mouse_up, this);
+	b_rotate_platform->Enable(false);
+
+
 	sizer_platform->Add(st_platform, 0, wxTOP, 10);
 	sizer_platform->Add(st_platform_com_port, 0, wxTOP, 10);
 	sizer_platform->Add(tc_platform_com_port);
@@ -54,8 +66,14 @@ void MainFrame::build_platform_interface(void)
 	sizer_platform->Add(s_platform_right_motor_speed);
 	sizer_platform->Add(tc_platform_right_motor_speed);
 
-
 	sizer_platform->Add(b_run_platform_motors, 0, wxTOP, 10);
+
+	sizer_platform->Add(st_platform_rotate_speed, 0, wxTOP, 10);
+	sizer_platform->Add(s_platform_rotate_speed);
+	sizer_platform->Add(tc_platform_rotate_speed);
+
+
+	sizer_platform->Add(b_rotate_platform, 0, wxTOP, 10);
 
 	p_platform->SetSizer(sizer_platform);
 }
@@ -74,6 +92,7 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 			tc_platform_battery_voltage->SetValue(wxString() << battery_voltage);
 
 			b_run_platform_motors->Enable(true);
+			b_rotate_platform->Enable(true);
 		}
 		else {
 			write_to_log(error_string);
@@ -84,6 +103,7 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 		platform_controller.close_connection();
 		b_connect_to_platform->SetLabel("Connect");
 		b_run_platform_motors->Enable(false);
+		b_rotate_platform->Enable(false);
 	}
 }
 //------------------------------------------------------------------------
@@ -116,5 +136,28 @@ void MainFrame::on_platform_right_motor_slider_move(wxCommandEvent& event)
 {
 	long platform_right_motor_speed_new_position = s_platform_right_motor_speed->GetValue();
 	tc_platform_right_motor_speed->SetValue(wxString() << platform_right_motor_speed_new_position);
+}
+//------------------------------------------------------------------------
+void MainFrame::on_platform_rotate_speed_slider_move(wxCommandEvent & event)
+{
+	long platform_rotate_speed_new_position = s_platform_rotate_speed->GetValue();
+	tc_platform_rotate_speed->SetValue(wxString() << platform_rotate_speed_new_position);
+}
+//------------------------------------------------------------------------
+void MainFrame::on_platform_rotate_mouse_down(wxMouseEvent &event)
+{
+	long platform_rotate_speed;
+	tc_platform_rotate_speed->GetValue().ToLong(&platform_rotate_speed);
+	
+	platform_controller.drive_M1_with_signed_duty_and_acceleration(platform_rotate_speed * 100, 1);
+	platform_controller.drive_M2_with_signed_duty_and_acceleration(-platform_rotate_speed * 100, 1);
+	b_run_platform_motors->SetLabel("Rotating");
+}
+//------------------------------------------------------------------------
+void MainFrame::on_platform_rotate_mouse_up(wxMouseEvent &event)
+{
+	platform_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
+	platform_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+	b_rotate_platform->SetLabel("Rotate");
 }
 //------------------------------------------------------------------------
