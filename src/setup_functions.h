@@ -22,7 +22,7 @@ bool connect_to_left_arm(t_jenny5_arduino_controller &left_arm_controller, int L
 bool init_face_classifier(CascadeClassifier &face_classifier, char* error_string);
 bool connect_to_lidar(t_jenny5_arduino_controller &lidar_controller, int lidar_com_port, char* error_string);
 bool connect_to_platform(t_roboclaw_controller &platform_controller, int platform_com_port, char* error_string);
-bool connect_to_foot(t_roboclaw_controller &foot_controller, int foot_com_port, char* error_string);
+bool connect_to_leg(t_roboclaw_controller &leg_controller, int leg_com_port, char* error_string);
 
 bool setup_head(t_jenny5_arduino_controller &head_controller, char* error_string);
 bool setup_left_arm(t_jenny5_arduino_controller &left_arm_controller, char* error_string);

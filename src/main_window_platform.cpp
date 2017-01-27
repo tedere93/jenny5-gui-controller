@@ -86,6 +86,7 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 
 	if (!platform_controller.is_open()) {
 		if (connect_to_platform(platform_controller, platform_com_port, error_string)) {
+			write_to_log("Connected to platform");
 			b_connect_to_platform->SetLabel("Disconnect");
 			// show the firmware version number
 			double battery_voltage = platform_controller.get_main_battery_voltage();

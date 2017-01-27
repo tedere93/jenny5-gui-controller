@@ -242,46 +242,46 @@ private:
 	void build_platform_interface(void);
 
 	//--------------------------------------------------------------
-	t_roboclaw_controller foot_controller;
-	wxPanel *p_foot;
-	wxStaticText *st_foot;
-	wxStaticText *st_foot_com_port;
-	wxTextCtrl *tc_foot_com_port;
-	wxButton *b_connect_to_foot;
-	void on_connect_to_foot_click(wxCommandEvent &event);
+	t_roboclaw_controller leg_controller;
+	wxPanel *p_leg;
+	wxStaticText *st_leg;
+	wxStaticText *st_leg_com_port;
+	wxTextCtrl *tc_leg_com_port;
+	wxButton *b_connect_to_leg;
+	void on_connect_to_leg_click(wxCommandEvent &event);
 
-	wxButton *b_expand_foot;
-	void on_foot_expand_mouse_down(wxMouseEvent &event);
-	void on_foot_expand_mouse_up(wxMouseEvent &event);
+	wxButton *b_expand_leg;
+	void on_leg_expand_mouse_down(wxMouseEvent &event);
+	void on_leg_expand_mouse_up(wxMouseEvent &event);
 
-	wxButton *b_contract_foot;
-	void on_foot_contract_mouse_down(wxMouseEvent &event);
-	void on_foot_contract_mouse_up(wxMouseEvent &event);
+	wxButton *b_contract_leg;
+	void on_leg_contract_mouse_down(wxMouseEvent &event);
+	void on_leg_contract_mouse_up(wxMouseEvent &event);
 
-	wxButton *b_expand_top_foot_motor;
-	void on_foot_expand_top_motor_mouse_down(wxMouseEvent &event);
-	void on_foot_expand_top_motor_mouse_up(wxMouseEvent &event);
+	wxButton *b_expand_top_leg_motor;
+	void on_leg_expand_top_motor_mouse_down(wxMouseEvent &event);
+	void on_leg_expand_top_motor_mouse_up(wxMouseEvent &event);
 
-	wxButton *b_contract_top_foot_motor;
-	void on_foot_contract_top_motor_mouse_down(wxMouseEvent &event);
-	void on_foot_contract_top_motor_mouse_up(wxMouseEvent &event);
+	wxButton *b_contract_top_leg_motor;
+	void on_leg_contract_top_motor_mouse_down(wxMouseEvent &event);
+	void on_leg_contract_top_motor_mouse_up(wxMouseEvent &event);
 
-	wxButton *b_expand_bottom_foot_motor;
-	void on_foot_expand_bottom_motor_mouse_down(wxMouseEvent &event);
-	void on_foot_expand_bottom_motor_mouse_up(wxMouseEvent &event);
+	wxButton *b_expand_bottom_leg_motor;
+	void on_leg_expand_bottom_motor_mouse_down(wxMouseEvent &event);
+	void on_leg_expand_bottom_motor_mouse_up(wxMouseEvent &event);
 
-	wxButton *b_contract_bottom_foot_motor;
-	void on_foot_contract_bottom_motor_mouse_down(wxMouseEvent &event);
-	void on_foot_contract_bottom_motor_mouse_up(wxMouseEvent &event);
+	wxButton *b_contract_bottom_leg_motor;
+	void on_leg_contract_bottom_motor_mouse_down(wxMouseEvent &event);
+	void on_leg_contract_bottom_motor_mouse_up(wxMouseEvent &event);
 
-	wxStaticText *st_foot_speed;
-	wxSlider *s_foot_speed;
-	void on_foot_speed_slider_move(wxCommandEvent & event);
-	wxTextCtrl *tc_foot_speed;
+	wxStaticText *st_leg_speed;
+	wxSlider *s_leg_speed;
+	void on_leg_speed_slider_move(wxCommandEvent & event);
+	wxTextCtrl *tc_leg_speed;
 
-	void foot_set_enable_all(bool new_state);
+	void leg_set_enable_all(bool new_state);
 
-	void build_foot_interface(void);
+	void build_leg_interface(void);
 
 	//--------------------------------------------------------------
 
