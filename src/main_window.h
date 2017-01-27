@@ -165,7 +165,8 @@ private:
 	void on_left_arm_close_gripper_click(wxCommandEvent &event);
 
 	wxButton *b_left_arm_open_gripper;
-	void on_left_arm_open_gripper_click(wxCommandEvent &event);
+	void on_left_arm_open_gripper_mouse_down(wxMouseEvent &event);
+	void on_left_arm_open_gripper_mouse_up(wxMouseEvent &event);
 
 
 	wxButton *b_left_arm_refresh;
@@ -225,6 +226,15 @@ private:
 	wxStaticText *st_platform_battery_voltage;
 	wxTextCtrl *tc_platform_battery_voltage;
 
+	wxStaticText *st_platform_rotate_speed;
+	wxSlider *s_platform_rotate_speed;
+	void on_platform_rotate_speed_slider_move(wxCommandEvent & event);
+	wxTextCtrl *tc_platform_rotate_speed;
+	wxButton *b_rotate_platform;
+	void on_platform_rotate_mouse_down(wxMouseEvent &event);
+	void on_platform_rotate_mouse_up(wxMouseEvent &event);
+
+
 	wxButton *b_run_platform_motors;
 	void on_platform_run_motors_mouse_down(wxMouseEvent &event);
 	void on_platform_run_motors_mouse_up(wxMouseEvent &event);
@@ -232,7 +242,6 @@ private:
 	void build_platform_interface(void);
 
 	//--------------------------------------------------------------
-	
 	t_roboclaw_controller foot_controller;
 	wxPanel *p_foot;
 	wxStaticText *st_foot;
@@ -265,6 +274,10 @@ private:
 	void on_foot_contract_bottom_motor_mouse_down(wxMouseEvent &event);
 	void on_foot_contract_bottom_motor_mouse_up(wxMouseEvent &event);
 
+	wxStaticText *st_foot_speed;
+	wxSlider *s_foot_speed;
+	void on_foot_speed_slider_move(wxCommandEvent & event);
+	wxTextCtrl *tc_foot_speed;
 
 	void foot_set_enable_all(bool new_state);
 

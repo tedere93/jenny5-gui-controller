@@ -103,6 +103,7 @@ void MainFrame::OnMainWindowClose(wxCloseEvent& WXUNUSED(event))
 	right_arm_controller.close_connection();
 	lidar_controller.close_connection();
 	platform_controller.close_connection();
+	foot_controller.close_connection();
 
 	Destroy();
 }
