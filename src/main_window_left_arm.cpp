@@ -112,7 +112,8 @@ void MainFrame::build_left_arm_interface(void)
 	b_left_arm_close_gripper->Bind(wxEVT_BUTTON, &MainFrame::on_left_arm_close_gripper_click, this);
 
 	b_left_arm_open_gripper = new wxButton(p_left_arm, -1, "Open Gripper");
-	b_left_arm_open_gripper->Bind(wxEVT_BUTTON, &MainFrame::on_left_arm_open_gripper_click, this);
+	b_left_arm_open_gripper->Bind(wxEVT_LEFT_DOWN, &MainFrame::on_left_arm_open_gripper_mouse_down, this);
+	b_left_arm_open_gripper->Bind(wxEVT_LEFT_UP, &MainFrame::on_left_arm_open_gripper_mouse_up, this);
 
 	//-------
 	b_left_arm_refresh = new wxButton(p_left_arm, -1, "Refresh");
@@ -441,9 +442,14 @@ void MainFrame::on_left_arm_close_gripper_click(wxCommandEvent &event)
 	left_arm_controller.send_go_home_stepper_motor(LEFT_ARM_GRIPPER_MOTOR);
 }
 //------------------------------------------------------------------------
-void MainFrame::on_left_arm_open_gripper_click(wxCommandEvent &event)
+void MainFrame::on_left_arm_open_gripper_mouse_down(wxMouseEvent &event)
 {
-	left_arm_controller.send_move_stepper_motor(LEFT_ARM_GRIPPER_MOTOR, -500);
+	left_arm_controller.send_move_stepper_motor(LEFT_ARM_GRIPPER_MOTOR, -5000);
+}
+//------------------------------------------------------------------------
+void MainFrame::on_left_arm_open_gripper_mouse_up(wxMouseEvent &event)
+{
+	left_arm_controller.send_move_stepper_motor(LEFT_ARM_GRIPPER_MOTOR, 0);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_show_left_arm_camera_click(wxCommandEvent &event)
