@@ -65,8 +65,8 @@
 #define _potentiometer_home_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR 500
 
 #define _potentiometer_min_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR 230
-#define _potentiometer_max_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR 760
-#define _potentiometer_home_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR 750
+#define _potentiometer_max_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR 750
+#define _potentiometer_home_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR 740
 
 #define _potentiometer_min_LEFT_ARM_ELBOW_MOTOR 480
 #define _potentiometer_max_LEFT_ARM_ELBOW_MOTOR 830
