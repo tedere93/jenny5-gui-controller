@@ -14,27 +14,27 @@
 #include "home.h"
 #include "setup_functions.h"
 #include "utils.h"
-#include "jenny5_arduino_controller.h"
-#include "jenny5_gui_defs.h"
+#include "head_controller.h"
+#include "jenny5_defs.h"
 
 
 using namespace cv;
 
 //----------------------------------------------------------------
-int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_port, VideoCapture &head_cam, CascadeClassifier &face_classifier, f_log_callback to_log)
+int head_face_follow(t_head_controller &jenny5_head_controller, int head_com_port, CascadeClassifier &face_classifier, f_log_callback to_log)
 {
 	// initialization
 
 	char error_string[1000];
 
-	if (!connect_to_head(head_controller, head_com_port, error_string)) {
+	if (!jenny5_head_controller.connect(head_com_port, error_string)) {
 		to_log(error_string);
 		return -1;
 	}
 	else
 		to_log("Head connection succceded.\n");
 
-	if (!head_cam.open(HEAD_CAMERA_INDEX)) {	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
+	if (!jenny5_head_controller.head_cam.open(HEAD_CAMERA_INDEX)) {	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
 		to_log("Couldn't open head's video camera!\n");
 		return -1;
 	}
@@ -50,7 +50,7 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 		to_log("Face classifier initialization succceded.\n");
 
 	// setup
-	if (!setup_head(head_controller, error_string)) {
+	if (!jenny5_head_controller.setup(error_string)) {
 		to_log(error_string);
 		return -1;
 	}
@@ -59,7 +59,7 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 
 
 	//  home
-	if (!home_head_motors(head_controller, error_string)) {
+	if (!jenny5_head_controller.home_all_motors(error_string)) {
 		to_log(error_string);
 		return -1;
 	}
@@ -75,10 +75,10 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 	bool active = true;
 	while (active) {        // starting infinit loop
 
-		if (!head_controller.update_commands_from_serial())
+		if (!jenny5_head_controller.head_arduino_controller.update_commands_from_serial())
 			Sleep(DOES_NOTHING_SLEEP); // no new data from serial ... we make a little pause so that we don't kill the processor
 
-		head_cam >> cam_frame; // put captured-image frame in frame
+		jenny5_head_controller.head_cam >> cam_frame; // put captured-image frame in frame
 
 		cvtColor(cam_frame, gray_frame, CV_BGR2GRAY); // convert to gray and equalize
 		equalizeHist(gray_frame, gray_frame);
@@ -106,9 +106,9 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 
 		imshow("Head camera", cam_frame); // display the result
 
-		if (head_controller.get_sonar_state(0) == COMMAND_DONE) {// I ping the sonar only if no ping was sent before
-			head_controller.send_get_sonar_distance(0);
-			head_controller.set_sonar_state(0, COMMAND_SENT);
+		if (jenny5_head_controller.head_arduino_controller.get_sonar_state(0) == COMMAND_DONE) {// I ping the sonar only if no ping was sent before
+			jenny5_head_controller.head_arduino_controller.send_get_sonar_distance(0);
+			jenny5_head_controller.head_arduino_controller.set_sonar_state(0, COMMAND_SENT);
 			to_log("U0# - sent\n");
 		}
 
@@ -120,8 +120,8 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 				tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 				int num_steps_x = angle_offset.degrees_from_center_x / 1.8 * 27.0;
 
-				head_controller.send_move_stepper_motor(HEAD_MOTOR_NECK, num_steps_x);
-				head_controller.set_stepper_motor_state(HEAD_MOTOR_NECK, COMMAND_SENT);
+				jenny5_head_controller.head_arduino_controller.send_move_stepper_motor(HEAD_MOTOR_NECK, num_steps_x);
+				jenny5_head_controller.head_arduino_controller.set_stepper_motor_state(HEAD_MOTOR_NECK, COMMAND_SENT);
 				char tmp_s[100];
 				sprintf(tmp_s, "M%d %d# - sent\n", HEAD_MOTOR_NECK, num_steps_x);
 				to_log(tmp_s);
@@ -133,8 +133,8 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 					tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 					int num_steps_x = angle_offset.degrees_from_center_x / 1.8 * 27.0;
 
-					head_controller.send_move_stepper_motor(HEAD_MOTOR_NECK, num_steps_x);
-					head_controller.set_stepper_motor_state(HEAD_MOTOR_NECK, COMMAND_SENT);
+					jenny5_head_controller.head_arduino_controller.send_move_stepper_motor(HEAD_MOTOR_NECK, num_steps_x);
+					jenny5_head_controller.head_arduino_controller.set_stepper_motor_state(HEAD_MOTOR_NECK, COMMAND_SENT);
 					char tmp_s[100];
 					sprintf(tmp_s, "M%d %d# - sent\n", HEAD_MOTOR_NECK, num_steps_x);
 					to_log(tmp_s);
@@ -152,8 +152,8 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 					tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 					int num_steps_y = angle_offset.degrees_from_center_y / 1.8 * 27.0;
 
-					head_controller.send_move_stepper_motor(HEAD_MOTOR_FACE, num_steps_y);
-					head_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_SENT);
+					jenny5_head_controller.head_arduino_controller.send_move_stepper_motor(HEAD_MOTOR_FACE, num_steps_y);
+					jenny5_head_controller.head_arduino_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_SENT);
 					char tmp_s[100];
 					sprintf(tmp_s, "M%d %d# - sent\n", HEAD_MOTOR_FACE, num_steps_y);
 					to_log(tmp_s);
@@ -164,8 +164,8 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 						tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 						int num_steps_y = angle_offset.degrees_from_center_y / 1.8 * 27.0;
 
-						head_controller.send_move_stepper_motor(HEAD_MOTOR_FACE, num_steps_y);
-						head_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_SENT);
+						jenny5_head_controller.head_arduino_controller.send_move_stepper_motor(HEAD_MOTOR_FACE, num_steps_y);
+						jenny5_head_controller.head_arduino_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_SENT);
 						char tmp_s[100];
 						sprintf(tmp_s, "M%d -%d# - sent\n", HEAD_MOTOR_FACE, num_steps_y);
 						to_log(tmp_s);
@@ -175,9 +175,9 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 		}
 
 		// now extract the executed moves from the queue ... otherwise they will just stay there
-		if (head_controller.get_stepper_motor_state(HEAD_MOTOR_NECK) == COMMAND_SENT) {// if a command has been sent
-			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_NECK)) { // have we received the event from Serial ?
-				head_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_DONE);
+		if (jenny5_head_controller.head_arduino_controller.get_stepper_motor_state(HEAD_MOTOR_NECK) == COMMAND_SENT) {// if a command has been sent
+			if (jenny5_head_controller.head_arduino_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_NECK)) { // have we received the event from Serial ?
+				jenny5_head_controller.head_arduino_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_DONE);
 				char tmp_s[100];
 				sprintf(tmp_s, "M%d# - done\n", HEAD_MOTOR_FACE);
 				to_log(tmp_s);
@@ -185,9 +185,9 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 		}
 
 		// now extract the moves done from the queue
-		if (head_controller.get_stepper_motor_state(HEAD_MOTOR_FACE) == COMMAND_SENT) {// if a command has been sent
-			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_FACE)) { // have we received the event from Serial ?
-				head_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_DONE);
+		if (jenny5_head_controller.head_arduino_controller.get_stepper_motor_state(HEAD_MOTOR_FACE) == COMMAND_SENT) {// if a command has been sent
+			if (jenny5_head_controller.head_arduino_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_FACE)) { // have we received the event from Serial ?
+				jenny5_head_controller.head_arduino_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_DONE);
 				char tmp_s[100];
 				sprintf(tmp_s, "M%d# - done\n", HEAD_MOTOR_FACE);
 				to_log(tmp_s);
@@ -195,10 +195,10 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 		}
 
 		// read to see if there is any distance received from sonar
-		if (head_controller.get_sonar_state(0) == COMMAND_SENT) {// if a command has been sent
+		if (jenny5_head_controller.head_arduino_controller.get_sonar_state(0) == COMMAND_SENT) {// if a command has been sent
 			intptr_t distance;
-			if (head_controller.query_for_event(SONAR_EVENT, 0, &distance)) { // have we received the event from Serial ?
-				head_controller.set_sonar_state(0, COMMAND_DONE);
+			if (jenny5_head_controller.head_arduino_controller.query_for_event(SONAR_EVENT, 0, &distance)) { // have we received the event from Serial ?
+				jenny5_head_controller.head_arduino_controller.set_sonar_state(0, COMMAND_DONE);
 				char tmp_s[100];
 				sprintf(tmp_s, "distance = %Id cm\n", distance);
 				to_log(tmp_s);
@@ -211,10 +211,10 @@ int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_
 			active = false;
 	}
 
-	head_controller.send_move_stepper_motor(HEAD_MOTOR_NECK, 0);
-	head_controller.send_move_stepper_motor(HEAD_MOTOR_FACE, 0);
+	jenny5_head_controller.head_arduino_controller.send_move_stepper_motor(HEAD_MOTOR_NECK, 0);
+	jenny5_head_controller.head_arduino_controller.send_move_stepper_motor(HEAD_MOTOR_FACE, 0);
 
-	head_controller.close_connection();
+	jenny5_head_controller.disconnect();
 
 	destroyWindow("Head camera");
 

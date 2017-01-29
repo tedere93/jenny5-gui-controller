@@ -11,8 +11,9 @@
 #include "main_window.h"
 #include "setup_functions.h"
 #include "home.h"
-#include "jenny5_gui_defs.h"
+#include "jenny5_defs.h"
 #include  "utils.h"
+#include "head_controller.h"
 
 
 
@@ -98,7 +99,7 @@ void MainFrame::OnMainWindowClose(wxCloseEvent& WXUNUSED(event))
 	t_timer->Stop();
 	delete t_timer;
 
-	head_controller.close_connection();
+	jenny5_head_controller.disconnect();
 	left_arm_controller.close_connection();
 	right_arm_controller.close_connection();
 	lidar_controller.close_connection();

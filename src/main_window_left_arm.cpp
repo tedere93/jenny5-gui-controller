@@ -1,7 +1,7 @@
 #include "main_window.h"
 #include "setup_functions.h"
 #include "home.h"
-#include "jenny5_gui_defs.h"
+#include "jenny5_defs.h"
 #include  "utils.h"
 
 //------------------------------------------------------------------------
@@ -11,7 +11,7 @@ void MainFrame::build_left_arm_interface(void)
 	wxBoxSizer* sizer_left_arm = new wxBoxSizer(wxVERTICAL);
 	st_left_arm = new wxStaticText(p_left_arm, wxID_ANY, "Left arm");
 	st_left_arm_com_port = new wxStaticText(p_left_arm, wxID_ANY, "COM port");
-	tc_left_arm_com_port = new wxTextCtrl(p_left_arm, wxID_ANY, "12");
+	tc_left_arm_com_port = new wxTextCtrl(p_left_arm, wxID_ANY, "6");
 	b_connect_to_left_arm = new wxButton(p_left_arm, -1, "Connect");
 	b_connect_to_left_arm->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_left_arm_click, this);
 //-------
@@ -116,11 +116,14 @@ void MainFrame::build_left_arm_interface(void)
 	b_left_arm_open_gripper->Bind(wxEVT_LEFT_UP, &MainFrame::on_left_arm_open_gripper_mouse_up, this);
 
 	//-------
-	b_left_arm_refresh = new wxButton(p_left_arm, -1, "Refresh");
+	b_left_arm_refresh = new wxButton(p_left_arm, -1, "Read sensors");
 	b_left_arm_refresh->Bind(wxEVT_BUTTON, &MainFrame::on_left_arm_refresh_data_click, this);
 
 	b_left_arm_home_all = new wxButton(p_left_arm, -1, "Home All");
 	b_left_arm_home_all->Bind(wxEVT_BUTTON, &MainFrame::on_left_arm_home_all_click, this);
+
+	b_disable_all_left_arm_motors = new wxButton(p_left_arm, -1, "Disable motors");
+	b_disable_all_left_arm_motors->Bind(wxEVT_BUTTON, &MainFrame::on_disable_all_left_arm_motors_clicked, this);
 	//-------
 
 	b_show_left_arm_camera = new wxButton(p_left_arm, -1, "View camera");
@@ -165,6 +168,8 @@ void MainFrame::build_left_arm_interface(void)
 	sizer_left_arm->Add(b_left_arm_home_all, 0, wxTOP, 10);
 	sizer_left_arm->Add(b_left_arm_refresh, 0, wxTOP, 10);
 
+	sizer_left_arm->Add(b_disable_all_left_arm_motors, 0, wxTOP, 10);
+
 	sizer_left_arm->Add(b_show_left_arm_camera, 0, wxTOP, 10);
 
 	p_left_arm->SetSizer(sizer_left_arm);
@@ -203,6 +208,8 @@ void MainFrame::left_arm_set_enable_all(bool new_state)
 
 	b_left_arm_close_gripper->Enable(new_state);
 	b_left_arm_open_gripper->Enable(new_state);
+
+	b_disable_all_left_arm_motors->Enable(new_state);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_connect_to_left_arm_click(wxCommandEvent &event)
@@ -483,5 +490,10 @@ void MainFrame::on_show_left_arm_camera_click(wxCommandEvent &event)
 
 	destroyWindow("Left arm camera");
 	left_arm_cam.release();
+}
+//------------------------------------------------------------------------
+void MainFrame::on_disable_all_left_arm_motors_clicked(wxCommandEvent &event)
+{
+	left_arm_controller.send_disable_stepper_motor(LEFT_ARM_BODY_MOTOR);
 }
 //------------------------------------------------------------------------

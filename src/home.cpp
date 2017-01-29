@@ -7,52 +7,8 @@
 // ---------------------------------------------------------------------------
 
 #include "home.h"
-#include "jenny5_gui_defs.h"
+#include "jenny5_defs.h"
 
-//----------------------------------------------------------------
-bool home_head_motors(t_jenny5_arduino_controller &head_controller, char* error_string)
-{
-	// must home the head
-	head_controller.send_go_home_stepper_motor(HEAD_MOTOR_NECK);
-	head_controller.send_go_home_stepper_motor(HEAD_MOTOR_FACE);
-
-	printf("Head motors home started ...");
-	clock_t start_time = clock();
-	bool horizontal_motor_homed = false;
-	bool vertical_motor_homed = false;
-
-	while (1) {
-		if (!head_controller.update_commands_from_serial())
-			Sleep(5); // no new data from serial ... we make a little pause so that we don't kill the processor
-
-		if (!horizontal_motor_homed)
-			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_NECK))  // have we received the event from Serial ?
-				horizontal_motor_homed = true;
-
-		if (!vertical_motor_homed)
-			if (head_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_FACE))  // have we received the event from Serial ?
-				vertical_motor_homed = true;
-
-		if (horizontal_motor_homed && vertical_motor_homed)
-			break;
-
-		// measure the passed time 
-		clock_t end_time = clock();
-
-		double wait_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
-		// if more than 5 seconds and no home
-		if (wait_time > 5) {
-			if (!vertical_motor_homed)
-				sprintf(error_string, "Cannot home vertical motor! Game over!");
-			if (!horizontal_motor_homed)
-				sprintf(error_string, "Cannot home horizontal motor! Game over!");
-			return false;
-		}
-	}
-
-	printf("DONE\n");
-	return true;
-}
 //----------------------------------------------------------------
 bool home_left_arm_motors(t_jenny5_arduino_controller &left_arm_controller, char* error_string)
 {

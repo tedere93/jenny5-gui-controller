@@ -53,9 +53,7 @@ private:
 	void build_predefined_task_interface(void);
 
 	//----------------------------------------------
-	cv::VideoCapture head_cam; 
-	t_jenny5_arduino_controller head_controller;
-	cv::CascadeClassifier face_classifier;
+
 	
 	wxPanel *p_head;
 	
@@ -99,7 +97,8 @@ private:
 	wxButton *b_show_head_camera;
 	void on_show_head_camera_click(wxCommandEvent &event);
 
-	void head_get_sensors_value(void);
+	wxButton *b_disable_all_head_motors;
+	void on_disable_all_head_motors_clicked(wxCommandEvent &event);
 	//--------------------------------------------------------------
 
 	t_jenny5_arduino_controller left_arm_controller;
@@ -181,6 +180,9 @@ private:
 
 	wxButton *b_show_left_arm_camera;
 	void on_show_left_arm_camera_click(wxCommandEvent &event);
+
+	wxButton *b_disable_all_left_arm_motors;
+	void on_disable_all_left_arm_motors_clicked(wxCommandEvent &event);
 	//--------------------------------------------------------------
 	t_jenny5_arduino_controller right_arm_controller;
 	cv::VideoCapture right_arm_cam;

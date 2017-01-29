@@ -17,7 +17,7 @@
 #include "setup_functions.h"
 #include "utils.h"
 #include "jenny5_arduino_controller.h"
-#include "jenny5_gui_defs.h"
+#include "jenny5_defs.h"
 #include "lidar_map.h"
 
 

@@ -12,5 +12,6 @@
 #include <opencv2\highgui\highgui.hpp>
 
 #include "utils.h"
+#include "head_controller.h"
 
-int head_face_follow(t_jenny5_arduino_controller &head_controller, int head_com_port, VideoCapture &head_cam, CascadeClassifier &face_classifier, f_log_callback to_log);
+int head_face_follow(t_head_controller &jenny5_head_controller, int head_com_port, CascadeClassifier &face_classifier, f_log_callback to_log);

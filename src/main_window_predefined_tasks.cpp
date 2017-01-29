@@ -1,12 +1,13 @@
 #include "main_window.h"
 #include "setup_functions.h"
 #include "home.h"
-#include "jenny5_gui_defs.h"
+#include "jenny5_defs.h"
 #include  "utils.h"
 
 #include "head_face_follow.h"
 #include "lidar_map.h"
 #include "follow_person.h"
+#include "head_controller.h"
 
 //------------------------------------------------------------------------
 void MainFrame::build_predefined_task_interface(void)
@@ -36,7 +37,9 @@ void MainFrame::on_head_face_follow_click(wxCommandEvent &event)
 	long head_com_port;
 	tc_head_com_port->GetValue().ToLong(&head_com_port); // real port number
 
-	if (head_face_follow(head_controller, head_com_port, head_cam, face_classifier, write_to_log) == -1) {
+	CascadeClassifier face_classifier;
+
+	if (head_face_follow(jenny5_head_controller, head_com_port, face_classifier, write_to_log) == -1) {
 	}
 }
 //------------------------------------------------------------------------
@@ -61,8 +64,8 @@ void MainFrame::on_follow_person_click(wxCommandEvent &event)
 	long platform_com_port;
 	tc_platform_com_port->GetValue().ToLong(&platform_com_port); // real port number
 
-	if (follow_person(head_controller, head_com_port, lidar_controller, lidar_com_port, platform_controller, platform_com_port, head_cam, face_classifier, write_to_log) == -1) {
+//	if (follow_person(head_controller, head_com_port, lidar_controller, lidar_com_port, platform_controller, platform_com_port, head_cam, face_classifier, write_to_log) == -1) {
 
-	}
+	//}
 }
 //------------------------------------------------------------------------
