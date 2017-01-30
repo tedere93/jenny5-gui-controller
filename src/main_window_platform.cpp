@@ -4,6 +4,10 @@
 #include "jenny5_defs.h"
 #include  "utils.h"
 
+#define RECTANGULAR_SLIDER_SIZE 120
+#define speed_factor 100
+
+bool _mouse_down = false;
 //------------------------------------------------------------------------
 void MainFrame::build_platform_interface(void)
 {
@@ -48,6 +52,12 @@ void MainFrame::build_platform_interface(void)
 	b_rotate_platform->Bind(wxEVT_LEFT_UP, &MainFrame::on_platform_rotate_mouse_up, this);
 	b_rotate_platform->Enable(false);
 
+	p_platform_2d_slider = new wxPanel(p_platform, -1, wxDefaultPosition, wxSize(RECTANGULAR_SLIDER_SIZE, RECTANGULAR_SLIDER_SIZE));
+	p_platform_2d_slider->SetBackgroundColour(wxColour(255, 255, 255));
+	p_platform_2d_slider->Bind(wxEVT_MOTION, &MainFrame::on_platform_2d_mouse_move, this);
+	p_platform_2d_slider->Bind(wxEVT_LEFT_DOWN, &MainFrame::on_platform_2d_mouse_down, this);
+	p_platform_2d_slider->Bind(wxEVT_LEFT_UP, &MainFrame::on_platform_2d_mouse_up, this);
+	p_platform->Bind(wxEVT_LEFT_UP, &MainFrame::on_platform_2d_mouse_up, this);
 
 	sizer_platform->Add(st_platform, 0, wxTOP, 10);
 	sizer_platform->Add(st_platform_com_port, 0, wxTOP, 10);
@@ -75,6 +85,8 @@ void MainFrame::build_platform_interface(void)
 
 	sizer_platform->Add(b_rotate_platform, 0, wxTOP, 10);
 
+	sizer_platform->Add(p_platform_2d_slider, 0, wxTOP, 10);
+
 	p_platform->SetSizer(sizer_platform);
 }
 //------------------------------------------------------------------------
@@ -94,6 +106,7 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 
 			b_run_platform_motors->Enable(true);
 			b_rotate_platform->Enable(true);
+			_mouse_down = false;
 		}
 		else {
 			write_to_log(error_string);
@@ -115,8 +128,8 @@ void MainFrame::on_platform_run_motors_mouse_down(wxMouseEvent &event)
 	tc_platform_left_motor_speed->GetValue().ToLong(&platform_left_motor_speed);
 	tc_platform_right_motor_speed->GetValue().ToLong(&platform_right_motor_speed);
 
-	platform_controller.drive_M1_with_signed_duty_and_acceleration(-platform_right_motor_speed * 100, 1);
-	platform_controller.drive_M2_with_signed_duty_and_acceleration(-platform_left_motor_speed * 100, 1);
+	platform_controller.drive_M1_with_signed_duty_and_acceleration(-platform_right_motor_speed * speed_factor, 1);
+	platform_controller.drive_M2_with_signed_duty_and_acceleration(-platform_left_motor_speed * speed_factor, 1);
 	b_run_platform_motors->SetLabel("Running");
 }
 //------------------------------------------------------------------------
@@ -150,8 +163,8 @@ void MainFrame::on_platform_rotate_mouse_down(wxMouseEvent &event)
 	long platform_rotate_speed;
 	tc_platform_rotate_speed->GetValue().ToLong(&platform_rotate_speed);
 	
-	platform_controller.drive_M1_with_signed_duty_and_acceleration(platform_rotate_speed * 100, 1);
-	platform_controller.drive_M2_with_signed_duty_and_acceleration(-platform_rotate_speed * 100, 1);
+	platform_controller.drive_M1_with_signed_duty_and_acceleration(platform_rotate_speed * speed_factor, 1);
+	platform_controller.drive_M2_with_signed_duty_and_acceleration(-platform_rotate_speed * speed_factor, 1);
 	b_run_platform_motors->SetLabel("Rotating");
 }
 //------------------------------------------------------------------------
@@ -160,5 +173,47 @@ void MainFrame::on_platform_rotate_mouse_up(wxMouseEvent &event)
 	platform_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
 	platform_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
 	b_rotate_platform->SetLabel("Rotate");
+}
+//------------------------------------------------------------------------
+void MainFrame::on_platform_2d_mouse_move(wxMouseEvent& event)
+{
+	if (_mouse_down) {
+		wxPoint pos = event.GetPosition();
+
+		long platform_left_motor_speed = RECTANGULAR_SLIDER_SIZE - pos.y - RECTANGULAR_SLIDER_SIZE / 2;
+		long platform_right_motor_speed = RECTANGULAR_SLIDER_SIZE - pos.y - RECTANGULAR_SLIDER_SIZE / 2;
+
+		if (pos.x > RECTANGULAR_SLIDER_SIZE / 2) {
+			platform_left_motor_speed += pos.x - RECTANGULAR_SLIDER_SIZE / 2;
+		}
+		else
+			platform_right_motor_speed += -(pos.x - RECTANGULAR_SLIDER_SIZE / 2);
+
+		tc_platform_left_motor_speed->SetValue(wxString() << platform_left_motor_speed);
+		tc_platform_right_motor_speed->SetValue(wxString() << platform_right_motor_speed);
+
+		platform_controller.drive_M1_with_signed_duty_and_acceleration(-platform_right_motor_speed * speed_factor, 1);
+		platform_controller.drive_M2_with_signed_duty_and_acceleration(-platform_left_motor_speed * speed_factor, 1);
+	}
+	event.Skip();
+}
+//------------------------------------------------------------------------
+void MainFrame::on_platform_2d_mouse_down(wxMouseEvent& event)
+{
+	_mouse_down = true;
+}
+//------------------------------------------------------------------------
+void MainFrame::on_platform_2d_mouse_up(wxMouseEvent& event)
+{
+	_mouse_down = false;
+	platform_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
+	platform_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+
+	long platform_left_motor_speed = 0;
+	long platform_right_motor_speed = 0;
+
+	tc_platform_left_motor_speed->SetValue(wxString() << platform_left_motor_speed);
+	tc_platform_right_motor_speed->SetValue(wxString() << platform_right_motor_speed);
+	event.Skip();
 }
 //------------------------------------------------------------------------

@@ -74,6 +74,9 @@ void MainFrame::build_interface(void)
 
 	Bind(wxEVT_CLOSE_WINDOW, &MainFrame::OnMainWindowClose, this);
 
+	Bind(wxEVT_LEFT_UP, &MainFrame::on_platform_2d_mouse_up, this);
+
+
 	splitter_commands_log->SplitHorizontally(p_commands_panel, p_log_panel);
 
 	wxBoxSizer *main_sizer = new wxBoxSizer(wxVERTICAL);

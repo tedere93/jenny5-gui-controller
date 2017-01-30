@@ -241,6 +241,11 @@ private:
 	void on_platform_run_motors_mouse_down(wxMouseEvent &event);
 	void on_platform_run_motors_mouse_up(wxMouseEvent &event);
 
+	wxPanel *p_platform_2d_slider;
+	void on_platform_2d_mouse_move(wxMouseEvent& event);
+	void on_platform_2d_mouse_down(wxMouseEvent& event);
+	void on_platform_2d_mouse_up(wxMouseEvent& event);
+
 	void build_platform_interface(void);
 
 	//--------------------------------------------------------------
