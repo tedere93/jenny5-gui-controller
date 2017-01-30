@@ -29,7 +29,7 @@ bool clear_ahead(int *lidar_distances)
 	return true;
 }
 //----------------------------------------------------------------
-int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, t_jenny5_arduino_controller &lidar_controller, int lidar_com_port, t_roboclaw_controller & tracks_controller, int platform_com_port, CascadeClassifier &face_classifier, f_log_callback to_log)
+int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, t_jenny5_arduino_controller &lidar_controller, int lidar_com_port, t_roboclaw_controller & tracks_controller, int platform_com_port, f_log_callback to_log)
 {
 	// initialization
 
@@ -65,7 +65,7 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 		to_log("Platform connection succceded.\n");
 
 	// initialization
-	if (!init_face_classifier(face_classifier, error_string)) {
+	if (!init_face_classifier(jenny5_head_controller.face_classifier, error_string)) {
 		to_log(error_string);
 		return -1;
 	}
@@ -153,7 +153,7 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 		std::vector<Rect> faces;// create an array to store the found faces
 
 								// find and store the faces
-		face_classifier.detectMultiScale(gray_frame, faces, 1.1, 3, CV_HAAR_FIND_BIGGEST_OBJECT | CV_HAAR_SCALE_IMAGE, Size(30, 30));
+		jenny5_head_controller.face_classifier.detectMultiScale(gray_frame, faces, 1.1, 3, CV_HAAR_FIND_BIGGEST_OBJECT | CV_HAAR_SCALE_IMAGE, Size(30, 30));
 
 		t_CENTER_POINT head_center;
 

@@ -64,8 +64,8 @@ void MainFrame::on_follow_person_click(wxCommandEvent &event)
 	long platform_com_port;
 	tc_platform_com_port->GetValue().ToLong(&platform_com_port); // real port number
 
-//	if (follow_person(head_controller, head_com_port, lidar_controller, lidar_com_port, platform_controller, platform_com_port, head_cam, face_classifier, write_to_log) == -1) {
+	if (follow_person(jenny5_head_controller, head_com_port, lidar_controller, lidar_com_port, platform_controller, platform_com_port, write_to_log) == -1) {
 
-	//}
+	}
 }
 //------------------------------------------------------------------------
