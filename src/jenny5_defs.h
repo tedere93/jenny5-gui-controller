@@ -34,7 +34,7 @@
 
 #define NUM_SECONDS_TO_WAIT_FOR_CONNECTION 3
 
-#define CAM_PIXELS_TOLERANCE 20
+#define CAM_PIXELS_TOLERANCE 100
 
 #define DOES_NOTHING_SLEEP 10
 
@@ -75,8 +75,5 @@
 #define _potentiometer_min_LEFT_ARM_FOREARM_MOTOR 230
 #define _potentiometer_max_LEFT_ARM_FOREARM_MOTOR 720
 #define _potentiometer_home_LEFT_ARM_FOREARM_MOTOR 440
-
-#define DC_MOTOR_SPEED 3000
-#define DC_MOTOR_SPEED_ROTATE 3000
 
 //----------------------------------------------------------------
