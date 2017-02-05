@@ -11,7 +11,7 @@ void MainFrame::build_left_arm_interface(void)
 	wxBoxSizer* sizer_left_arm = new wxBoxSizer(wxVERTICAL);
 	st_left_arm = new wxStaticText(p_left_arm, wxID_ANY, "Left arm");
 	st_left_arm_com_port = new wxStaticText(p_left_arm, wxID_ANY, "COM port");
-	tc_left_arm_com_port = new wxTextCtrl(p_left_arm, wxID_ANY, "6");
+	tc_left_arm_com_port = new wxTextCtrl(p_left_arm, wxID_ANY, "21");
 	b_connect_to_left_arm = new wxButton(p_left_arm, -1, "Connect");
 	b_connect_to_left_arm->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_left_arm_click, this);
 //-------
@@ -309,7 +309,7 @@ void MainFrame::handle_left_arm_events(void)
 		if (left_arm_controller.query_for_event(BUTTON_EVENT, LEFT_ARM_GRIPPER_BUTTON_INDEX, &button_state)) {
 			sprintf(buffer, "Left arm GRIPPER button state (%d) = %d\n", LEFT_ARM_GRIPPER_BUTTON_INDEX, (int)button_state);
 			write_to_log(buffer);
-			cb_left_arm_gripper_closed->SetValue(button_state);
+			cb_left_arm_gripper_closed->SetValue((bool)button_state);
 		}
 
 		/*

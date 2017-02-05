@@ -6,6 +6,8 @@
 // MIT License
 // ---------------------------------------------------------------------------
 
+#define _USE_MATH_DEFINES
+
 #include "utils.h"
 #include <time.h>
 

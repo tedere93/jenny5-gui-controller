@@ -13,7 +13,7 @@ void MainFrame::build_head_interface(void)
 	wxBoxSizer* sizer_head = new wxBoxSizer(wxVERTICAL);
 	st_head = new wxStaticText(p_head, wxID_ANY, "Head");
 	st_head_com_port = new wxStaticText(p_head, wxID_ANY, "COM port");
-	tc_head_com_port = new wxTextCtrl(p_head, wxID_ANY, "7");
+	tc_head_com_port = new wxTextCtrl(p_head, wxID_ANY, "14");
 	b_connect_to_head = new wxButton(p_head, -1, "Connect");
 	b_connect_to_head->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_head_click, this);
 

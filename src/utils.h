@@ -11,6 +11,7 @@
 #include <vector>
 #include <opencv2\objdetect\objdetect.hpp>
 #include <opencv2\highgui\highgui.hpp>
+#include <opencv2\imgproc\imgproc.hpp>
 
 #define C910_4_3_HORIZONTAL_FIELD_OF_VIEW 70.58
 #define C910_4_3_VERTICAL_FIELD_OF_VIEW 55.92
