@@ -184,10 +184,10 @@ void MainFrame::on_platform_2d_mouse_move(wxMouseEvent& event)
 		long platform_right_motor_speed = RECTANGULAR_SLIDER_SIZE - pos.y - RECTANGULAR_SLIDER_SIZE / 2;
 
 		if (pos.x > RECTANGULAR_SLIDER_SIZE / 2) {
-			platform_left_motor_speed += pos.x - RECTANGULAR_SLIDER_SIZE / 2;
+			platform_left_motor_speed += (pos.x - RECTANGULAR_SLIDER_SIZE / 2) / 2;
 		}
 		else
-			platform_right_motor_speed += -(pos.x - RECTANGULAR_SLIDER_SIZE / 2);
+			platform_right_motor_speed += -(pos.x - RECTANGULAR_SLIDER_SIZE / 2) / 2;
 
 		tc_platform_left_motor_speed->SetValue(wxString() << platform_left_motor_speed);
 		tc_platform_right_motor_speed->SetValue(wxString() << platform_right_motor_speed);
