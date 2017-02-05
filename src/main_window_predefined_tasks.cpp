@@ -8,6 +8,7 @@
 #include "lidar_map.h"
 #include "follow_person.h"
 #include "head_controller.h"
+#include "lidar_controller.h"
 
 //------------------------------------------------------------------------
 void MainFrame::build_predefined_task_interface(void)
@@ -48,7 +49,7 @@ void MainFrame::on_lidar_map_click(wxCommandEvent &event)
 	long lidar_com_port; // real port number
 	tc_lidar_com_port->GetValue().ToLong(&lidar_com_port); // real port number
 
-	if (lidar_map(lidar_controller, lidar_com_port, write_to_log) == -1) {
+	if (lidar_map(LIDAR_controller, lidar_com_port, write_to_log) == -1) {
 
 	}
 }
@@ -64,7 +65,7 @@ void MainFrame::on_follow_person_click(wxCommandEvent &event)
 	long platform_com_port;
 	tc_platform_com_port->GetValue().ToLong(&platform_com_port); // real port number
 
-	if (follow_person(jenny5_head_controller, head_com_port, lidar_controller, lidar_com_port, platform_controller, platform_com_port, write_to_log) == -1) {
+	if (follow_person(jenny5_head_controller, head_com_port, LIDAR_controller, lidar_com_port, platform_controller, platform_com_port, write_to_log) == -1) {
 
 	}
 }

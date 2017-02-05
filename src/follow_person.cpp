@@ -16,6 +16,7 @@
 #include "setup_functions.h"
 #include "utils.h"
 #include "lidar_map.h"
+#include "lidar_controller.h"
 
 #include "jenny5_defs.h"
 
@@ -34,7 +35,7 @@ bool clear_ahead(int *lidar_distances)
 	return true;
 }
 //----------------------------------------------------------------
-int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port, t_roboclaw_controller & tracks_controller, int platform_com_port, f_log_callback to_log)
+int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, t_lidar_controller &LIDAR_controller, int lidar_com_port, t_roboclaw_controller & tracks_controller, int platform_com_port, f_log_callback to_log)
 {
 	// initialization
 
@@ -55,7 +56,7 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 		to_log("Head camera connection succceded.\n");
 
 
-	if (!connect_to_lidar(LIDAR_controller, lidar_com_port, error_string)) {
+	if (!LIDAR_controller.connect(lidar_com_port, error_string)) {
 		to_log(error_string);
 		return -1;
 	}
@@ -96,15 +97,15 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 
 
 	// setup
-	if (!setup_lidar(LIDAR_controller, error_string)) {
+	if (!LIDAR_controller.setup(error_string)) {
 		to_log(error_string);
 		return -1;
 	}
 	else
 		to_log("Setup LIDAR OK.\n");
 
-	LIDAR_controller.send_set_LIDAR_motor_speed_and_acceleration(30, 100);
-	LIDAR_controller.send_LIDAR_go();
+	LIDAR_controller.arduino_controller.send_set_LIDAR_motor_speed_and_acceleration(30, 100);
+	LIDAR_controller.arduino_controller.send_LIDAR_go();
 
 	int image_width = 600;
 	Point center(image_width / 2, image_width / 2);
@@ -114,11 +115,12 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 	t_lidar_user_data lidar_user_data;
 	lidar_user_data.lidar_image = &lidar_map_image;
 	lidar_user_data.image_width = image_width;
+	lidar_user_data.LIDAR_controller = &LIDAR_controller;
 	for (int i = 0; i < LIDAR_NUM_STEPS; i++)
-		lidar_user_data.lidar_distances[i] = 0;
+		LIDAR_controller.lidar_distances[i] = 0;
 	lidar_user_data.lidar_map_scale_factor = 0.1;
 
-	create_and_init_lidar_map(lidar_map_image, image_width, lidar_user_data);
+	create_and_init_lidar_image(lidar_map_image, image_width, lidar_user_data.lidar_map_scale_factor);
 
 	setMouseCallback("LIDAR map", on_lidar_mouse_event, &lidar_user_data);
 
@@ -132,14 +134,12 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 	bool active = true;
 	while (active)        // starting infinit loop
 	{
-		if (!jenny5_head_controller.head_arduino_controller.update_commands_from_serial() && !LIDAR_controller.update_commands_from_serial())
+		if (!jenny5_head_controller.head_arduino_controller.update_commands_from_serial() && !LIDAR_controller.arduino_controller.update_commands_from_serial())
 			Sleep(DOES_NOTHING_SLEEP); // no new data from serial ... we take a little break so that we don't kill the processor
 		else {
 
 			// extract all data from LIDAR 
-			int motor_position;
-			intptr_t distance;
-			bool at_least_one_new_LIDAR_distance = update_lidar_map(LIDAR_controller, lidar_map_image, image_width, lidar_user_data, to_log);
+			bool at_least_one_new_LIDAR_distance = update_lidar_image(LIDAR_controller, lidar_map_image, image_width, lidar_user_data.lidar_map_scale_factor, to_log);
 
 			if (at_least_one_new_LIDAR_distance)
 				imshow("LIDAR map", lidar_map_image);
@@ -177,9 +177,6 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 			// send a command to the module so that the face is in the center of the image
 			if (head_center.x > cam_frame.cols / 2 + CAM_PIXELS_TOLERANCE) {
 
-				//tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
-				//int num_steps_x = (int)(angle_offset.degrees_from_center_x / 1.8 * 8) * TRACKS_MOTOR_REDUCTION;
-
 				// rotate
 				tracks_controller.drive_M1_with_signed_duty_and_acceleration(DC_MOTOR_SPEED_ROTATE, 1);
 				tracks_controller.drive_M2_with_signed_duty_and_acceleration(-DC_MOTOR_SPEED_ROTATE, 1);
@@ -202,7 +199,7 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 					if (head_center.range < HEAD_RADIUS_TO_REVERT) {
 						// move forward
 						// only if LIDAR distance to the front point is very far from the robot
-						if (clear_ahead(lidar_user_data.lidar_distances)) {
+						if (clear_ahead(lidar_user_data.LIDAR_controller->lidar_distances)) {
 							tracks_controller.drive_M1_with_signed_duty_and_acceleration(-DC_MOTOR_SPEED, 1);
 							tracks_controller.drive_M2_with_signed_duty_and_acceleration(-DC_MOTOR_SPEED, 1);
 
@@ -285,11 +282,11 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 	tracks_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
 	tracks_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
 
-	LIDAR_controller.send_LIDAR_stop();
+	LIDAR_controller.arduino_controller. send_LIDAR_stop();
 
 	// close connection
 	jenny5_head_controller.disconnect();
-	LIDAR_controller.close_connection();
+	LIDAR_controller.arduino_controller.close_connection();
 	tracks_controller.close_connection();
 
 	destroyWindow("LIDAR map");

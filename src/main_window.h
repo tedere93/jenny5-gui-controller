@@ -197,7 +197,7 @@ private:
 	void on_connect_to_right_arm_click(wxCommandEvent &event);
 
 	//--------------------------------------------------------------
-	t_jenny5_arduino_controller lidar_controller;
+	
 	wxPanel *p_lidar;
 	wxStaticText *st_lidar;
 	wxStaticText *st_lidar_com_port;

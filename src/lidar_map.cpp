@@ -12,7 +12,6 @@
 #include <opencv2\highgui\highgui.hpp>
 #include <opencv2\imgproc\imgproc.hpp>
 
-
 #include "home.h"
 #include "setup_functions.h"
 #include "utils.h"
@@ -20,34 +19,30 @@
 #include "jenny5_defs.h"
 #include "lidar_map.h"
 
-
-
 using namespace cv;
 
-
-
 //----------------------------------------------------------------
-void create_and_init_lidar_map(Mat &lidar_image, int image_width, t_lidar_user_data &user_data)
+void create_and_init_lidar_image(Mat &lidar_image, int image_width, double lidar_map_scale_factor)
 {
 	lidar_image.zeros(image_width, image_width, CV_8UC3);
 	Point center(image_width / 2, image_width / 2);
 	//LIDAR
 	circle(lidar_image, center, 10, Scalar(0, 255, 0), 1, 8);
 	// robot
-	rectangle(lidar_image, Point(center.x - 175 * user_data.lidar_map_scale_factor, center.y), Point(center.x + user_data.lidar_map_scale_factor * 175, center.y + 600 * user_data.lidar_map_scale_factor), Scalar(0, 255, 0));
+	rectangle(lidar_image, Point(center.x - 175 * lidar_map_scale_factor, center.y), Point(center.x + lidar_map_scale_factor * 175, center.y + 600 * lidar_map_scale_factor), Scalar(0, 255, 0));
 
 	char text[100];
-	sprintf(text, "scale = %.2lf", user_data.lidar_map_scale_factor);
+	sprintf(text, "scale = %.2lf", lidar_map_scale_factor);
 	int font_face = FONT_HERSHEY_SCRIPT_SIMPLEX;
 	cv::Point text_position(10, 25);
 	cv::putText(lidar_image, text, text_position, font_face, 1, Scalar::all(255), 1, 8);
 }
 //----------------------------------------------------------------
-int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port, f_log_callback to_log)
+int lidar_map(t_lidar_controller &LIDAR_controller, int lidar_com_port, f_log_callback to_log)
 {
 	// setup
 	char error_string[1000];
-	if (!connect_to_lidar(LIDAR_controller, lidar_com_port, error_string)) {
+	if (!LIDAR_controller.connect(lidar_com_port, error_string)) {
 		to_log(error_string);
 		return -1;
 	}
@@ -55,17 +50,15 @@ int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port,
 		to_log("Connection to LIDAR OK.\n");
 
 	// setup
-	if (!setup_lidar(LIDAR_controller, error_string)) {
+	if (!LIDAR_controller.setup(error_string)) {
 		to_log(error_string);
 		return -1;
 	}
 	else
 		to_log("Setup LIDAR OK.\n");
 
-
-
-	LIDAR_controller.send_set_LIDAR_motor_speed_and_acceleration(60, 100);
-	LIDAR_controller.send_LIDAR_go();
+	LIDAR_controller.arduino_controller.send_set_LIDAR_motor_speed_and_acceleration(60, 100);
+	LIDAR_controller.arduino_controller.send_LIDAR_go();
 
 	int image_width = 600;
 	Point center(image_width / 2, image_width / 2);
@@ -76,9 +69,12 @@ int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port,
 	user_data.lidar_image = &lidar_image;
 	user_data.image_width = image_width;
 	for (int i = 0; i < LIDAR_NUM_STEPS; i++)
-		user_data.lidar_distances[i] = 0;
+		LIDAR_controller.lidar_distances[i] = 0;
+
 	user_data.lidar_map_scale_factor = 0.1;
-	create_and_init_lidar_map(lidar_image, image_width, user_data);
+	user_data.LIDAR_controller = &LIDAR_controller;
+
+	create_and_init_lidar_image(lidar_image, image_width, user_data.lidar_map_scale_factor);
 
 	setMouseCallback("LIDAR map", on_lidar_mouse_event, &user_data);
 
@@ -87,19 +83,19 @@ int lidar_map(t_jenny5_arduino_controller &LIDAR_controller, int lidar_com_port,
 
 	while (active) {        // starting infinit loop
 
-		if (!LIDAR_controller.update_commands_from_serial())
+		if (!LIDAR_controller.arduino_controller. update_commands_from_serial())
 			Sleep(5); // no new data from serial ... we make a little pause so that we don't kill the processor
 
-		bool at_least_one_new_LIDAR_distance = update_lidar_data(LIDAR_controller, lidar_image, image_width, user_data, to_log);
+		bool at_least_one_new_LIDAR_distance = update_lidar_image(LIDAR_controller, lidar_image, image_width, user_data.lidar_map_scale_factor, to_log);
 		imshow("LIDAR map", lidar_image);
 
 		if (waitKey(1) == VK_ESCAPE)  // break the loop
 			active = false;
 	}
 
-	LIDAR_controller.send_LIDAR_stop();
+	LIDAR_controller.arduino_controller.send_LIDAR_stop();
 
-	LIDAR_controller.close_connection();
+	LIDAR_controller.arduino_controller.close_connection();
 
 	destroyWindow("LIDAR map");
 
@@ -115,8 +111,8 @@ void on_lidar_mouse_event(int event, int x, int y, int flags, void *userdata)
 		cv::Point center(user_data->image_width / 2, user_data->image_width / 2);
 		for (int i = 0; i < LIDAR_NUM_STEPS; i++) {
 			cv::Point old_p;
-			old_p.x = -user_data->lidar_distances[i] * user_data->lidar_map_scale_factor * sin(i / 100.0 * M_PI - M_PI / 2);
-			old_p.y = -user_data->lidar_distances[i] * user_data->lidar_map_scale_factor * cos(i / 100.0 * M_PI - M_PI / 2);
+			old_p.x = -user_data->LIDAR_controller->lidar_distances[i] * user_data->lidar_map_scale_factor * sin(i / 100.0 * M_PI - M_PI / 2);
+			old_p.y = -user_data->LIDAR_controller->lidar_distances[i] * user_data->lidar_map_scale_factor * cos(i / 100.0 * M_PI - M_PI / 2);
 			cv::circle(*(user_data->lidar_image), center + old_p, 5, cv::Scalar(0, 0, 0), 1, 8);
 		}
 		char text[100];
@@ -141,8 +137,8 @@ void on_lidar_mouse_event(int event, int x, int y, int flags, void *userdata)
 		for (int i = 0; i < LIDAR_NUM_STEPS; i++) {
 			// draw the new point
 			Point new_p;
-			new_p.x = -user_data->lidar_distances[i] * user_data->lidar_map_scale_factor * sin(i / 100.0 * M_PI - M_PI / 2);
-			new_p.y = -user_data->lidar_distances[i] * user_data->lidar_map_scale_factor * cos(i / 100.0 * M_PI - M_PI / 2);
+			new_p.x = -user_data->LIDAR_controller->lidar_distances[i] * user_data->lidar_map_scale_factor * sin(i / 100.0 * M_PI - M_PI / 2);
+			new_p.y = -user_data->LIDAR_controller->lidar_distances[i] * user_data->lidar_map_scale_factor * cos(i / 100.0 * M_PI - M_PI / 2);
 			circle(*(user_data->lidar_image), center + new_p, 5, Scalar(0, 0, 255), 1, 8);
 		}
 
@@ -154,26 +150,26 @@ void on_lidar_mouse_event(int event, int x, int y, int flags, void *userdata)
 	}
 }
 //----------------------------------------------------------------
-bool update_lidar_data(t_jenny5_arduino_controller &LIDAR_controller, Mat &lidar_image, int image_width, t_lidar_user_data &user_data, f_log_callback to_log)
+bool update_lidar_image(t_lidar_controller &LIDAR_controller, Mat &lidar_image, int image_width, double lidar_map_scale_factor, f_log_callback to_log)
 {
 	int motor_position;
 	intptr_t distance;
 	Point center(image_width / 2, image_width / 2);
 	bool at_least_one_new_LIDAR_distance = false;
 
-	while (LIDAR_controller.query_for_event(LIDAR_READ_EVENT, &motor_position, &distance)) {  // have we received the event from Serial ?
+	while (LIDAR_controller.arduino_controller.query_for_event(LIDAR_READ_EVENT, &motor_position, &distance)) {  // have we received the event from Serial ?
 
 																						  // delete old distance
 		Point old_p;
-		old_p.x = -user_data.lidar_distances[motor_position] * user_data.lidar_map_scale_factor * sin(motor_position / 100.0 * M_PI - M_PI / 2);
-		old_p.y = -user_data.lidar_distances[motor_position] * user_data.lidar_map_scale_factor * cos(motor_position / 100.0 * M_PI - M_PI / 2);
+		old_p.x = -LIDAR_controller.lidar_distances[motor_position] * lidar_map_scale_factor * sin(motor_position / 100.0 * M_PI - M_PI / 2);
+		old_p.y = -LIDAR_controller.lidar_distances[motor_position] * lidar_map_scale_factor * cos(motor_position / 100.0 * M_PI - M_PI / 2);
 		circle(lidar_image, center + old_p, 5, Scalar(0, 0, 0), 1, 8);
 
 	// draw the new point
-		user_data.lidar_distances[motor_position] = distance;
+		LIDAR_controller.lidar_distances[motor_position] = distance;
 		Point new_p;
-		new_p.x = -distance * user_data.lidar_map_scale_factor * sin(motor_position / 100.0 * M_PI - M_PI / 2);
-		new_p.y = -distance * user_data.lidar_map_scale_factor * cos(motor_position / 100.0 * M_PI - M_PI / 2);
+		new_p.x = -distance * lidar_map_scale_factor * sin(motor_position / 100.0 * M_PI - M_PI / 2);
+		new_p.y = -distance * lidar_map_scale_factor * cos(motor_position / 100.0 * M_PI - M_PI / 2);
 		circle(lidar_image, center + new_p, 5, Scalar(0, 0, 255), 1, 8);
 		at_least_one_new_LIDAR_distance = true;
 		if (to_log) {

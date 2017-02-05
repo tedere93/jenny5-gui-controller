@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "head_controller.h"
 #include "roboclaw_controller.h"
+#include "lidar_controller.h"
 
 
-int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, t_jenny5_arduino_controller &lidar_controller, int lidar_com_port, t_roboclaw_controller & tracks_controller, int platform_com_port, f_log_callback to_log);
+int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, t_lidar_controller &lidar_controller, int lidar_com_port, t_roboclaw_controller & tracks_controller, int platform_com_port, f_log_callback to_log);
