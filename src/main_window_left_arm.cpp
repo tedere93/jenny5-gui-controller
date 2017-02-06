@@ -1,8 +1,8 @@
 #include "main_window.h"
 #include "setup_functions.h"
-#include "home.h"
 #include "jenny5_defs.h"
 #include  "utils.h"
+#include "left_arm_controller.h"
 
 //------------------------------------------------------------------------
 void MainFrame::build_left_arm_interface(void)
@@ -218,24 +218,17 @@ void MainFrame::on_connect_to_left_arm_click(wxCommandEvent &event)
 	long left_arm_com_port;
 	tc_left_arm_com_port->GetValue().ToLong(&left_arm_com_port); // real port number
 
-	if (!left_arm_controller.is_open()) {
-		if (connect_to_left_arm(left_arm_controller, left_arm_com_port, error_string)) {
+	if (!left_arm_controller.is_connected()) {
+		if (left_arm_controller.connect(left_arm_com_port, error_string)) {
 			b_connect_to_left_arm->SetLabel("Disconnect");
 			// show the firmware version number
-			left_arm_controller.send_get_firmware_version();
+			left_arm_controller.send_get_arduino_firmware_version();
 
-			if (!setup_left_arm(left_arm_controller, error_string)) {
+			if (!left_arm_controller.setup(error_string)) {
 				write_to_log(error_string);
 			}
 			else {
-				left_arm_controller.send_get_potentiometer_position(LEFT_ARM_BODY_POTENTIOMETER_INDEX);
-				left_arm_controller.send_get_potentiometer_position(LEFT_ARM_SHOULDER_UP_DOWN_POTENTIOMETER_INDEX);
-				left_arm_controller.send_get_potentiometer_position(LEFT_ARM_SHOULDER_LEFT_RIGHT_POTENTIOMETER_INDEX);
-				left_arm_controller.send_get_potentiometer_position(LEFT_ARM_ELBOW_POTENTIOMETER_INDEX);
-				left_arm_controller.send_get_potentiometer_position(LEFT_ARM_FOREARM_POTENTIOMETER_INDEX);
-
-				left_arm_controller.send_get_infrared_signal_strength(LEFT_ARM_GRIPPER_INFRARED_INDEX);
-				left_arm_controller.send_get_button_state(LEFT_ARM_GRIPPER_BUTTON_INDEX);
+				left_arm_controller.send_get_sensors_value();
 
 				left_arm_set_enable_all(true);
 			}
@@ -246,7 +239,7 @@ void MainFrame::on_connect_to_left_arm_click(wxCommandEvent &event)
 	}// is open, so just disconect
 	else {
 		write_to_log("Disconnected from left arm");
-		left_arm_controller.close_connection();
+		left_arm_controller.disconnect();
 		b_connect_to_left_arm->SetLabel("Connect");
 		left_arm_set_enable_all(false);
 	}
@@ -255,43 +248,43 @@ void MainFrame::on_connect_to_left_arm_click(wxCommandEvent &event)
 //------------------------------------------------------------------------
 void MainFrame::handle_left_arm_events(void)
 {
-	if (left_arm_controller.is_open()) {
-		left_arm_controller.update_commands_from_serial();
+	if (left_arm_controller.is_connected()) {
+		left_arm_controller.arduino_controller.update_commands_from_serial();
 
 		char firmware_version[100];
 		strcpy(firmware_version, "Left arm firmware version: ");
-		if (left_arm_controller.query_for_firmware_version_event(firmware_version + strlen(firmware_version))) {
+		if (left_arm_controller.arduino_controller.query_for_firmware_version_event(firmware_version + strlen(firmware_version))) {
 			strcat(firmware_version, "\n");
 			write_to_log(firmware_version);
 		}
 		
 		intptr_t pot_position;
-		char buffer[100];
-		if (left_arm_controller.query_for_event(POTENTIOMETER_EVENT, LEFT_ARM_BODY_POTENTIOMETER_INDEX, &pot_position)) {
+		char buffer[1000];
+		if (left_arm_controller.arduino_controller.query_for_event(POTENTIOMETER_EVENT, LEFT_ARM_BODY_POTENTIOMETER_INDEX, &pot_position)) {
 			sprintf(buffer, "Left arm body pot position (%d) = %d\n", LEFT_ARM_BODY_POTENTIOMETER_INDEX, (int)pot_position);
 			write_to_log(buffer);
 			tc_left_arm_body_motor_position->SetValue(wxString() << pot_position);
 			s_left_arm_body_motor_position->SetValue(pot_position);
 		}
-		if (left_arm_controller.query_for_event(POTENTIOMETER_EVENT, LEFT_ARM_SHOULDER_UP_DOWN_POTENTIOMETER_INDEX, &pot_position)) {
+		if (left_arm_controller.arduino_controller.query_for_event(POTENTIOMETER_EVENT, LEFT_ARM_SHOULDER_UP_DOWN_POTENTIOMETER_INDEX, &pot_position)) {
 			sprintf(buffer, "Left arm SHOULDER_UP_DOWN pot position (%d) = %d\n", LEFT_ARM_SHOULDER_UP_DOWN_POTENTIOMETER_INDEX, (int)pot_position);
 			write_to_log(buffer);
 			tc_left_arm_SHOULDER_UP_DOWN_motor_position->SetValue(wxString() << pot_position);
 			s_left_arm_SHOULDER_UP_DOWN_motor_position->SetValue(pot_position);
 		}		
-		if (left_arm_controller.query_for_event(POTENTIOMETER_EVENT, LEFT_ARM_SHOULDER_LEFT_RIGHT_POTENTIOMETER_INDEX, &pot_position)) {
+		if (left_arm_controller.arduino_controller.query_for_event(POTENTIOMETER_EVENT, LEFT_ARM_SHOULDER_LEFT_RIGHT_POTENTIOMETER_INDEX, &pot_position)) {
 			sprintf(buffer, "Left arm SHOULDER_LEFT_RIGHT pot position (%d) = %d\n", LEFT_ARM_SHOULDER_LEFT_RIGHT_POTENTIOMETER_INDEX, (int)pot_position);
 			write_to_log(buffer);
 			tc_left_arm_SHOULDER_LEFT_RIGHT_motor_position->SetValue(wxString() << pot_position);
 			s_left_arm_SHOULDER_LEFT_RIGHT_motor_position->SetValue(pot_position);
 		}
-		if (left_arm_controller.query_for_event(POTENTIOMETER_EVENT, LEFT_ARM_ELBOW_POTENTIOMETER_INDEX, &pot_position)) {
+		if (left_arm_controller.arduino_controller.query_for_event(POTENTIOMETER_EVENT, LEFT_ARM_ELBOW_POTENTIOMETER_INDEX, &pot_position)) {
 			sprintf(buffer, "Left arm ELBOW pot position (%d) = %d\n", LEFT_ARM_ELBOW_POTENTIOMETER_INDEX, (int)pot_position);
 			write_to_log(buffer);
 			tc_left_arm_ELBOW_motor_position->SetValue(wxString() << pot_position);
 			s_left_arm_ELBOW_motor_position->SetValue(pot_position);
 		}
-		if (left_arm_controller.query_for_event(POTENTIOMETER_EVENT, LEFT_ARM_FOREARM_POTENTIOMETER_INDEX, &pot_position)) {
+		if (left_arm_controller.arduino_controller.query_for_event(POTENTIOMETER_EVENT, LEFT_ARM_FOREARM_POTENTIOMETER_INDEX, &pot_position)) {
 			sprintf(buffer, "Left arm FOREARM pot position (%d) = %d\n", LEFT_ARM_FOREARM_POTENTIOMETER_INDEX, (int)pot_position);
 			write_to_log(buffer);
 			tc_left_arm_FOREARM_motor_position->SetValue(wxString() << pot_position);
@@ -299,175 +292,148 @@ void MainFrame::handle_left_arm_events(void)
 		}
 
 		intptr_t infrared_signal_strength;
-		if (left_arm_controller.query_for_event(INFRARED_EVENT, LEFT_ARM_GRIPPER_INFRARED_INDEX, &infrared_signal_strength)) {
+		if (left_arm_controller.arduino_controller.query_for_event(INFRARED_EVENT, LEFT_ARM_GRIPPER_INFRARED_INDEX, &infrared_signal_strength)) {
 			sprintf(buffer, "Left arm GRIPPER infrared signal strength (%d) = %d\n", LEFT_ARM_GRIPPER_INFRARED_INDEX, (int)infrared_signal_strength);
 			write_to_log(buffer);
 			tc_left_arm_gripper_IR_signal_strength->SetValue(wxString() << infrared_signal_strength);
 		}
 
 		intptr_t button_state;
-		if (left_arm_controller.query_for_event(BUTTON_EVENT, LEFT_ARM_GRIPPER_BUTTON_INDEX, &button_state)) {
+		if (left_arm_controller.arduino_controller.query_for_event(BUTTON_EVENT, LEFT_ARM_GRIPPER_BUTTON_INDEX, &button_state)) {
 			sprintf(buffer, "Left arm GRIPPER button state (%d) = %d\n", LEFT_ARM_GRIPPER_BUTTON_INDEX, (int)button_state);
 			write_to_log(buffer);
 			cb_left_arm_gripper_closed->SetValue((bool)button_state);
 		}
-
-		/*
-		if (left_arm_controller.query_for_event(POTENTIOMETER_EVENT, HEAD_POTENTIOMETER_FACE_INDEX, &pot_position)) {
-		sprintf(buffer, "Left arm pot position (%d) = %d\n", HEAD_POTENTIOMETER_FACE_INDEX, pot_position);
-		write_to_log(buffer);
-		tc_head_face_motor_position->SetValue(wxString() << pot_position);
-		s_head_face_motor_position->SetValue(pot_position);
-		}
-		*/
-		/*
-		int button_state;
-		if (left_arm_controller.query_for_event(BUTTON_EVENT, 0, &button_state)) {
-		sprintf(buffer, "Button state = %d\n", button_state);
-		write_to_log(buffer);
-		tc_head_ultrasonic->SetValue(wxString() << button_state);
-		}
-		*/
 	}
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_refresh_data_click(wxCommandEvent &event)
 {
-	left_arm_controller.send_get_potentiometer_position(LEFT_ARM_BODY_POTENTIOMETER_INDEX);
-	left_arm_controller.send_get_potentiometer_position(LEFT_ARM_SHOULDER_UP_DOWN_POTENTIOMETER_INDEX);
-	left_arm_controller.send_get_potentiometer_position(LEFT_ARM_SHOULDER_LEFT_RIGHT_POTENTIOMETER_INDEX);
-	left_arm_controller.send_get_potentiometer_position(LEFT_ARM_ELBOW_POTENTIOMETER_INDEX);
-	left_arm_controller.send_get_potentiometer_position(LEFT_ARM_FOREARM_POTENTIOMETER_INDEX);
-	left_arm_controller.send_get_infrared_signal_strength(LEFT_ARM_GRIPPER_INFRARED_INDEX);
-	
-	left_arm_controller.send_get_button_state(LEFT_ARM_GRIPPER_BUTTON_INDEX);
+	left_arm_controller.send_get_sensors_value();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_home_all_click(wxCommandEvent &event)
 {
-	left_arm_controller.send_go_home_dc_motor(LEFT_ARM_BODY_MOTOR);
-	left_arm_controller.send_go_home_dc_motor(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR);
-	left_arm_controller.send_go_home_dc_motor(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR);
-	left_arm_controller.send_go_home_dc_motor(LEFT_ARM_ELBOW_MOTOR);
-	left_arm_controller.send_go_home_dc_motor(LEFT_ARM_FOREARM_MOTOR);
-	left_arm_controller.send_go_home_dc_motor(LEFT_ARM_GRIPPER_MOTOR);
+	char error_str[100];
+	left_arm_controller.home_all_motors(error_str);
+	write_to_log(error_str);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_body_home_click(wxCommandEvent &event)
 {
-	left_arm_controller.send_go_home_stepper_motor(LEFT_ARM_BODY_MOTOR);
+	left_arm_controller.send_LEFT_ARM_BODY_MOTOR_home();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_body_move_click(wxCommandEvent &event)
 {
 	long new_position;
 	tc_left_arm_body_motor_position->GetValue().ToLong(&new_position);
-	left_arm_controller.send_stepper_motor_goto_sensor_position(LEFT_ARM_BODY_MOTOR, new_position);
+	left_arm_controller.send_LEFT_ARM_BODY_MOTOR_to_sensor_position(new_position);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_body_slider_move(wxCommandEvent& event)
 {
 	long new_position = s_left_arm_body_motor_position->GetValue();
-	left_arm_controller.send_stepper_motor_goto_sensor_position(LEFT_ARM_BODY_MOTOR, new_position);
+	left_arm_controller.send_LEFT_ARM_BODY_MOTOR_to_sensor_position(new_position);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_SHOULDER_UP_DOWN_home_click(wxCommandEvent &event)
 {
-	left_arm_controller.send_go_home_stepper_motor(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR);
+	left_arm_controller.send_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR_home();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_SHOULDER_UP_DOWN_move_click(wxCommandEvent &event)
 {
 	long new_position;
 	tc_left_arm_SHOULDER_UP_DOWN_motor_position->GetValue().ToLong(&new_position);
-	left_arm_controller.send_stepper_motor_goto_sensor_position(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, new_position);
+	left_arm_controller.send_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR_to_sensor_position(new_position);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_SHOULDER_UP_DOWN_slider_move(wxCommandEvent& event)
 {
 	long new_position = s_left_arm_SHOULDER_UP_DOWN_motor_position->GetValue();
-	left_arm_controller.send_stepper_motor_goto_sensor_position(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, new_position);
+	left_arm_controller.send_LEFT_ARM_SHOULDER_UP_DOWN_MOTOR_to_sensor_position(new_position);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_SHOULDER_LEFT_RIGHT_home_click(wxCommandEvent &event)
 {
-	left_arm_controller.send_go_home_stepper_motor(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR);
+	left_arm_controller.send_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR_home();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_SHOULDER_LEFT_RIGHT_move_click(wxCommandEvent &event)
 {
 	long new_position;
 	tc_left_arm_SHOULDER_LEFT_RIGHT_motor_position->GetValue().ToLong(&new_position);
-	left_arm_controller.send_stepper_motor_goto_sensor_position(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, new_position);
+	left_arm_controller.send_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR_to_sensor_position(new_position);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_SHOULDER_LEFT_RIGHT_slider_move(wxCommandEvent& event)
 {
 	long new_position = s_left_arm_SHOULDER_LEFT_RIGHT_motor_position->GetValue();
-	left_arm_controller.send_stepper_motor_goto_sensor_position(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, new_position);
+	left_arm_controller.send_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR_to_sensor_position(new_position);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_ELBOW_home_click(wxCommandEvent &event)
 {
-	left_arm_controller.send_go_home_stepper_motor(LEFT_ARM_ELBOW_MOTOR);
+	left_arm_controller.send_LEFT_ARM_ELBOW_MOTOR_home();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_ELBOW_move_click(wxCommandEvent &event)
 {
 	long new_position;
 	tc_left_arm_ELBOW_motor_position->GetValue().ToLong(&new_position);
-	left_arm_controller.send_stepper_motor_goto_sensor_position(LEFT_ARM_ELBOW_MOTOR, new_position);
+	left_arm_controller.send_LEFT_ARM_ELBOW_MOTOR_to_sensor_position(new_position);
 
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_ELBOW_slider_move(wxCommandEvent& event)
 {
 	long new_position = s_left_arm_ELBOW_motor_position->GetValue();
-	left_arm_controller.send_stepper_motor_goto_sensor_position(LEFT_ARM_ELBOW_MOTOR, new_position);
+	left_arm_controller.send_LEFT_ARM_ELBOW_MOTOR_to_sensor_position(new_position);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_FOREARM_home_click(wxCommandEvent &event)
 {
-	left_arm_controller.send_go_home_stepper_motor(LEFT_ARM_FOREARM_MOTOR);
+	left_arm_controller.send_LEFT_ARM_FOREARM_MOTOR_home();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_FOREARM_move_click(wxCommandEvent &event)
 {
 	long new_position;
 	tc_left_arm_FOREARM_motor_position->GetValue().ToLong(&new_position);
-	left_arm_controller.send_stepper_motor_goto_sensor_position(LEFT_ARM_FOREARM_MOTOR, new_position);
+	left_arm_controller.send_LEFT_ARM_FOREARM_MOTOR_to_sensor_position(new_position);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_FOREARM_slider_move(wxCommandEvent& event)
 {
 	long new_position = s_left_arm_FOREARM_motor_position->GetValue();
-	left_arm_controller.send_stepper_motor_goto_sensor_position(LEFT_ARM_FOREARM_MOTOR, new_position);
+	left_arm_controller.send_LEFT_ARM_FOREARM_MOTOR_to_sensor_position(new_position);
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_close_gripper_click(wxCommandEvent &event)
 {
-	left_arm_controller.send_go_home_stepper_motor(LEFT_ARM_GRIPPER_MOTOR);
+	left_arm_controller.send_LEFT_ARM_GRIPPER_MOTOR_home();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_open_gripper_mouse_down(wxMouseEvent &event)
 {
-	left_arm_controller.send_move_stepper_motor(LEFT_ARM_GRIPPER_MOTOR, -5000);
+	left_arm_controller.send_LEFT_ARM_GRIPPER_MOTOR_start_open();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_left_arm_open_gripper_mouse_up(wxMouseEvent &event)
 {
-	left_arm_controller.send_move_stepper_motor(LEFT_ARM_GRIPPER_MOTOR, 0);
+	left_arm_controller.send_LEFT_ARM_GRIPPER_MOTOR_stop_open();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_show_left_arm_camera_click(wxCommandEvent &event)
 {
 	char error_string[1000];
-	if (left_arm_cam.isOpened()) {
+	if (left_arm_controller.left_arm_cam.isOpened()) {
 		sprintf(error_string, "Left arm video camera already open!\n");
 		write_to_log(error_string);
 		return;
 	}
-	if (!left_arm_cam.open(LEFT_ARM_CAMERA_INDEX)){	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
+	if (!left_arm_controller.left_arm_cam.open(LEFT_ARM_CAMERA_INDEX)){	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
 		sprintf(error_string, "Couldn't open left arm's video camera!\n");
 		write_to_log(error_string);
 		return;
@@ -479,7 +445,7 @@ void MainFrame::on_show_left_arm_camera_click(wxCommandEvent &event)
 
 	bool active = true;
 	while (active) {        // starting infinit loop
-		left_arm_cam >> cam_frame; // put captured-image frame in frame
+		left_arm_controller.left_arm_cam >> cam_frame; // put captured-image frame in frame
 
 		imshow("Left arm camera", cam_frame); // display the result
 
@@ -489,11 +455,11 @@ void MainFrame::on_show_left_arm_camera_click(wxCommandEvent &event)
 	}
 
 	destroyWindow("Left arm camera");
-	left_arm_cam.release();
+	left_arm_controller.left_arm_cam.release();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_disable_all_left_arm_motors_clicked(wxCommandEvent &event)
 {
-	left_arm_controller.send_disable_stepper_motor(LEFT_ARM_BODY_MOTOR);
+	left_arm_controller.send_disable_motors();
 }
 //------------------------------------------------------------------------

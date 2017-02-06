@@ -101,9 +101,6 @@ private:
 	void on_disable_all_head_motors_clicked(wxCommandEvent &event);
 	//--------------------------------------------------------------
 
-	t_jenny5_arduino_controller left_arm_controller;
-	cv::VideoCapture left_arm_cam;
-
 	wxPanel *p_left_arm;
 	wxStaticText *st_left_arm;
 	wxStaticText *st_left_arm_com_port;

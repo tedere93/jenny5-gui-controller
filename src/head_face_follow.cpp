@@ -10,8 +10,6 @@
 #include <opencv2\highgui\highgui.hpp>
 #include <opencv2\imgproc\imgproc.hpp>
 
-
-#include "home.h"
 #include "setup_functions.h"
 #include "utils.h"
 #include "head_controller.h"
