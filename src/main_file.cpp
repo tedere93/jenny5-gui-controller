@@ -21,7 +21,7 @@ wxIMPLEMENT_APP(jenny5_gui_controller_app);
 
 bool jenny5_gui_controller_app::OnInit()
 {
-	f_main = new MainFrame("Jenny 5 GUI controller 2017.02.06.1", wxPoint(50, 50), wxSize(900, 1100));
+	f_main = new MainFrame("Jenny 5 GUI controller 2017.02.09.0", wxPoint(50, 50), wxSize(900, 1100));
 
 	f_main->Show(true);
 	//f_main->Maximize();

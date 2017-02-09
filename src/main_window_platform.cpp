@@ -15,7 +15,7 @@ void MainFrame::build_platform_interface(void)
 	wxBoxSizer* sizer_platform = new wxBoxSizer(wxVERTICAL);
 	st_platform = new wxStaticText(p_platform, wxID_ANY, "Platform");
 	st_platform_com_port = new wxStaticText(p_platform, wxID_ANY, "COM port");
-	tc_platform_com_port = new wxTextCtrl(p_platform, wxID_ANY, "19");
+	tc_platform_com_port = new wxTextCtrl(p_platform, wxID_ANY, "20");
 	b_connect_to_platform = new wxButton(p_platform, -1, "Connect");
 	b_connect_to_platform->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_platform_click, this);
 
@@ -53,11 +53,15 @@ void MainFrame::build_platform_interface(void)
 
 	p_platform_2d_slider = new wxPanel(p_platform, -1, wxDefaultPosition, wxSize(RECTANGULAR_SLIDER_SIZE, RECTANGULAR_SLIDER_SIZE));
 	p_platform_2d_slider->SetBackgroundColour(wxColour(255, 255, 255));
+	
 	p_platform_2d_slider->Bind(wxEVT_MOTION, &MainFrame::on_platform_2d_mouse_move, this);
 	p_platform_2d_slider->Bind(wxEVT_LEFT_DOWN, &MainFrame::on_platform_2d_mouse_down, this);
 	p_platform_2d_slider->Bind(wxEVT_LEFT_UP, &MainFrame::on_platform_2d_mouse_up, this);
-	p_platform->Bind(wxEVT_LEFT_UP, &MainFrame::on_platform_2d_mouse_up, this);
+	p_platform_2d_slider->Bind(wxEVT_LEAVE_WINDOW, &MainFrame::on_platform_2d_mouse_up, this);
+	
 
+	p_platform->Bind(wxEVT_LEFT_UP, &MainFrame::on_platform_2d_mouse_up, this);
+	
 	sizer_platform->Add(st_platform, 0, wxTOP, 10);
 	sizer_platform->Add(st_platform_com_port, 0, wxTOP, 10);
 	sizer_platform->Add(tc_platform_com_port);
@@ -97,7 +101,7 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 
 	if (!platform_controller.is_open()) {
 		if (connect_to_platform(platform_controller, platform_com_port, error_string)) {
-			write_to_log("Connected to platform");
+			write_to_log("Connected to platform\n");
 			b_connect_to_platform->SetLabel("Disconnect");
 			// show the firmware version number
 			double battery_voltage = platform_controller.get_main_battery_voltage();
@@ -127,16 +131,18 @@ void MainFrame::on_platform_run_motors_mouse_down(wxMouseEvent &event)
 	tc_platform_left_motor_speed->GetValue().ToLong(&platform_left_motor_speed);
 	tc_platform_right_motor_speed->GetValue().ToLong(&platform_right_motor_speed);
 
-	platform_controller.drive_M1_with_signed_duty_and_acceleration(-platform_right_motor_speed * speed_factor, 1);
-	platform_controller.drive_M2_with_signed_duty_and_acceleration(-platform_left_motor_speed * speed_factor, 1);
+	platform_controller.drive_M2_with_signed_duty_and_acceleration(platform_right_motor_speed * speed_factor, 1);
+	platform_controller.drive_M1_with_signed_duty_and_acceleration(-platform_left_motor_speed * speed_factor, 1);
 	b_run_platform_motors->SetLabel("Running");
+	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_run_motors_mouse_up(wxMouseEvent &event)
 {
-	platform_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
 	platform_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+	platform_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
 	b_run_platform_motors->SetLabel("Run");
+	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_left_motor_slider_move(wxCommandEvent& event)
@@ -162,9 +168,10 @@ void MainFrame::on_platform_rotate_mouse_down(wxMouseEvent &event)
 	long platform_rotate_speed;
 	tc_platform_rotate_speed->GetValue().ToLong(&platform_rotate_speed);
 	
-	platform_controller.drive_M1_with_signed_duty_and_acceleration(platform_rotate_speed * speed_factor, 1);
 	platform_controller.drive_M2_with_signed_duty_and_acceleration(-platform_rotate_speed * speed_factor, 1);
+	platform_controller.drive_M1_with_signed_duty_and_acceleration(-platform_rotate_speed * speed_factor, 1);
 	b_run_platform_motors->SetLabel("Rotating");
+	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_rotate_mouse_up(wxMouseEvent &event)
@@ -172,6 +179,7 @@ void MainFrame::on_platform_rotate_mouse_up(wxMouseEvent &event)
 	platform_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
 	platform_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
 	b_rotate_platform->SetLabel("Rotate");
+	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_2d_mouse_move(wxMouseEvent& event)
@@ -191,10 +199,10 @@ void MainFrame::on_platform_2d_mouse_move(wxMouseEvent& event)
 		tc_platform_left_motor_speed->SetValue(wxString() << platform_left_motor_speed);
 		tc_platform_right_motor_speed->SetValue(wxString() << platform_right_motor_speed);
 
-		platform_controller.drive_M1_with_signed_duty_and_acceleration(-platform_right_motor_speed * speed_factor, 1);
-		platform_controller.drive_M2_with_signed_duty_and_acceleration(-platform_left_motor_speed * speed_factor, 1);
+		platform_controller.drive_M2_with_signed_duty_and_acceleration(platform_right_motor_speed * speed_factor, 1);
+		platform_controller.drive_M1_with_signed_duty_and_acceleration(-platform_left_motor_speed * speed_factor, 1);
 	}
-	event.Skip();
+//	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_2d_mouse_down(wxMouseEvent& event)
@@ -213,6 +221,6 @@ void MainFrame::on_platform_2d_mouse_up(wxMouseEvent& event)
 
 	tc_platform_left_motor_speed->SetValue(wxString() << platform_left_motor_speed);
 	tc_platform_right_motor_speed->SetValue(wxString() << platform_right_motor_speed);
-	event.Skip();
+	//event.Skip();
 }
 //------------------------------------------------------------------------
