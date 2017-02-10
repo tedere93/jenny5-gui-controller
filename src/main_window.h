@@ -204,7 +204,7 @@ private:
 	void build_lidar_interface(void);
 
 	//--------------------------------------------------------------
-	t_roboclaw_controller platform_controller;
+	
 	wxPanel *p_platform;
 	wxStaticText *st_platform;
 	wxStaticText *st_platform_com_port;

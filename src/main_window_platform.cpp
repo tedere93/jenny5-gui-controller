@@ -1,7 +1,8 @@
 #include "main_window.h"
-#include "setup_functions.h"
-#include "jenny5_defs.h"
+
+//#include "jenny5_defs.h"
 #include  "utils.h"
+#include "platform_controller.h"
 
 #define RECTANGULAR_SLIDER_SIZE 120
 #define speed_factor 100
@@ -99,12 +100,12 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 	long platform_com_port;
 	tc_platform_com_port->GetValue().ToLong(&platform_com_port); // real port number
 
-	if (!platform_controller.is_open()) {
-		if (connect_to_platform(platform_controller, platform_com_port, error_string)) {
+	if (!platform_controller.is_connected()) {
+		if (platform_controller.connect(platform_com_port, error_string)) {
 			write_to_log("Connected to platform\n");
 			b_connect_to_platform->SetLabel("Disconnect");
 			// show the firmware version number
-			double battery_voltage = platform_controller.get_main_battery_voltage();
+			double battery_voltage = platform_controller.roboclaw_controller.get_main_battery_voltage();
 			tc_platform_battery_voltage->SetValue(wxString() << battery_voltage);
 
 			b_run_platform_motors->Enable(true);
@@ -117,11 +118,12 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 	}// is open, so just disconect
 	else {
 		write_to_log("Disconnected from platform\n");
-		platform_controller.close_connection();
+		platform_controller.disconnect();
 		b_connect_to_platform->SetLabel("Connect");
 		b_run_platform_motors->Enable(false);
 		b_rotate_platform->Enable(false);
 	}
+	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_run_motors_mouse_down(wxMouseEvent &event)
@@ -131,16 +133,15 @@ void MainFrame::on_platform_run_motors_mouse_down(wxMouseEvent &event)
 	tc_platform_left_motor_speed->GetValue().ToLong(&platform_left_motor_speed);
 	tc_platform_right_motor_speed->GetValue().ToLong(&platform_right_motor_speed);
 
-	platform_controller.drive_M2_with_signed_duty_and_acceleration(platform_right_motor_speed * speed_factor, 1);
-	platform_controller.drive_M1_with_signed_duty_and_acceleration(-platform_left_motor_speed * speed_factor, 1);
+	platform_controller.move_right_motor(platform_right_motor_speed * speed_factor, 1);
+	platform_controller.move_left_motor(-platform_left_motor_speed * speed_factor, 1);
 	b_run_platform_motors->SetLabel("Running");
 	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_run_motors_mouse_up(wxMouseEvent &event)
 {
-	platform_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
-	platform_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
+	platform_controller.stop_motors();
 	b_run_platform_motors->SetLabel("Run");
 	event.Skip();
 }
@@ -149,18 +150,21 @@ void MainFrame::on_platform_left_motor_slider_move(wxCommandEvent& event)
 {
 	long platform_left_motor_speed_new_position = s_platform_left_motor_speed->GetValue(); 
 	tc_platform_left_motor_speed->SetValue(wxString() << platform_left_motor_speed_new_position);
+	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_right_motor_slider_move(wxCommandEvent& event)
 {
 	long platform_right_motor_speed_new_position = s_platform_right_motor_speed->GetValue();
 	tc_platform_right_motor_speed->SetValue(wxString() << platform_right_motor_speed_new_position);
+	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_rotate_speed_slider_move(wxCommandEvent & event)
 {
 	long platform_rotate_speed_new_position = s_platform_rotate_speed->GetValue();
 	tc_platform_rotate_speed->SetValue(wxString() << platform_rotate_speed_new_position);
+	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_rotate_mouse_down(wxMouseEvent &event)
@@ -168,16 +172,16 @@ void MainFrame::on_platform_rotate_mouse_down(wxMouseEvent &event)
 	long platform_rotate_speed;
 	tc_platform_rotate_speed->GetValue().ToLong(&platform_rotate_speed);
 	
-	platform_controller.drive_M2_with_signed_duty_and_acceleration(-platform_rotate_speed * speed_factor, 1);
-	platform_controller.drive_M1_with_signed_duty_and_acceleration(-platform_rotate_speed * speed_factor, 1);
+	platform_controller.move_right_motor(-platform_rotate_speed * speed_factor, 1);
+	platform_controller.move_left_motor(-platform_rotate_speed * speed_factor, 1);
 	b_run_platform_motors->SetLabel("Rotating");
 	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_rotate_mouse_up(wxMouseEvent &event)
 {
-	platform_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
-	platform_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+	platform_controller.stop_motors();
+	
 	b_rotate_platform->SetLabel("Rotate");
 	event.Skip();
 }
@@ -199,28 +203,28 @@ void MainFrame::on_platform_2d_mouse_move(wxMouseEvent& event)
 		tc_platform_left_motor_speed->SetValue(wxString() << platform_left_motor_speed);
 		tc_platform_right_motor_speed->SetValue(wxString() << platform_right_motor_speed);
 
-		platform_controller.drive_M2_with_signed_duty_and_acceleration(platform_right_motor_speed * speed_factor, 1);
-		platform_controller.drive_M1_with_signed_duty_and_acceleration(-platform_left_motor_speed * speed_factor, 1);
+		platform_controller.move_right_motor(platform_right_motor_speed * speed_factor, 1);
+		platform_controller.move_left_motor(-platform_left_motor_speed * speed_factor, 1);
 	}
-//	event.Skip();
+	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_2d_mouse_down(wxMouseEvent& event)
 {
 	_mouse_down = true;
+	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_platform_2d_mouse_up(wxMouseEvent& event)
 {
 	_mouse_down = false;
-	platform_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
-	platform_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+	platform_controller.stop_motors();
 
 	long platform_left_motor_speed = 0;
 	long platform_right_motor_speed = 0;
 
 	tc_platform_left_motor_speed->SetValue(wxString() << platform_left_motor_speed);
 	tc_platform_right_motor_speed->SetValue(wxString() << platform_right_motor_speed);
-	//event.Skip();
+	event.Skip();
 }
 //------------------------------------------------------------------------

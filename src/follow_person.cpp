@@ -17,6 +17,7 @@
 #include "utils.h"
 #include "lidar_map.h"
 #include "lidar_controller.h"
+#include "platform_controller.h"
 
 #include "jenny5_defs.h"
 
@@ -35,7 +36,7 @@ bool clear_ahead(int *lidar_distances)
 	return true;
 }
 //----------------------------------------------------------------
-int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, t_lidar_controller &LIDAR_controller, int lidar_com_port, t_roboclaw_controller & tracks_controller, int platform_com_port, f_log_callback to_log)
+int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, t_lidar_controller &LIDAR_controller, int lidar_com_port, t_platform_controller & tracks_controller, int platform_com_port, f_log_callback to_log)
 {
 	// initialization
 
@@ -63,7 +64,7 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 	else
 		to_log("Lidar connection succceded.\n");
 
-	if (!connect_to_platform(tracks_controller, platform_com_port, error_string)) {
+	if (!tracks_controller.connect(platform_com_port, error_string)) {
 		to_log(error_string);
 		return -1;
 	}
@@ -178,8 +179,8 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 			if (head_center.x > cam_frame.cols / 2 + CAM_PIXELS_TOLERANCE) {
 
 				// rotate
-				tracks_controller.drive_M1_with_signed_duty_and_acceleration(DC_MOTOR_SPEED_ROTATE, 1);
-				tracks_controller.drive_M2_with_signed_duty_and_acceleration(-DC_MOTOR_SPEED_ROTATE, 1);
+				tracks_controller.move_left_motor(DC_MOTOR_SPEED_ROTATE, 1);
+				tracks_controller.move_right_motor(-DC_MOTOR_SPEED_ROTATE, 1);
 				printf("rotate right - sent\n");
 			}
 			else
@@ -189,8 +190,8 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 					//					int num_steps_x = (int)(angle_offset.degrees_from_center_x / 1.8 * 8) * TRACKS_MOTOR_REDUCTION;
 
 					// rotate
-					tracks_controller.drive_M1_with_signed_duty_and_acceleration(-DC_MOTOR_SPEED_ROTATE, 1);
-					tracks_controller.drive_M2_with_signed_duty_and_acceleration(DC_MOTOR_SPEED_ROTATE, 1);
+					tracks_controller.move_left_motor(-DC_MOTOR_SPEED_ROTATE, 1);
+					tracks_controller.move_right_motor(DC_MOTOR_SPEED_ROTATE, 1);
 					printf("rotate left - sent\n");
 				}
 				else {
@@ -200,22 +201,21 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 						// move forward
 						// only if LIDAR distance to the front point is very far from the robot
 						if (clear_ahead(lidar_user_data.LIDAR_controller->lidar_distances)) {
-							tracks_controller.drive_M1_with_signed_duty_and_acceleration(-DC_MOTOR_SPEED, 1);
-							tracks_controller.drive_M2_with_signed_duty_and_acceleration(-DC_MOTOR_SPEED, 1);
+							tracks_controller.move_left_motor(-DC_MOTOR_SPEED, 1);
+							tracks_controller.move_right_motor(-DC_MOTOR_SPEED, 1);
 
 							printf("move ahead - sent\n");
 						}
 						else {
 							// stop the robot -- here I have to move around the obstacle
-							tracks_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
-							tracks_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+							tracks_controller.stop_motors();
 							printf("cannot move ahead - obstacle detected\n");
 						}
 					}
 					else {
 						// move backward
-						tracks_controller.drive_M1_with_signed_duty_and_acceleration(DC_MOTOR_SPEED, 1);
-						tracks_controller.drive_M2_with_signed_duty_and_acceleration(DC_MOTOR_SPEED, 1);
+						tracks_controller.move_left_motor(DC_MOTOR_SPEED, 1);
+						tracks_controller.move_right_motor(DC_MOTOR_SPEED, 1);
 						printf("move backward - sent\n");
 					}
 
@@ -245,8 +245,7 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 		}
 		else {
 			// no face found ... so stop the platoform motors
-			tracks_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
-			tracks_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+			tracks_controller.stop_motors();
 
 			printf("no face found - motors stopped\n");
 		}
@@ -279,15 +278,15 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 	jenny5_head_controller.head_arduino_controller.send_disable_stepper_motor(HEAD_MOTOR_FACE);
 	jenny5_head_controller.head_arduino_controller.send_disable_stepper_motor(HEAD_MOTOR_NECK);
 
-	tracks_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
-	tracks_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+	tracks_controller.stop_motors();
+	
 
 	LIDAR_controller.arduino_controller. send_LIDAR_stop();
 
 	// close connection
 	jenny5_head_controller.disconnect();
-	LIDAR_controller.arduino_controller.close_connection();
-	tracks_controller.close_connection();
+	LIDAR_controller.disconnect();
+	tracks_controller.disconnect();
 
 	destroyWindow("LIDAR map");
 	destroyWindow("Head camera");

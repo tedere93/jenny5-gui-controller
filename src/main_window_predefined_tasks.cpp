@@ -8,6 +8,7 @@
 #include "follow_person.h"
 #include "head_controller.h"
 #include "lidar_controller.h"
+#include "platform_controller.h"
 
 //------------------------------------------------------------------------
 void MainFrame::build_predefined_task_interface(void)
