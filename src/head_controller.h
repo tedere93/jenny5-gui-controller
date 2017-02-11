@@ -6,6 +6,28 @@
 
 #include "jenny5_arduino_controller.h"
 
+#define HEAD_MOTOR_NECK 0
+#define HEAD_MOTOR_FACE 1
+
+#define HEAD_POTENTIOMETER_NECK_INDEX 0
+#define HEAD_POTENTIOMETER_FACE_INDEX 1
+#define HEAD_ULTRASONIC_FACE_INDEX 0
+
+#define HEAD_CAMERA_INDEX 0
+
+
+// head
+#define _head_horizontal_motor_potentiometer_min 329
+#define _head_horizontal_motor_potentiometer_max 829
+#define _head_horizontal_motor_potentiometer_home 529
+
+#define _head_vertical_motor_potentiometer_min 332
+#define _head_vertical_motor_potentiometer_max 832
+#define _head_vertical_motor_potentiometer_home 632
+
+#define HEAD_RADIUS_TO_REVERT 70
+#define CAM_PIXELS_TOLERANCE 100
+
 class t_head_controller {
 public:
 	cv::VideoCapture head_cam;
