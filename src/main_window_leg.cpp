@@ -2,6 +2,7 @@
 #include "setup_functions.h"
 #include "jenny5_defs.h"
 #include  "utils.h"
+#include "leg_controller.h"
 
 //------------------------------------------------------------------------
 void MainFrame::build_leg_interface(void)
@@ -87,23 +88,24 @@ void MainFrame::leg_set_enable_all(bool new_state)
 //------------------------------------------------------------------------
 void MainFrame::on_connect_to_leg_click(wxCommandEvent &event)
 {
-	char error_string[1000];
+
 	long leg_com_port;
 	tc_leg_com_port->GetValue().ToLong(&leg_com_port); // real port number
 
-	if (!leg_controller.is_open()) {
-		if (connect_to_leg(leg_controller, leg_com_port, error_string)) {
-			write_to_log("Connected to leg\n");
+	if (!leg_controller.is_connected()) {
+		if (leg_controller.connect(leg_com_port) == E_OK) {
+			write_to_log(Connected_to_leg_STR);
+
 			b_connect_to_leg->SetLabel("Disconnect");
 			leg_set_enable_all(true);
 		}
 		else {
-			write_to_log(error_string);
+			write_to_log(CANNOT_CONNECT_TO_JENNY5_LEG_STR);
 		}
 	}// is open, so just disconect
 	else {
 		write_to_log("Disconnected from leg\n");
-		leg_controller.close_connection();
+		leg_controller.disconnect();
 		b_connect_to_leg->SetLabel("Connect");
 		leg_set_enable_all(false);
 	}
@@ -115,16 +117,15 @@ void MainFrame::on_leg_expand_mouse_down(wxMouseEvent &event)
 	long leg_motor_speed;
 	tc_leg_speed->GetValue().ToLong(&leg_motor_speed);
 
-	leg_controller.drive_M1_with_signed_duty_and_acceleration(-leg_motor_speed, 1);
-	leg_controller.drive_M2_with_signed_duty_and_acceleration(-leg_motor_speed, 1);
+	leg_controller.expand_both(leg_motor_speed, 1);
+	
 	b_expand_leg->SetLabel("Expanding leg");
 	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_leg_expand_mouse_up(wxMouseEvent &event)
 {
-	leg_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
-	leg_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+	leg_controller.stop_motors();
 	b_expand_leg->SetLabel("Expand leg");
 	event.Skip();
 }
@@ -134,16 +135,14 @@ void MainFrame::on_leg_contract_mouse_down(wxMouseEvent &event)
 	long leg_motor_speed;
 	tc_leg_speed->GetValue().ToLong(&leg_motor_speed);
 
-	leg_controller.drive_M1_with_signed_duty_and_acceleration(leg_motor_speed, 1);
-	leg_controller.drive_M2_with_signed_duty_and_acceleration(leg_motor_speed, 1);
+	leg_controller.contract_both(leg_motor_speed, 1);
 	b_contract_leg->SetLabel("Contracting leg");
 	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_leg_contract_mouse_up(wxMouseEvent &event)
 {
-	leg_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
-	leg_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+	leg_controller.stop_motors();
 	b_contract_leg->SetLabel("Contract leg");
 	event.Skip();
 }
@@ -153,14 +152,14 @@ void MainFrame::on_leg_expand_top_motor_mouse_down(wxMouseEvent &event)
 	long leg_motor_speed;
 	tc_leg_speed->GetValue().ToLong(&leg_motor_speed);
 
-	leg_controller.drive_M2_with_signed_duty_and_acceleration(-leg_motor_speed, 1);
+	leg_controller.expand_top(leg_motor_speed, 1);
 	b_expand_top_leg_motor->SetLabel("Expanding top");
 	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_leg_expand_top_motor_mouse_up(wxMouseEvent &event)
 {
-	leg_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+	leg_controller.stop_motors();
 	b_expand_top_leg_motor->SetLabel("Expand top");
 	event.Skip();
 }
@@ -170,14 +169,14 @@ void MainFrame::on_leg_contract_top_motor_mouse_down(wxMouseEvent &event)
 	long leg_motor_speed;
 	tc_leg_speed->GetValue().ToLong(&leg_motor_speed);
 
-	leg_controller.drive_M2_with_signed_duty_and_acceleration(leg_motor_speed, 1);
+	leg_controller.contract_top(leg_motor_speed, 1);
 	b_contract_top_leg_motor->SetLabel("Contracting top");
 	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_leg_contract_top_motor_mouse_up(wxMouseEvent &event)
 {
-	leg_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+	leg_controller.stop_motors();
 	b_contract_top_leg_motor->SetLabel("Contract leg");
 	event.Skip();
 }
@@ -187,14 +186,14 @@ void MainFrame::on_leg_expand_bottom_motor_mouse_down(wxMouseEvent &event)
 	long leg_motor_speed;
 	tc_leg_speed->GetValue().ToLong(&leg_motor_speed);
 
-	leg_controller.drive_M1_with_signed_duty_and_acceleration(-leg_motor_speed, 1);
+	leg_controller.expand_bottom(leg_motor_speed, 1);
 	b_expand_bottom_leg_motor->SetLabel("Expanding bottom");
 	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_leg_expand_bottom_motor_mouse_up(wxMouseEvent &event)
 {
-	leg_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
+	leg_controller.stop_motors();
 	b_expand_bottom_leg_motor->SetLabel("Expand leg");
 	event.Skip();
 }
@@ -204,14 +203,14 @@ void MainFrame::on_leg_contract_bottom_motor_mouse_down(wxMouseEvent &event)
 	long leg_motor_speed;
 	tc_leg_speed->GetValue().ToLong(&leg_motor_speed);
 
-	leg_controller.drive_M1_with_signed_duty_and_acceleration(leg_motor_speed, 1);
+	leg_controller.contract_bottom(leg_motor_speed, 1);
 	b_contract_bottom_leg_motor->SetLabel("Contracting bottom");
 	event.Skip();
 }
 //------------------------------------------------------------------------
 void MainFrame::on_leg_contract_bottom_motor_mouse_up(wxMouseEvent &event)
 {
-	leg_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
+	leg_controller.stop_motors();
 	b_contract_bottom_leg_motor->SetLabel("Contract bottom");
 	event.Skip();
 }

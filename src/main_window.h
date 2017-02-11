@@ -28,7 +28,7 @@
 #include <opencv2\imgproc\imgproc.hpp>
 
 #include "jenny5_arduino_controller.h"
-#include "roboclaw_controller.h"
+
 //------------------------------------------------------------------------
 class MainFrame : public wxFrame
 {
@@ -246,7 +246,7 @@ private:
 	void build_platform_interface(void);
 
 	//--------------------------------------------------------------
-	t_roboclaw_controller leg_controller;
+	
 	wxPanel *p_leg;
 	wxStaticText *st_leg;
 	wxStaticText *st_leg_com_port;
