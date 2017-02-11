@@ -14,7 +14,7 @@
 
 #include "follow_person.h"
 #include "setup_functions.h"
-#include "utils.h"
+
 #include "lidar_map.h"
 #include "lidar_controller.h"
 #include "platform_controller.h"

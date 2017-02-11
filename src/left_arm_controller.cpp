@@ -1,11 +1,7 @@
-
 #include "left_arm_controller.h"
 #include "jenny5_defs.h"
 
-
 t_left_arm_controller left_arm_controller;
-
-
 //----------------------------------------------------------------
 t_left_arm_controller::t_left_arm_controller(void)
 {

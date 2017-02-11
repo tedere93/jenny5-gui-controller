@@ -11,7 +11,6 @@
 #include "main_window.h"
 #include "setup_functions.h"
 
-#include "jenny5_defs.h"
 #include "utils.h"
 #include "head_controller.h"
 #include "lidar_controller.h"
@@ -106,7 +105,7 @@ void MainFrame::OnMainWindowClose(wxCloseEvent& WXUNUSED(event))
 
 	jenny5_head_controller.disconnect();
 	left_arm_controller.disconnect();
-	right_arm_controller.close_connection();
+//	right_arm_controller.close_connection();
 	LIDAR_controller.disconnect();
 	platform_controller.disconnect();
 	leg_controller.disconnect();

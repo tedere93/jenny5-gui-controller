@@ -1,7 +1,5 @@
 #include "main_window.h"
-#include "setup_functions.h"
-#include "jenny5_defs.h"
-#include  "utils.h"
+
 
 //------------------------------------------------------------------------
 void MainFrame::build_lidar_interface(void)

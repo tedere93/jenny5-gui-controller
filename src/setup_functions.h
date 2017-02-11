@@ -18,5 +18,3 @@ using namespace cv;
 
 
 bool init_face_classifier(CascadeClassifier &face_classifier, char* error_string);
-
-bool connect_to_leg(t_roboclaw_controller &leg_controller, int leg_com_port, char* error_string);

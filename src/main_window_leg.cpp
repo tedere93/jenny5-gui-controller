@@ -1,7 +1,6 @@
 #include "main_window.h"
 #include "setup_functions.h"
 #include "jenny5_defs.h"
-#include  "utils.h"
 #include "leg_controller.h"
 
 //------------------------------------------------------------------------

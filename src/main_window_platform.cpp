@@ -1,7 +1,7 @@
 #include "main_window.h"
 
 #include "jenny5_defs.h"
-#include  "utils.h"
+#include "utils.h"
 #include "platform_controller.h"
 
 #define RECTANGULAR_SLIDER_SIZE 120

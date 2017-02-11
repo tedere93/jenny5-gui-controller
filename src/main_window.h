@@ -27,8 +27,6 @@
 #include <opencv2\highgui\highgui.hpp>
 #include <opencv2\imgproc\imgproc.hpp>
 
-#include "jenny5_arduino_controller.h"
-
 //------------------------------------------------------------------------
 class MainFrame : public wxFrame
 {
@@ -53,8 +51,6 @@ private:
 	void build_predefined_task_interface(void);
 
 	//----------------------------------------------
-
-	
 	wxPanel *p_head;
 	
 	wxStaticText *st_head;
@@ -181,8 +177,6 @@ private:
 	wxButton *b_disable_all_left_arm_motors;
 	void on_disable_all_left_arm_motors_clicked(wxCommandEvent &event);
 	//--------------------------------------------------------------
-	t_jenny5_arduino_controller right_arm_controller;
-	cv::VideoCapture right_arm_cam;
 
 	wxPanel *p_right_arm;
 

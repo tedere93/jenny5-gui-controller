@@ -1,7 +1,5 @@
 #include "main_window.h"
 #include "setup_functions.h"
-#include "jenny5_defs.h"
-#include  "utils.h"
 
 #include "head_face_follow.h"
 #include "lidar_map.h"
