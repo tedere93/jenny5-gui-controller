@@ -4,7 +4,7 @@
 #define CANNOT_CONNECT_TO_JENNY5_PLATFORM_STR "CANNOT_CONNECT_TO_JENNY5_PLATFORM\n" 
 #define CANNOT_CONNECT_TO_JENNY5_PLATFORM 1
 
-#define Connected_to_platform "Connected to platform\n"
+#define Connected_to_platform_STR "Connected to platform\n"
 
 #include "roboclaw_controller.h"
 
@@ -23,9 +23,9 @@ public:
 	void send_get_roboclaw_firmware_version(void);
 
 	// positive if move forward
-	void move_left_motor(uint32_t speed, uint32_t acceleration);
+	void move_left_motor(int16_t speed, uint32_t acceleration);
 	// positive if move forward
-	void move_right_motor(uint32_t speed, uint32_t acceleration);
+	void move_right_motor(int16_t speed, uint32_t acceleration);
 
 	void stop_motors(void);
 };

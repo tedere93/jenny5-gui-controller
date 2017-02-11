@@ -43,12 +43,12 @@ void t_platform_controller::send_get_roboclaw_firmware_version(void)
 
 }
 //------------------------------------------------------------------------
-void t_platform_controller::move_left_motor(uint32_t speed, uint32_t acceleration)
+void t_platform_controller::move_left_motor(int16_t speed, uint32_t acceleration)
 {
-	roboclaw_controller.drive_M1_with_signed_duty_and_acceleration(speed, acceleration);
+	roboclaw_controller.drive_M1_with_signed_duty_and_acceleration(-speed, acceleration);
 }
 //------------------------------------------------------------------------
-void t_platform_controller::move_right_motor(uint32_t speed, uint32_t acceleration)
+void t_platform_controller::move_right_motor(int16_t speed, uint32_t acceleration)
 {
 	roboclaw_controller.drive_M2_with_signed_duty_and_acceleration(speed, acceleration);
 }
