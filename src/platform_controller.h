@@ -1,6 +1,11 @@
 #pragma once
 
 
+#define CANNOT_CONNECT_TO_JENNY5_PLATFORM_STR "CANNOT_CONNECT_TO_JENNY5_PLATFORM\n" 
+#define CANNOT_CONNECT_TO_JENNY5_PLATFORM 1
+
+#define Connected_to_platform "Connected to platform\n"
+
 #include "roboclaw_controller.h"
 
 class t_platform_controller {
@@ -10,14 +15,16 @@ public:
 	t_platform_controller();
 	~t_platform_controller();
 
-	bool connect(int PLATFORM_COM_PORT, char* error_string);
+	int connect(int PLATFORM_COM_PORT);
 	bool is_connected(void);
 	void disconnect(void);
 	bool setup(char* error_string);
 
 	void send_get_roboclaw_firmware_version(void);
 
+	// positive if move forward
 	void move_left_motor(uint32_t speed, uint32_t acceleration);
+	// positive if move forward
 	void move_right_motor(uint32_t speed, uint32_t acceleration);
 
 	void stop_motors(void);

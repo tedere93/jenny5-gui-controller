@@ -1,6 +1,6 @@
 #include "main_window.h"
 
-//#include "jenny5_defs.h"
+#include "jenny5_defs.h"
 #include  "utils.h"
 #include "platform_controller.h"
 
@@ -96,13 +96,13 @@ void MainFrame::build_platform_interface(void)
 //------------------------------------------------------------------------
 void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 {
-	char error_string[1000];
+
 	long platform_com_port;
 	tc_platform_com_port->GetValue().ToLong(&platform_com_port); // real port number
 
 	if (!platform_controller.is_connected()) {
-		if (platform_controller.connect(platform_com_port, error_string)) {
-			write_to_log("Connected to platform\n");
+		if (platform_controller.connect(platform_com_port) == E_OK) {
+			write_to_log(Connected_to_platform);
 			b_connect_to_platform->SetLabel("Disconnect");
 			// show the firmware version number
 			double battery_voltage = platform_controller.roboclaw_controller.get_main_battery_voltage();
@@ -113,7 +113,7 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 			_mouse_down = false;
 		}
 		else {
-			write_to_log(error_string);
+			write_to_log(CANNOT_CONNECT_TO_JENNY5_PLATFORM_STR);
 		}
 	}// is open, so just disconect
 	else {

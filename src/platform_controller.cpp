@@ -1,4 +1,5 @@
 #include "platform_controller.h"
+#include "jenny5_defs.h"
 
 t_platform_controller platform_controller;
 
@@ -14,13 +15,12 @@ t_platform_controller::~t_platform_controller()
 	roboclaw_controller.close_connection();
 }
 //------------------------------------------------------------------------
-bool t_platform_controller::connect(int PLATFORM_COM_PORT, char* error_string)
+int t_platform_controller::connect(int PLATFORM_COM_PORT)
 {
 	if (!roboclaw_controller.connect(PLATFORM_COM_PORT - 1, 38400)) {
-		sprintf(error_string, "Error attaching to Jenny 5' platform!\n");
-		return false;
+		return CANNOT_CONNECT_TO_JENNY5_PLATFORM;
 	}
-	return true;
+	return E_OK;
 }
 //------------------------------------------------------------------------
 bool t_platform_controller::is_connected(void)

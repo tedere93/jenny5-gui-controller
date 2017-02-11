@@ -64,8 +64,8 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 	else
 		to_log("Lidar connection succceded.\n");
 
-	if (!tracks_controller.connect(platform_com_port, error_string)) {
-		to_log(error_string);
+	if (!tracks_controller.connect(platform_com_port) != E_OK) {
+		to_log(CANNOT_CONNECT_TO_JENNY5_PLATFORM_STR);
 		return -1;
 	}
 	else
