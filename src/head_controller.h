@@ -58,6 +58,8 @@ public:
 
 	void send_neck_to_sensor_position(int head_neck_new_position);
 	void send_face_to_sensor_position(int head_face_new_position);
+
+	// send home and blocks until returns
 	bool home_all_motors(char* error_string);
 	void send_disable_motors(void);
 

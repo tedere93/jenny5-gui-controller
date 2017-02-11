@@ -102,7 +102,7 @@ void MainFrame::on_connect_to_platform_click(wxCommandEvent &event)
 
 	if (!platform_controller.is_connected()) {
 		if (platform_controller.connect(platform_com_port) == E_OK) {
-			write_to_log(Connected_to_platform);
+			write_to_log(Connected_to_platform_STR);
 			b_connect_to_platform->SetLabel("Disconnect");
 			// show the firmware version number
 			double battery_voltage = platform_controller.roboclaw_controller.get_main_battery_voltage();
