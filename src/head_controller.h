@@ -28,6 +28,15 @@
 #define HEAD_RADIUS_TO_REVERT 70
 #define CAM_PIXELS_TOLERANCE 100
 
+
+#define CANNOT_CONNECT_TO_JENNY5_HEAD_STR "CANNOT_CONNECT_TO_JENNY5_HEAD\n" 
+#define CANNOT_CONNECT_TO_JENNY5_HEAD_ERROR 1
+
+#define Head_does_not_respond_STR "Head does not respond! Game over!\n"
+#define Head_does_not_respond_ERROR 2
+
+#define Connected_to_head_STR "Connected to head\n"
+
 class t_head_controller {
 public:
 	cv::VideoCapture head_cam;
@@ -35,7 +44,7 @@ public:
 	cv::CascadeClassifier face_classifier;
 	t_head_controller();
 
-	bool connect(int HEAD_COM_PORT, char* error_string);
+	int connect(int HEAD_COM_PORT);
 	bool is_connected(void);
 	void disconnect(void);
 	bool setup(char* error_string);
@@ -51,6 +60,8 @@ public:
 	void send_face_to_sensor_position(int head_face_new_position);
 	bool home_all_motors(char* error_string);
 	void send_disable_motors(void);
+
+	char *error_to_string(int error);
 };
 
 extern t_head_controller jenny5_head_controller;

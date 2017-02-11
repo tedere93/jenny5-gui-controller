@@ -9,15 +9,13 @@ t_head_controller::t_head_controller(void)
 
 }
 //--------------------------------------------------------
-bool t_head_controller::connect(int HEAD_COM_PORT, char* error_string)
+int t_head_controller::connect(int HEAD_COM_PORT)
 {
 	//-------------- START INITIALIZATION ------------------------------
 
 	if (!head_arduino_controller.connect(HEAD_COM_PORT - 1, 115200)) { // real - 1
-		sprintf(error_string, "Error attaching to Jenny 5' head!\n");
-		return false;
+		return CANNOT_CONNECT_TO_JENNY5_HEAD_ERROR;
 	}
-
 
 	bool head_responded = false;
 
@@ -42,13 +40,11 @@ bool t_head_controller::connect(int HEAD_COM_PORT, char* error_string)
 		// if more than 3 seconds then game over
 		if (wait_time > NUM_SECONDS_TO_WAIT_FOR_CONNECTION) {
 			if (!head_responded)
-				sprintf(error_string, "Head does not respond! Game over!\n");
-
-			return false;
+			  return Head_does_not_respond_ERROR;
 		}
 	}
 
-	return true;
+	return E_OK;
 }
 //----------------------------------------------------------------
 void t_head_controller::disconnect(void)
@@ -256,5 +252,18 @@ void t_head_controller::send_disable_motors(void)
 {
 	head_arduino_controller.send_disable_stepper_motor(HEAD_MOTOR_NECK);
 	head_arduino_controller.send_disable_stepper_motor(HEAD_MOTOR_FACE);
+}
+//----------------------------------------------------------------
+char *t_head_controller::error_to_string(int error)
+{
+	switch (error) {
+	case E_OK:
+		return "HEAD PERFECT";
+	case CANNOT_CONNECT_TO_JENNY5_HEAD_ERROR:
+		return CANNOT_CONNECT_TO_JENNY5_HEAD_STR;
+	case Head_does_not_respond_ERROR:
+		return Head_does_not_respond_STR;
+	}
+	return NULL;
 }
 //----------------------------------------------------------------

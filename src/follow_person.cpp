@@ -42,12 +42,12 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 
 	char error_string[1000];
 
-	if (!jenny5_head_controller.connect(head_com_port, error_string)) {
-		to_log(error_string);
+	int error_index = jenny5_head_controller.connect(head_com_port);
+
+	to_log(jenny5_head_controller.error_to_string(error_index));
+	if (error_index != E_OK) {
 		return -1;
 	}
-	else
-		to_log("Head connection succceded.\n");
 
 	if (!jenny5_head_controller.head_cam.open(HEAD_CAMERA_INDEX)) {	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
 		to_log("Couldn't open head's video camera!\n");

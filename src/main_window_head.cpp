@@ -119,7 +119,9 @@ void  MainFrame::on_connect_to_head_click(wxCommandEvent &event)
 	tc_head_com_port->GetValue().ToLong(&head_com_port); // real port number
 
 	if (!jenny5_head_controller.is_connected()) {
-		if (jenny5_head_controller.connect(head_com_port, error_string)) {
+		int error_index = jenny5_head_controller.connect(head_com_port);
+		write_to_log(jenny5_head_controller.error_to_string(error_index));
+		if (error_index == E_OK) {
 			b_connect_to_head->SetLabel("Disconnect");
 			// show the firmware version number
 			jenny5_head_controller.send_get_arduino_firmware_version();
