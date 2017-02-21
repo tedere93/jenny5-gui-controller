@@ -59,3 +59,15 @@ void t_platform_controller::stop_motors(void)
 	roboclaw_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
 }
 //------------------------------------------------------------------------
+void t_platform_controller::rotate_left(uint16_t speed, uint32_t acceleration)
+{
+	move_right_motor(speed, 1);
+	move_left_motor(-speed, 1);
+}
+//------------------------------------------------------------------------
+void t_platform_controller::rotate_right(uint16_t speed, uint32_t acceleration)
+{
+	move_right_motor(-speed, 1);
+	move_left_motor(speed, 1);
+}
+//------------------------------------------------------------------------
