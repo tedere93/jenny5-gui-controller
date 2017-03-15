@@ -134,7 +134,7 @@ void MainFrame::on_platform_run_motors_mouse_down(wxMouseEvent &event)
 	tc_platform_right_motor_speed->GetValue().ToLong(&platform_right_motor_speed);
 
 	platform_controller.move_right_motor(platform_right_motor_speed * speed_factor, 1);
-	platform_controller.move_left_motor(-platform_left_motor_speed * speed_factor, 1);
+	platform_controller.move_left_motor(platform_left_motor_speed * speed_factor, 1);
 	b_run_platform_motors->SetLabel("Running");
 	event.Skip();
 }
@@ -172,7 +172,7 @@ void MainFrame::on_platform_rotate_mouse_down(wxMouseEvent &event)
 	long platform_rotate_speed;
 	tc_platform_rotate_speed->GetValue().ToLong(&platform_rotate_speed);
 	
-	platform_controller.move_right_motor(-platform_rotate_speed * speed_factor, 1);
+	platform_controller.move_right_motor(platform_rotate_speed * speed_factor, 1);
 	platform_controller.move_left_motor(-platform_rotate_speed * speed_factor, 1);
 	b_run_platform_motors->SetLabel("Rotating");
 	event.Skip();
@@ -204,7 +204,7 @@ void MainFrame::on_platform_2d_mouse_move(wxMouseEvent& event)
 		tc_platform_right_motor_speed->SetValue(wxString() << platform_right_motor_speed);
 
 		platform_controller.move_right_motor(platform_right_motor_speed * speed_factor, 1);
-		platform_controller.move_left_motor(-platform_left_motor_speed * speed_factor, 1);
+		platform_controller.move_left_motor(platform_left_motor_speed * speed_factor, 1);
 	}
 	event.Skip();
 }
