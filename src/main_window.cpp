@@ -118,11 +118,6 @@ void write_to_log(char* str)
 	char *s = current_time_to_string();
 	*(f_main->tc_log) << wxString(s) + wxString(':') + wxString(str);
 }//------------------------------------------------------------------------
-void MainFrame::on_connect_to_lidar_click(wxCommandEvent &event)
-{
-
-}
-//------------------------------------------------------------------------
 void MainFrame::on_connect_to_right_arm_click(wxCommandEvent &event)
 {
 
