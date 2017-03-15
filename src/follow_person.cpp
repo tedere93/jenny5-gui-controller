@@ -40,33 +40,51 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 {
 	// initialization
 
+	bool error = false;
 	char error_string[1000];
 
 	int error_index = jenny5_head_controller.connect(head_com_port);
 
 	to_log(jenny5_head_controller.error_to_string(error_index));
 	if (error_index != E_OK) {
-		return -1;
+		error = true;
 	}
+	
+
+	// setup
+	if (!jenny5_head_controller.setup(error_string)) {
+		to_log(error_string);
+		error = true;
+	}
+	else
+		to_log("Head setup succceded.\n");
 
 	if (!jenny5_head_controller.head_cam.open(HEAD_CAMERA_INDEX)) {	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
 		to_log("Couldn't open head's video camera!\n");
-		return -1;
+		error = true;
 	}
 	else
 		to_log("Head camera connection succceded.\n");
 
+	error_index = LIDAR_controller.connect(lidar_com_port);
+	to_log(LIDAR_controller.error_to_string(error_index));
+	if (error_index != E_OK) {
+		
+		error = true;
+	}
 
-	if (!LIDAR_controller.connect(lidar_com_port, error_string)) {
+	// setup
+	if (!LIDAR_controller.setup(error_string)) {
 		to_log(error_string);
-		return -1;
+		error = true;
 	}
 	else
-		to_log("Lidar connection succceded.\n");
+		to_log("Setup LIDAR OK.\n");
 
-	if (!tracks_controller.connect(platform_com_port) != E_OK) {
+	error_index = tracks_controller.connect(platform_com_port);
+	if (error_index != E_OK) {
 		to_log(CANNOT_CONNECT_TO_JENNY5_PLATFORM_STR);
-		return -1;
+		error = true;
 	}
 	else
 		to_log("Platform connection succceded.\n");
@@ -74,43 +92,31 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 	// initialization
 	if (!init_face_classifier(jenny5_head_controller.face_classifier, error_string)) {
 		to_log(error_string);
-		return -1;
+		error = true;
 	}
 	else
 		to_log("Face classifier initialization succceded.\n");
 
-	// setup
-	if (!jenny5_head_controller.setup(error_string)) {
-		to_log(error_string);
-		return -1;
-	}
-	else
-		to_log("Head setup succceded.\n");
-
-
 	//  home
 	if (!jenny5_head_controller.home_all_motors(error_string)) {
 		to_log(error_string);
-		return -1;
+		error = true;
 	}
 	else
 		to_log("Head home succceded.\n");
 
-
-	// setup
-	if (!LIDAR_controller.setup(error_string)) {
-		to_log(error_string);
+	if (error) {
+		LIDAR_controller.disconnect();
+		jenny5_head_controller.disconnect();
+		tracks_controller.disconnect();
 		return -1;
 	}
-	else
-		to_log("Setup LIDAR OK.\n");
-
 	LIDAR_controller.arduino_controller.send_set_LIDAR_motor_speed_and_acceleration(30, 100);
 	LIDAR_controller.arduino_controller.send_LIDAR_go();
 
 	int image_width = 600;
 	Point center(image_width / 2, image_width / 2);
-	Mat lidar_map_image;
+	Mat lidar_map_image = Mat::zeros(image_width, image_width, CV_8UC3); //Mat lidar_map_image;
 
 	namedWindow("LIDAR map", WINDOW_AUTOSIZE);
 	t_lidar_user_data lidar_user_data;
@@ -201,8 +207,8 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 						// move forward
 						// only if LIDAR distance to the front point is very far from the robot
 						if (clear_ahead(lidar_user_data.LIDAR_controller->lidar_distances)) {
-							tracks_controller.move_left_motor(-DC_MOTOR_SPEED, 1);
-							tracks_controller.move_right_motor(-DC_MOTOR_SPEED, 1);
+							tracks_controller.move_left_motor(DC_MOTOR_SPEED, 1);
+							tracks_controller.move_right_motor(DC_MOTOR_SPEED, 1);
 
 							printf("move ahead - sent\n");
 						}
@@ -214,8 +220,8 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 					}
 					else {
 						// move backward
-						tracks_controller.move_left_motor(DC_MOTOR_SPEED, 1);
-						tracks_controller.move_right_motor(DC_MOTOR_SPEED, 1);
+						tracks_controller.move_left_motor(-DC_MOTOR_SPEED, 1);
+						tracks_controller.move_right_motor(-DC_MOTOR_SPEED, 1);
 						printf("move backward - sent\n");
 					}
 
