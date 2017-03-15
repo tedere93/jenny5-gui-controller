@@ -210,7 +210,7 @@ bool t_head_controller::home_all_motors(char* error_string)
 	head_arduino_controller.send_go_home_stepper_motor(HEAD_MOTOR_NECK);
 	head_arduino_controller.send_go_home_stepper_motor(HEAD_MOTOR_FACE);
 
-	printf("Head motors home started ...");
+	sprintf(error_string, "Head motors home started ...\n");
 	clock_t start_time = clock();
 	bool horizontal_motor_homed = false;
 	bool vertical_motor_homed = false;
@@ -244,7 +244,7 @@ bool t_head_controller::home_all_motors(char* error_string)
 		}
 	}
 
-	printf("DONE\n");
+	sprintf(error_string, "Home motors DONE\n");
 	return true;
 }
 //----------------------------------------------------------------
@@ -258,7 +258,7 @@ char *t_head_controller::error_to_string(int error)
 {
 	switch (error) {
 	case E_OK:
-		return "HEAD PERFECT";
+		return "HEAD PERFECT\n";
 	case CANNOT_CONNECT_TO_JENNY5_HEAD_ERROR:
 		return CANNOT_CONNECT_TO_JENNY5_HEAD_STR;
 	case Head_does_not_respond_ERROR:
