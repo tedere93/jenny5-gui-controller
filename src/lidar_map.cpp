@@ -23,7 +23,8 @@ using namespace cv;
 //----------------------------------------------------------------
 void create_and_init_lidar_image(Mat &lidar_image, int image_width, double lidar_map_scale_factor)
 {
-	lidar_image.zeros(image_width, image_width, CV_8UC3);
+	//lidar_image.create(image_width, image_width, CV_8UC3);
+	//lidar_image.zeros(image_width, image_width, CV_8UC3);
 	Point center(image_width / 2, image_width / 2);
 	//LIDAR
 	circle(lidar_image, center, 10, Scalar(0, 255, 0), 1, 8);
@@ -41,8 +42,9 @@ int lidar_map(t_lidar_controller &LIDAR_controller, int lidar_com_port, f_log_ca
 {
 	// setup
 	char error_string[1000];
-	if (!LIDAR_controller.connect(lidar_com_port, error_string)) {
-		to_log(error_string);
+	int error_index = LIDAR_controller.connect(lidar_com_port);
+	if (error_index != E_OK) {
+		to_log(LIDAR_controller.error_to_string(error_index));
 		return -1;
 	}
 	else
@@ -61,7 +63,9 @@ int lidar_map(t_lidar_controller &LIDAR_controller, int lidar_com_port, f_log_ca
 
 	int image_width = 600;
 	Point center(image_width / 2, image_width / 2);
-	Mat lidar_image;
+//	Mat lidar_image;
+	Mat lidar_image = Mat::zeros(image_width, image_width, CV_8UC3);
+
 	namedWindow("LIDAR map", WINDOW_AUTOSIZE);
 
 	t_lidar_user_data user_data;
@@ -74,7 +78,7 @@ int lidar_map(t_lidar_controller &LIDAR_controller, int lidar_com_port, f_log_ca
 	user_data.LIDAR_controller = &LIDAR_controller;
 
 	create_and_init_lidar_image(lidar_image, image_width, user_data.lidar_map_scale_factor);
-
+	
 	setMouseCallback("LIDAR map", on_lidar_mouse_event, &user_data);
 
 	to_log("Now running the main loop. Press Escape when want to exit!\n");

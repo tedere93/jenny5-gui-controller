@@ -9,13 +9,13 @@ t_lidar_controller::t_lidar_controller(void)
 
 }
 //----------------------------------------------------------------
-bool t_lidar_controller::connect(int lidar_com_port, char* error_string)
+int t_lidar_controller::connect(int lidar_com_port)
 {
 	//-------------- START INITIALIZATION ------------------------------
 
 	if (!arduino_controller.connect(lidar_com_port - 1, 115200)) { // real number - 1
-		sprintf(error_string, "Error attaching to Jenny 5' LIDAR!\n");
-		return false;
+		//sprintf(error_string, "Error attaching to Jenny 5' LIDAR!\n");
+		return CANNOT_CONNECT_TO_JENNY5_LIDAR_ERROR;
 	}
 
 	// now wait to see if I have been connected
@@ -41,17 +41,16 @@ bool t_lidar_controller::connect(int lidar_com_port, char* error_string)
 		// if more than 3 seconds then game over
 		if (wait_time > NUM_SECONDS_TO_WAIT_FOR_CONNECTION) {
 			if (!LIDAR_responded)
-				sprintf(error_string, "LIDAR does not respond! Game over!\n");
-			return false;
+				return LIDAR_does_not_respond_ERROR;
 		}
 	}
 
-	return true;
+	return E_OK;
 }
 //----------------------------------------------------------------
 bool t_lidar_controller::setup(char* error_string)
 {
-	arduino_controller.send_create_LIDAR(5, 6, 7, 12);// dir, step, enable, IR_pin
+	arduino_controller.send_create_LIDAR(8, 9, 10, 12);// dir, step, enable, IR_pin
 
 	clock_t start_time = clock();
 
@@ -105,5 +104,18 @@ void t_lidar_controller::disconnect(void)
 bool t_lidar_controller::is_connected(void)
 {
 	return arduino_controller.is_open();
+}
+//----------------------------------------------------------------
+char *t_lidar_controller::error_to_string(int error)
+{
+	switch (error) {
+	case E_OK:
+		return "LIDAR PERFECT\n";
+	case CANNOT_CONNECT_TO_JENNY5_LIDAR_ERROR:
+		return CANNOT_CONNECT_TO_JENNY5_LIDAR_STR;
+	case LIDAR_does_not_respond_ERROR:
+		return LIDAR_does_not_respond_STR;
+	}
+	return NULL;
 }
 //----------------------------------------------------------------
