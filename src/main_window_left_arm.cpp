@@ -10,7 +10,7 @@ void MainFrame::build_left_arm_interface(void)
 	wxBoxSizer* sizer_left_arm = new wxBoxSizer(wxVERTICAL);
 	st_left_arm = new wxStaticText(p_left_arm, wxID_ANY, "Left arm");
 	st_left_arm_com_port = new wxStaticText(p_left_arm, wxID_ANY, "COM port");
-	tc_left_arm_com_port = new wxTextCtrl(p_left_arm, wxID_ANY, "21");
+	tc_left_arm_com_port = new wxTextCtrl(p_left_arm, wxID_ANY, "5");
 	b_connect_to_left_arm = new wxButton(p_left_arm, -1, "Connect");
 	b_connect_to_left_arm->Bind(wxEVT_BUTTON, &MainFrame::on_connect_to_left_arm_click, this);
 //-------
@@ -218,7 +218,9 @@ void MainFrame::on_connect_to_left_arm_click(wxCommandEvent &event)
 	tc_left_arm_com_port->GetValue().ToLong(&left_arm_com_port); // real port number
 
 	if (!left_arm_controller.is_connected()) {
-		if (left_arm_controller.connect(left_arm_com_port, error_string)) {
+		int error_index = left_arm_controller.connect(left_arm_com_port);
+		write_to_log(left_arm_controller.error_to_string(error_index));
+		if (error_index == E_OK) {
 			b_connect_to_left_arm->SetLabel("Disconnect");
 			// show the firmware version number
 			left_arm_controller.send_get_arduino_firmware_version();

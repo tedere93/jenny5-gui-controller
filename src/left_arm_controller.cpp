@@ -18,13 +18,12 @@ void t_left_arm_controller::disconnect(void)
 	arduino_controller.close_connection();
 }
 //----------------------------------------------------------------
-bool t_left_arm_controller::connect(int LEFT_ARM_COM_PORT, char* error_string)
+int t_left_arm_controller::connect(int LEFT_ARM_COM_PORT)
 {
 	//-------------- START INITIALIZATION ------------------------------
 
 	if (!arduino_controller.connect(LEFT_ARM_COM_PORT - 1, 115200)) { // real - 1
-		sprintf(error_string, "Error attaching to Jenny 5' left arm!\n");
-		return false;
+		return CANNOT_CONNECT_TO_JENNY5_LEFT_ARM_ERROR;
 	}
 
 	bool left_arm_responded = false;
@@ -50,13 +49,11 @@ bool t_left_arm_controller::connect(int LEFT_ARM_COM_PORT, char* error_string)
 		if (wait_time > NUM_SECONDS_TO_WAIT_FOR_CONNECTION) {
 
 			if (!left_arm_responded)
-				sprintf(error_string, "Left arm does not respond! Game over!\n");
-
-			return false;
+				return LEFT_ARM_does_not_respond_ERROR;
 		}
 	}
 
-	return true;
+	return E_OK;
 }
 //----------------------------------------------------------------
 bool t_left_arm_controller::setup(char* error_string)
@@ -447,5 +444,38 @@ void t_left_arm_controller::send_LEFT_ARM_GRIPPER_MOTOR_start_open(void)
 void t_left_arm_controller::send_LEFT_ARM_GRIPPER_MOTOR_stop_open(void)
 {
 	arduino_controller.send_move_stepper_motor(LEFT_ARM_GRIPPER_MOTOR, 0);
+}
+//----------------------------------------------------------------
+void t_left_arm_controller::send_LEFT_ARM_BODY_MOTOR_move(int num_steps, int speed, int accelleration)
+{
+	arduino_controller.send_move_stepper_motor(LEFT_ARM_BODY_MOTOR, num_steps);
+}
+//----------------------------------------------------------------
+void t_left_arm_controller::send_LEFT_SHOULDER_UP_DOWN_MOTOR_move(int num_steps, int speed, int accelleration)
+{
+	arduino_controller.send_move_stepper_motor(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, num_steps);
+}
+//----------------------------------------------------------------
+void t_left_arm_controller::send_LEFT_ARM_stop_motors(void)
+{
+	arduino_controller.send_move_stepper_motor(LEFT_ARM_BODY_MOTOR, 0);
+	arduino_controller.send_move_stepper_motor(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, 0);
+	arduino_controller.send_move_stepper_motor(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, 0);
+	arduino_controller.send_move_stepper_motor(LEFT_ARM_ELBOW_MOTOR, 0);
+	arduino_controller.send_move_stepper_motor(LEFT_ARM_FOREARM_MOTOR, 0);
+	arduino_controller.send_move_stepper_motor(LEFT_ARM_GRIPPER_MOTOR, 0);
+}
+//----------------------------------------------------------------
+char *t_left_arm_controller::error_to_string(int error)
+{
+	switch (error) {
+	case E_OK:
+		return "LEFT ARM PERFECT\n";
+	case CANNOT_CONNECT_TO_JENNY5_LEFT_ARM_ERROR:
+		return CANNOT_CONNECT_TO_JENNY5_LEFT_ARM_STR;
+	case LEFT_ARM_does_not_respond_ERROR:
+		return LEFT_ARM_does_not_respond_STR;
+	}
+	return NULL;
 }
 //----------------------------------------------------------------
