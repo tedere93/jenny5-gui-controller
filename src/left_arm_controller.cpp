@@ -456,6 +456,21 @@ void t_left_arm_controller::send_LEFT_SHOULDER_UP_DOWN_MOTOR_move(int num_steps,
 	arduino_controller.send_move_stepper_motor(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, num_steps);
 }
 //----------------------------------------------------------------
+void t_left_arm_controller::send_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR_move(int num_steps, int speed, int accelleration)
+{
+	arduino_controller.send_move_stepper_motor(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, num_steps);
+}
+//----------------------------------------------------------------
+void t_left_arm_controller::send_LEFT_ARM_ELBOW_MOTOR_move(int num_steps, int speed, int accelleration)
+{
+	arduino_controller.send_move_stepper_motor(LEFT_ARM_ELBOW_MOTOR, num_steps);
+}
+//----------------------------------------------------------------
+void t_left_arm_controller::send_LEFT_ARM_FOREARM_MOTOR_move(int num_steps, int speed, int accelleration)
+{
+	arduino_controller.send_move_stepper_motor(LEFT_ARM_FOREARM_MOTOR, num_steps);
+}
+//----------------------------------------------------------------
 void t_left_arm_controller::send_LEFT_ARM_stop_motors(void)
 {
 	arduino_controller.send_move_stepper_motor(LEFT_ARM_BODY_MOTOR, 0);

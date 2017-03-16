@@ -90,6 +90,9 @@ public:
 
 	void send_LEFT_ARM_BODY_MOTOR_move(int num_steps, int speed, int accelleration);
 	void send_LEFT_SHOULDER_UP_DOWN_MOTOR_move(int num_steps, int speed, int accelleration);
+	void send_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR_move(int num_steps, int speed, int accelleration);
+	void send_LEFT_ARM_ELBOW_MOTOR_move(int num_steps, int speed, int accelleration);
+	void send_LEFT_ARM_FOREARM_MOTOR_move(int num_steps, int speed, int accelleration);
 
 	bool home_all_motors(char* error_string);
 	void send_disable_motors(void);
