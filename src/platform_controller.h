@@ -23,14 +23,14 @@ public:
 	void send_get_roboclaw_firmware_version(void);
 
 	// positive if move forward
-	void move_left_motor(int16_t speed, uint32_t acceleration);
+	bool move_left_motor(int16_t speed, uint32_t acceleration);
 	// positive if move forward
-	void move_right_motor(int16_t speed, uint32_t acceleration);
+	bool move_right_motor(int16_t speed, uint32_t acceleration);
 
-	void rotate_left(uint16_t speed, uint32_t acceleration);
-	void rotate_right(uint16_t speed, uint32_t acceleration);
+	int rotate_left(uint16_t speed, uint32_t acceleration);
+	int rotate_right(uint16_t speed, uint32_t acceleration);
 
-	void stop_motors(void);
+	int stop_motors(void);
 };
 
 extern t_platform_controller platform_controller;

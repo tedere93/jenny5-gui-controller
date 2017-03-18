@@ -43,31 +43,49 @@ void t_platform_controller::send_get_roboclaw_firmware_version(void)
 
 }
 //------------------------------------------------------------------------
-void t_platform_controller::move_left_motor(int16_t speed, uint32_t acceleration)
+bool t_platform_controller::move_left_motor(int16_t speed, uint32_t acceleration)
 {
-	roboclaw_controller.drive_M1_with_signed_duty_and_acceleration(-speed, acceleration);
+	return roboclaw_controller.drive_M1_with_signed_duty_and_acceleration(-speed, acceleration);
 }
 //------------------------------------------------------------------------
-void t_platform_controller::move_right_motor(int16_t speed, uint32_t acceleration)
+bool t_platform_controller::move_right_motor(int16_t speed, uint32_t acceleration)
 {
-	roboclaw_controller.drive_M2_with_signed_duty_and_acceleration(speed, acceleration);
+	return roboclaw_controller.drive_M2_with_signed_duty_and_acceleration(speed, acceleration);
 }
 //------------------------------------------------------------------------
-void t_platform_controller::stop_motors(void)
+int t_platform_controller::stop_motors(void)
 {
-	roboclaw_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
-	roboclaw_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+	bool m1 = roboclaw_controller.drive_M1_with_signed_duty_and_acceleration(0, 1);
+	bool m2 = roboclaw_controller.drive_M2_with_signed_duty_and_acceleration(0, 1);
+
+	if (!m1)
+		return 1;
+	if (!m2)
+		return 2;
+	return 0;
 }
 //------------------------------------------------------------------------
-void t_platform_controller::rotate_left(uint16_t speed, uint32_t acceleration)
+int t_platform_controller::rotate_left(uint16_t speed, uint32_t acceleration)
 {
-	move_right_motor(speed, 1);
-	move_left_motor(-speed, 1);
+	bool m1 = move_right_motor(speed, 1);
+	bool m2 = move_left_motor(-speed, 1);
+
+	if (!m1)
+		return 1;
+	if (!m2)
+		return 2;
+	return 0;
 }
 //------------------------------------------------------------------------
-void t_platform_controller::rotate_right(uint16_t speed, uint32_t acceleration)
+int t_platform_controller::rotate_right(uint16_t speed, uint32_t acceleration)
 {
-	move_right_motor(-speed, 1);
-	move_left_motor(speed, 1);
+	bool m1 = move_right_motor(-speed, 1);
+	bool m2 = move_left_motor(speed, 1);
+
+	if (!m1)
+		return 1;
+	if (!m2)
+		return 2;
+	return 0;
 }
 //------------------------------------------------------------------------
