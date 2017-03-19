@@ -93,13 +93,14 @@ public:
 	void send_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR_move(int num_steps, int speed, int accelleration);
 	void send_LEFT_ARM_ELBOW_MOTOR_move(int num_steps, int speed, int accelleration);
 	void send_LEFT_ARM_FOREARM_MOTOR_move(int num_steps, int speed, int accelleration);
+	void send_LEFT_ARM_GRIPPER_MOTOR_move(int num_steps, int speed, int accelleration);
 
 	void send_stop_motor(int motor_index);
 
 	bool home_all_motors(char* error_string);
 	void send_disable_motors(void);
 
-	void send_LEFT_ARM_stop_motors(void);
+	void send_stop_motors(void);
 
 	char *error_to_string(int error);
 };

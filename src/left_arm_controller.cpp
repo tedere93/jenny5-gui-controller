@@ -471,6 +471,11 @@ void t_left_arm_controller::send_LEFT_ARM_FOREARM_MOTOR_move(int num_steps, int 
 	arduino_controller.send_move_stepper_motor(LEFT_ARM_FOREARM_MOTOR, num_steps);
 }
 //----------------------------------------------------------------
+void t_left_arm_controller::send_LEFT_ARM_GRIPPER_MOTOR_move(int num_steps, int speed, int accelleration)
+{
+	arduino_controller.send_move_stepper_motor(LEFT_ARM_GRIPPER_MOTOR, num_steps);
+}
+//----------------------------------------------------------------
 void t_left_arm_controller::send_LEFT_ARM_stop_motors(void)
 {
 	arduino_controller.send_stop_stepper_motor(LEFT_ARM_BODY_MOTOR);
