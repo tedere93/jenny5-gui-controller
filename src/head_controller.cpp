@@ -267,3 +267,24 @@ char *t_head_controller::error_to_string(int error)
 	return NULL;
 }
 //----------------------------------------------------------------
+void t_head_controller::send_HEAD_MOTOR_NECK_move(int num_steps, int speed, int accelleration)
+{
+	head_arduino_controller.send_move_stepper_motor(HEAD_MOTOR_NECK, num_steps);
+}
+//----------------------------------------------------------------
+void t_head_controller::send_HEAD_MOTOR_FACE_move(int num_steps, int speed, int accelleration)
+{
+	head_arduino_controller.send_move_stepper_motor(HEAD_MOTOR_FACE, num_steps);
+}
+//----------------------------------------------------------------
+void t_head_controller::send_stop_motors(void)
+{
+	head_arduino_controller.send_stop_stepper_motor(HEAD_MOTOR_NECK);
+	head_arduino_controller.send_stop_stepper_motor(HEAD_MOTOR_FACE);
+}
+//----------------------------------------------------------------
+void t_head_controller::send_stop_motor(int motor_index)
+{
+	head_arduino_controller.send_stop_stepper_motor(motor_index);
+}
+//----------------------------------------------------------------
