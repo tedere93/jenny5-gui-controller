@@ -120,17 +120,17 @@ bool t_left_arm_controller::setup(char* error_string)
 		}
 	}
 
-	arduino_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_GRIPPER_MOTOR, 500, 500);
+	arduino_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_GRIPPER_MOTOR, ARM_DEFAULT_MOTOR_SPEED, ARM_DEFAULT_MOTOR_ACCELERATION);
 
-	arduino_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_BODY_MOTOR, 500, 500);
+	arduino_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_BODY_MOTOR, ARM_DEFAULT_MOTOR_SPEED, ARM_DEFAULT_MOTOR_ACCELERATION);
 
-	arduino_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, 500, 500);
+	arduino_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR, ARM_DEFAULT_MOTOR_SPEED, ARM_DEFAULT_MOTOR_ACCELERATION);
 
-	arduino_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, 500, 500);
+	arduino_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR, ARM_DEFAULT_MOTOR_SPEED, ARM_DEFAULT_MOTOR_ACCELERATION);
 
-	arduino_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_ELBOW_MOTOR, 500, 500);
+	arduino_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_ELBOW_MOTOR, ARM_DEFAULT_MOTOR_SPEED, ARM_DEFAULT_MOTOR_ACCELERATION);
 
-	arduino_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_FOREARM_MOTOR, 500, 500);
+	arduino_controller.send_set_stepper_motor_speed_and_acceleration(LEFT_ARM_FOREARM_MOTOR, ARM_DEFAULT_MOTOR_SPEED, ARM_DEFAULT_MOTOR_ACCELERATION);
 
 	//	Sleep(100);
 	bool LEFT_ARM_BODY_MOTOR_set_speed_accell = false;
@@ -270,6 +270,7 @@ bool t_left_arm_controller::setup(char* error_string)
 	arduino_controller.send_attach_sensors_to_stepper_motor(LEFT_ARM_GRIPPER_MOTOR, 0,
 		NULL, NULL, NULL, NULL, NULL, 0, NULL, 1, button_index_LEFT_ARM_GRIPPER_MOTOR, button_direction_LEFT_ARM_GRIPPER_MOTOR);
 
+	strcpy(error_string, "LEFT ARM SETUP PERFECT\n");
 	return true;
 }
 //----------------------------------------------------------------
@@ -476,7 +477,7 @@ void t_left_arm_controller::send_LEFT_ARM_GRIPPER_MOTOR_move(int num_steps, int 
 	arduino_controller.send_move_stepper_motor(LEFT_ARM_GRIPPER_MOTOR, num_steps);
 }
 //----------------------------------------------------------------
-void t_left_arm_controller::send_LEFT_ARM_stop_motors(void)
+void t_left_arm_controller::send_stop_motors(void)
 {
 	arduino_controller.send_stop_stepper_motor(LEFT_ARM_BODY_MOTOR);
 	arduino_controller.send_stop_stepper_motor(LEFT_ARM_SHOULDER_UP_DOWN_MOTOR);

@@ -38,7 +38,7 @@
 #define _potentiometer_home_LEFT_ARM_SHOULDER_LEFT_RIGHT_MOTOR 740
 
 #define _potentiometer_min_LEFT_ARM_ELBOW_MOTOR 480
-#define _potentiometer_max_LEFT_ARM_ELBOW_MOTOR 830
+#define _potentiometer_max_LEFT_ARM_ELBOW_MOTOR 940
 #define _potentiometer_home_LEFT_ARM_ELBOW_MOTOR 630
 
 #define _potentiometer_min_LEFT_ARM_FOREARM_MOTOR 230
@@ -55,6 +55,11 @@
 #define LEFT_ARM_does_not_respond_ERROR 2
 
 #define Connected_to_LEFT_ARM_STR "Connected to LEFT_ARM\n"
+
+#define ARM_DEFAULT_MOTOR_SPEED 400
+#define ARM_DEFAULT_MOTOR_ACCELERATION 200
+
+
 
 
 class t_left_arm_controller {

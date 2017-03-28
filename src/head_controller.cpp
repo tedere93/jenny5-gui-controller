@@ -163,6 +163,7 @@ bool t_head_controller::setup(char* error_string)
 	head_arduino_controller.send_attach_sensors_to_stepper_motor(HEAD_MOTOR_FACE, 1, potentiometer_index_head_vertical_motor, head_vertical_motor_potentiometer_min, head_vertical_motor_potentiometer_max, head_vertical_motor_potentiometer_home, head_vertical_motor_potentiometer_dir,
 		0, NULL, 0, NULL, NULL);
 
+	strcpy(error_string, "HEAD SETUP PERFECT\n");
 	return true;
 }
 //----------------------------------------------------------------
