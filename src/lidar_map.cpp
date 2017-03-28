@@ -29,7 +29,7 @@ void create_and_init_lidar_image(Mat &lidar_image, int image_width, double lidar
 	//LIDAR
 	circle(lidar_image, center, 10, Scalar(0, 255, 0), 1, 8);
 	// robot
-	rectangle(lidar_image, Point(center.x - 175 * lidar_map_scale_factor, center.y), Point(center.x + lidar_map_scale_factor * 175, center.y + 600 * lidar_map_scale_factor), Scalar(0, 255, 0));
+	rectangle(lidar_image, Point(center.x - 175 * lidar_map_scale_factor, center.y), Point(center.x + lidar_map_scale_factor * 175, center.y + 600 * lidar_map_scale_factor), Scalar(0, 0, 255));
 
 	char text[100];
 	sprintf(text, "scale = %.2lf", lidar_map_scale_factor);
@@ -142,7 +142,7 @@ void on_lidar_mouse_event(int event, int x, int y, int flags, void *userdata)
 			Point new_p;
 			new_p.x = -user_data->LIDAR_controller->lidar_distances[i] * user_data->lidar_map_scale_factor * sin(i / 100.0 * M_PI - M_PI / 2);
 			new_p.y = -user_data->LIDAR_controller->lidar_distances[i] * user_data->lidar_map_scale_factor * cos(i / 100.0 * M_PI - M_PI / 2);
-			circle(*(user_data->lidar_image), center + new_p, 5, Scalar(0, 0, 255), 1, 8);
+			circle(*(user_data->lidar_image), center + new_p, 5, Scalar(0, 255, 0), 1, 8);
 		}
 
 		// robot
@@ -173,7 +173,7 @@ bool update_lidar_image(t_lidar_controller &LIDAR_controller, Mat &lidar_image, 
 		Point new_p;
 		new_p.x = -distance * lidar_map_scale_factor * sin(motor_position / 100.0 * M_PI - M_PI / 2);
 		new_p.y = -distance * lidar_map_scale_factor * cos(motor_position / 100.0 * M_PI - M_PI / 2);
-		circle(lidar_image, center + new_p, 5, Scalar(0, 0, 255), 1, 8);
+		circle(lidar_image, center + new_p, 5, Scalar(0, 255, 0), 1, 8);
 		at_least_one_new_LIDAR_distance = true;
 		if (to_log) {
 			char tmp_s[100];
