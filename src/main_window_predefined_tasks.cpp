@@ -8,6 +8,8 @@
 #include "lidar_controller.h"
 #include "platform_controller.h"
 
+using namespace cv;
+
 //------------------------------------------------------------------------
 void MainFrame::build_predefined_task_interface(void)
 {

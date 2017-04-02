@@ -8,13 +8,6 @@
 
 #pragma once
 
-#include <opencv2\objdetect\objdetect.hpp>
-#include <opencv2\highgui\highgui.hpp>
+#include "opencv2\objdetect\objdetect.hpp"
 
-#include "roboclaw_controller.h"
-
-using namespace std;
-using namespace cv;
-
-
-bool init_face_classifier(CascadeClassifier &face_classifier, char* error_string);
+bool init_face_classifier(cv::CascadeClassifier &face_classifier, char* error_string);

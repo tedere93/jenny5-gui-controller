@@ -10,9 +10,8 @@
 #include <opencv2\highgui\highgui.hpp>
 #include <opencv2\imgproc\imgproc.hpp>
 
+#include "head_face_follow.h"
 #include "setup_functions.h"
-#include "utils.h"
-#include "head_controller.h"
 #include "jenny5_defs.h"
 
 
@@ -220,7 +219,7 @@ int head_face_follow(t_head_controller &jenny5_head_controller, int head_com_por
 }
 //----------------------------------------------------------------
 
-int head_face_follow_no_window(t_head_controller &jenny5_head_controller, int head_com_port, CascadeClassifier &face_classifier, f_log_callback to_log)
+int head_face_follow_no_window(t_head_controller &jenny5_head_controller, CascadeClassifier &face_classifier, f_log_callback to_log, f_stop_callback stop_function)
 {
 	// initialization
 
@@ -229,6 +228,9 @@ int head_face_follow_no_window(t_head_controller &jenny5_head_controller, int he
 
 	bool active = true;
 	while (active) {        // starting infinit loop
+
+		if (stop_function())
+			break;
 
 		if (!jenny5_head_controller.head_arduino_controller.update_commands_from_serial())
 			Sleep(DOES_NOTHING_SLEEP); // no new data from serial ... we make a little pause so that we don't kill the processor

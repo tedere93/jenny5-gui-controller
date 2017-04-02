@@ -4,6 +4,8 @@
 #include "head_controller.h"
 #include  "utils.h"
 
+using namespace cv;
+
 //------------------------------------------------------------------------
 void MainFrame::build_head_interface(void)
 {

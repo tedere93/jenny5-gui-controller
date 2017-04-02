@@ -6,16 +6,12 @@
 // MIT License
 // ---------------------------------------------------------------------------
 
-#include <opencv2\imgproc\imgproc.hpp>
+//#include <opencv2\imgproc\imgproc.hpp>
 
 #include "setup_functions.h"
 
-#include "jenny5_events.h"
-#include "jenny5_defs.h"
-
-
 //----------------------------------------------------------------
-bool init_face_classifier(CascadeClassifier &face_classifier, char* error_string)
+bool init_face_classifier(cv::CascadeClassifier &face_classifier, char* error_string)
 {
 	//-------------- START INITIALIZATION ------------------------------
 

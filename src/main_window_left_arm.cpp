@@ -3,6 +3,7 @@
 #include "jenny5_defs.h"
 #include "left_arm_controller.h"
 
+using namespace cv;
 //------------------------------------------------------------------------
 void MainFrame::build_left_arm_interface(void)
 {
