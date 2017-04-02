@@ -357,8 +357,6 @@ int head_face_follow_no_window(t_head_controller &jenny5_head_controller, Cascad
 
 			}
 		}
-
-		active = false;
 	}
 
 	jenny5_head_controller.head_arduino_controller.send_move_stepper_motor(HEAD_MOTOR_NECK, 0);
