@@ -20,6 +20,10 @@ int t_platform_controller::connect(int PLATFORM_COM_PORT)
 	if (!roboclaw_controller.connect(PLATFORM_COM_PORT - 1, 38400)) {
 		return CANNOT_CONNECT_TO_JENNY5_PLATFORM;
 	}
+
+	roboclaw_controller.set_M1_max_current_limit(1000);// max 10 Amps
+	roboclaw_controller.set_M2_max_current_limit(1000);// max 10 Amps
+
 	return E_OK;
 }
 //------------------------------------------------------------------------
