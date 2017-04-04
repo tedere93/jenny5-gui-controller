@@ -54,6 +54,7 @@ bool get_biggest_face(std::vector<cv::Rect> faces, t_CENTER_POINT &center);
 
 typedef void (*f_log_callback)(char*);
 typedef bool (*f_stop_callback)(void);
+typedef void (*f_show_image_callback)(char* window_name, cv::Mat &image);
 
 
 char* current_time_to_string(void);
