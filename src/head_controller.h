@@ -41,7 +41,6 @@ class t_head_controller {
 public:
 	cv::VideoCapture head_cam;
 	t_jenny5_arduino_controller head_arduino_controller;
-	cv::CascadeClassifier face_classifier;
 	t_head_controller();
 
 	int connect(int HEAD_COM_PORT);
