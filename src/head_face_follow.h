@@ -14,6 +14,4 @@
 #include "utils.h"
 #include "head_controller.h"
 
-int head_face_follow(t_head_controller &jenny5_head_controller, int head_com_port, cv::CascadeClassifier &face_classifier, f_log_callback to_log);
-int head_face_follow_no_window(t_head_controller &jenny5_head_controller, cv::CascadeClassifier &face_classifier, f_log_callback to_log, f_stop_callback stop_function);
-
+int head_face_follow(t_head_controller &jenny5_head_controller, cv::CascadeClassifier &face_classifier, f_log_callback to_log, f_stop_callback stop_function, char* window_name);

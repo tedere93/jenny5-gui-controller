@@ -36,81 +36,8 @@ bool clear_ahead(int *lidar_distances)
 	return true;
 }
 //----------------------------------------------------------------
-int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, t_lidar_controller &LIDAR_controller, int lidar_com_port, t_platform_controller & tracks_controller, int platform_com_port, f_log_callback to_log)
+int follow_person(t_head_controller &jenny5_head_controller, t_lidar_controller &LIDAR_controller, t_platform_controller & platform_controller, cv::CascadeClassifier &face_classifier, f_log_callback to_log, f_stop_callback stop_function, char* head_window_name, char* LIDAR_window_name)
 {
-	// initialization
-
-	bool error = false;
-	char error_string[1000];
-
-	int error_index = jenny5_head_controller.connect(head_com_port);
-
-	to_log(jenny5_head_controller.error_to_string(error_index));
-	if (error_index != E_OK) {
-		error = true;
-	}
-	
-
-	// setup
-	if (!jenny5_head_controller.setup(error_string)) {
-		to_log(error_string);
-		error = true;
-	}
-	else
-		to_log("Head setup succceded.\n");
-
-	if (!jenny5_head_controller.head_cam.open(HEAD_CAMERA_INDEX)) {	// link it to the device [0 = default cam] (USBcam is default 'cause I disabled the onbord one IRRELEVANT!)
-		to_log("Couldn't open head's video camera!\n");
-		error = true;
-	}
-	else
-		to_log("Head camera connection succceded.\n");
-
-	error_index = LIDAR_controller.connect(lidar_com_port);
-	to_log(LIDAR_controller.error_to_string(error_index));
-	if (error_index != E_OK) {
-		
-		error = true;
-	}
-
-	// setup
-	if (!LIDAR_controller.setup(error_string)) {
-		to_log(error_string);
-		error = true;
-	}
-	else
-		to_log("Setup LIDAR OK.\n");
-
-	error_index = tracks_controller.connect(platform_com_port);
-	if (error_index != E_OK) {
-		to_log(CANNOT_CONNECT_TO_JENNY5_PLATFORM_STR);
-		error = true;
-	}
-	else
-		to_log("Platform connection succceded.\n");
-
-	// initialization
-	if (!init_face_classifier(jenny5_head_controller.face_classifier, error_string)) {
-		to_log(error_string);
-		error = true;
-	}
-	else
-		to_log("Face classifier initialization succceded.\n");
-
-	//  home
-	if (!jenny5_head_controller.home_all_motors(error_string)) {
-		to_log(error_string);
-		error = true;
-	}
-	else
-		to_log("Head home succceded.\n");
-
-	if (error) {
-		LIDAR_controller.disconnect();
-		jenny5_head_controller.disconnect();
-		tracks_controller.disconnect();
-		return -1;
-	}
 	LIDAR_controller.arduino_controller.send_set_LIDAR_motor_speed_and_acceleration(30, 100);
 	LIDAR_controller.arduino_controller.send_LIDAR_go();
 
@@ -118,7 +45,6 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 	Point center(image_width / 2, image_width / 2);
 	Mat lidar_map_image = Mat::zeros(image_width, image_width, CV_8UC3); //Mat lidar_map_image;
 
-	namedWindow("LIDAR map", WINDOW_AUTOSIZE);
 	t_lidar_user_data lidar_user_data;
 	lidar_user_data.lidar_image = &lidar_map_image;
 	lidar_user_data.image_width = image_width;
@@ -129,18 +55,22 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 
 	create_and_init_lidar_image(lidar_map_image, image_width, lidar_user_data.lidar_map_scale_factor);
 
-	setMouseCallback("LIDAR map", on_lidar_mouse_event, &lidar_user_data);
+	if (LIDAR_window_name)
+		setMouseCallback(LIDAR_window_name, on_lidar_mouse_event, &lidar_user_data);
 
-	Mat cam_frame; // images used in the proces
+	Mat head_cam_frame; // images used in the proces
 	Mat gray_frame;
-
-	namedWindow("Head camera", WINDOW_AUTOSIZE); // window to display the results
 
 	double scale_factor = 0.5;
 
 	bool active = true;
 	while (active)        // starting infinit loop
 	{
+
+		if (stop_function)
+			if (stop_function())
+				break;
+
 		if (!jenny5_head_controller.head_arduino_controller.update_commands_from_serial() && !LIDAR_controller.arduino_controller.update_commands_from_serial())
 			Sleep(DOES_NOTHING_SLEEP); // no new data from serial ... we take a little break so that we don't kill the processor
 		else {
@@ -149,18 +79,19 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 			bool at_least_one_new_LIDAR_distance = update_lidar_image(LIDAR_controller, lidar_map_image, image_width, lidar_user_data.lidar_map_scale_factor, to_log);
 
 			if (at_least_one_new_LIDAR_distance)
-				imshow("LIDAR map", lidar_map_image);
+				if(LIDAR_window_name)
+					imshow(LIDAR_window_name, lidar_map_image);
 
 		}
-		jenny5_head_controller.head_cam >> cam_frame; // put captured-image frame in frame
+		jenny5_head_controller.head_cam >> head_cam_frame; // put captured-image frame in frame
 
-		cvtColor(cam_frame, gray_frame, CV_BGR2GRAY); // convert to gray and equalize
+		cvtColor(head_cam_frame, gray_frame, CV_BGR2GRAY); // convert to gray and equalize
 		equalizeHist(gray_frame, gray_frame);
 
 		std::vector<Rect> faces;// create an array to store the found faces
 
 								// find and store the faces
-		jenny5_head_controller.face_classifier.detectMultiScale(gray_frame, faces, 1.1, 3, CV_HAAR_FIND_BIGGEST_OBJECT | CV_HAAR_SCALE_IMAGE, Size(30, 30));
+		face_classifier.detectMultiScale(gray_frame, faces, 1.1, 3, CV_HAAR_FIND_BIGGEST_OBJECT | CV_HAAR_SCALE_IMAGE, Size(30, 30));
 
 		t_CENTER_POINT head_center;
 
@@ -170,35 +101,43 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 			Point p1(head_center.x - head_center.range, head_center.y - head_center.range);
 			Point p2(head_center.x + head_center.range, head_center.y + head_center.range);
 			// draw an outline for the faces
-			rectangle(cam_frame, p1, p2, cvScalar(0, 255, 0, 0), 1, 8, 0);
+			rectangle(head_cam_frame, p1, p2, cvScalar(0, 255, 0, 0), 1, 8, 0);
 		}
 		else {
 			Sleep(DOES_NOTHING_SLEEP); // no face found
 									   // I have to move the head right-left; top-down
 		}
 
-		imshow("Head camera", cam_frame); // display the result
+		if (head_window_name) {
+			imshow(head_window_name, head_cam_frame); // display the result
+			int key = waitKey(1);
+			if (key == VK_ESCAPE)  // break the loop
+				active = false;
+		}
 
 		if (face_found) {
-
 			// send a command to the module so that the face is in the center of the image
-			if (head_center.x > cam_frame.cols / 2 + CAM_PIXELS_TOLERANCE) {
+			if (head_center.x > head_cam_frame.cols / 2 + CAM_PIXELS_TOLERANCE) {
 
 				// rotate
-				tracks_controller.move_left_motor(DC_MOTOR_SPEED_ROTATE, 1);
-				tracks_controller.move_right_motor(-DC_MOTOR_SPEED_ROTATE, 1);
-				printf("rotate right - sent\n");
+				platform_controller.move_left_motor(DC_MOTOR_SPEED_ROTATE, 1);
+				platform_controller.move_right_motor(-DC_MOTOR_SPEED_ROTATE, 1);
+				char tmp_s[100];
+				sprintf(tmp_s, "rotate right - sent\n");
+				to_log(tmp_s);
 			}
 			else
-				if (head_center.x < cam_frame.cols / 2 - CAM_PIXELS_TOLERANCE) {
+				if (head_center.x < head_cam_frame.cols / 2 - CAM_PIXELS_TOLERANCE) {
 
 					//					tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 					//					int num_steps_x = (int)(angle_offset.degrees_from_center_x / 1.8 * 8) * TRACKS_MOTOR_REDUCTION;
 
 					// rotate
-					tracks_controller.move_left_motor(-DC_MOTOR_SPEED_ROTATE, 1);
-					tracks_controller.move_right_motor(DC_MOTOR_SPEED_ROTATE, 1);
-					printf("rotate left - sent\n");
+					platform_controller.move_left_motor(-DC_MOTOR_SPEED_ROTATE, 1);
+					platform_controller.move_right_motor(DC_MOTOR_SPEED_ROTATE, 1);
+					char tmp_s[100];
+					sprintf(tmp_s, "rotate left - sent\n");
+					to_log(tmp_s);
 				}
 				else {
 
@@ -206,61 +145,76 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 					if (head_center.range < HEAD_RADIUS_TO_REVERT) {
 						// move forward
 						// only if LIDAR distance to the front point is very far from the robot
-						if (clear_ahead(lidar_user_data.LIDAR_controller->lidar_distances)) {
-							tracks_controller.move_left_motor(DC_MOTOR_SPEED, 1);
-							tracks_controller.move_right_motor(DC_MOTOR_SPEED, 1);
+					//	if (clear_ahead(lidar_user_data.LIDAR_controller->lidar_distances)) {
+							platform_controller.move_left_motor(DC_MOTOR_SPEED, 1);
+							platform_controller.move_right_motor(DC_MOTOR_SPEED, 1);
 
-							printf("move ahead - sent\n");
-						}
+							char tmp_s[100];
+							sprintf(tmp_s, "move ahead - sent\n");
+							to_log(tmp_s);
+					/*	
+					}
 						else {
 							// stop the robot -- here I have to move around the obstacle
-							tracks_controller.stop_motors();
-							printf("cannot move ahead - obstacle detected\n");
+							platform_controller.stop_motors();
+							char tmp_s[100];
+							sprintf(tmp_s, "cannot move ahead - obstacle detected\n");
+							to_log(tmp_s);
 						}
+						*/
 					}
 					else {
 						// move backward
-						tracks_controller.move_left_motor(-DC_MOTOR_SPEED, 1);
-						tracks_controller.move_right_motor(-DC_MOTOR_SPEED, 1);
-						printf("move backward - sent\n");
+						platform_controller.move_left_motor(-DC_MOTOR_SPEED, 1);
+						platform_controller.move_right_motor(-DC_MOTOR_SPEED, 1);
+						char tmp_s[100];
+						sprintf(tmp_s, "move backward - sent\n");
+						to_log(tmp_s);
 					}
-
 				}
 
 				// vertical movement motor
 				// send a command to the module so that the face is in the center of the image
-				if (head_center.y < cam_frame.rows / 2 - CAM_PIXELS_TOLERANCE) {
+				if (head_center.y < head_cam_frame.rows / 2 - CAM_PIXELS_TOLERANCE) {
 					tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 					int num_steps_y = angle_offset.degrees_from_center_y / 1.8 * 27.0;
 
 					jenny5_head_controller.head_arduino_controller.send_move_stepper_motor(HEAD_MOTOR_FACE, num_steps_y);
 					jenny5_head_controller.head_arduino_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_SENT);
-					printf("move head down M%d %d# - sent\n", HEAD_MOTOR_FACE, num_steps_y);
+					char tmp_s[100];
+					sprintf(tmp_s, "move head down M%d %d# - sent\n", HEAD_MOTOR_FACE, num_steps_y);
+					to_log(tmp_s);
 					//	head_controller.set_sonar_state(0, COMMAND_DONE); // if the motor has been moved the previous distances become invalid
 				}
 				else
-					if (head_center.y > cam_frame.rows / 2 + CAM_PIXELS_TOLERANCE) {
+					if (head_center.y > head_cam_frame.rows / 2 + CAM_PIXELS_TOLERANCE) {
 						tracking_data angle_offset = get_offset_angles(920, Point(head_center.x, head_center.y));
 						int num_steps_y = angle_offset.degrees_from_center_y / 1.8 * 27.0;
 
 						jenny5_head_controller.head_arduino_controller.send_move_stepper_motor(HEAD_MOTOR_FACE, num_steps_y);
 						jenny5_head_controller.head_arduino_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_SENT);
-						printf("hove head up M%d -%d# - sent\n", HEAD_MOTOR_FACE, num_steps_y);
+						char tmp_s[100];
+						sprintf(tmp_s, "hove head up M%d -%d# - sent\n", HEAD_MOTOR_FACE, num_steps_y);
+						to_log(tmp_s);
 						//		head_controller.set_sonar_state(0, COMMAND_DONE); // if the motor has been moved the previous distances become invalid
 					}
 		}
 		else {
 			// no face found ... so stop the platoform motors
-			tracks_controller.stop_motors();
+			platform_controller.stop_motors();
 
-			printf("no face found - motors stopped\n");
+			char tmp_s[100];
+			sprintf(tmp_s, "no face found - motors stopped\n");
+			to_log(tmp_s);
 		}
 
 		// now extract the executed moves from the queue ... otherwise they will just sit there and will occupy memory
 		if (jenny5_head_controller.head_arduino_controller.get_stepper_motor_state(HEAD_MOTOR_NECK) == COMMAND_SENT) {// if a command has been sent
 			if (jenny5_head_controller.head_arduino_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_NECK)) { // have we received the event from Serial ?
 				jenny5_head_controller.head_arduino_controller.set_stepper_motor_state(HEAD_MOTOR_NECK, COMMAND_DONE);
-				printf("M%d# - done\n", HEAD_MOTOR_NECK);
+				char tmp_s[100];
+				sprintf(tmp_s, "M%d# - done\n", HEAD_MOTOR_NECK);
+				to_log(tmp_s);
 			}
 		}
 
@@ -268,13 +222,11 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 		if (jenny5_head_controller.head_arduino_controller.get_stepper_motor_state(HEAD_MOTOR_FACE) == COMMAND_SENT) {// if a command has been sent
 			if (jenny5_head_controller.head_arduino_controller.query_for_event(STEPPER_MOTOR_MOVE_DONE_EVENT, HEAD_MOTOR_FACE)) { // have we received the event from Serial ?
 				jenny5_head_controller.head_arduino_controller.set_stepper_motor_state(HEAD_MOTOR_FACE, COMMAND_DONE);
-				printf("M%d# - done\n", HEAD_MOTOR_FACE);
+				char tmp_s[100];
+				sprintf(tmp_s, "M%d# - done\n", HEAD_MOTOR_FACE);
+				to_log(tmp_s);
 			}
 		}
-
-		int key = waitKey(1);
-		if (key == VK_ESCAPE)  // break the loop
-			active = false;
 	}
 
 	// stops all motors
@@ -284,18 +236,9 @@ int follow_person(t_head_controller &jenny5_head_controller, int head_com_port, 
 	jenny5_head_controller.head_arduino_controller.send_disable_stepper_motor(HEAD_MOTOR_FACE);
 	jenny5_head_controller.head_arduino_controller.send_disable_stepper_motor(HEAD_MOTOR_NECK);
 
-	tracks_controller.stop_motors();
+	platform_controller.stop_motors();
 	
-
-	LIDAR_controller.arduino_controller. send_LIDAR_stop();
-
-	// close connection
-	jenny5_head_controller.disconnect();
-	LIDAR_controller.disconnect();
-	tracks_controller.disconnect();
-
-	destroyWindow("LIDAR map");
-	destroyWindow("Head camera");
+	LIDAR_controller.arduino_controller.send_LIDAR_stop();
 
 	return true;
 }
