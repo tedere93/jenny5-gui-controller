@@ -81,7 +81,7 @@ void MainFrame::on_head_face_follow_click(wxCommandEvent &event)
 
 	namedWindow("Head camera");
 
-	head_face_follow(jenny5_head_controller, face_classifier, write_to_log, NULL, "Head camera");
+	head_face_follow(&jenny5_head_controller, &face_classifier, write_to_log, NULL, "Head camera");
 
 	destroyWindow("Head camera");
 
@@ -179,7 +179,7 @@ void MainFrame::on_follow_person_click(wxCommandEvent &event)
 	namedWindow("Head camera", WINDOW_AUTOSIZE); // window to display the head camera results
 	namedWindow("LIDAR map", WINDOW_AUTOSIZE); // LIDAR window
 
-	if (follow_person(jenny5_head_controller, LIDAR_controller, platform_controller, face_classifier, write_to_log, NULL, "Head camera", "LIDAR map") == -1) {
+	if (follow_person(&jenny5_head_controller, &LIDAR_controller, &platform_controller, &face_classifier, write_to_log, NULL, "Head camera", "LIDAR map") == -1) {
 
 	}
 
