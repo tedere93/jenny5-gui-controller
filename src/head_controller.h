@@ -26,6 +26,8 @@
 #define _head_vertical_motor_potentiometer_home 632
 
 #define HEAD_RADIUS_TO_REVERT 70
+#define HEAD_RADIUS_TOLERANCE 20
+
 #define CAM_PIXELS_TOLERANCE 100
 
 
