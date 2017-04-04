@@ -17,4 +17,4 @@
 #include "platform_controller.h"
 
 
-int follow_person(t_head_controller &jenny5_head_controller, t_lidar_controller &LIDAR_controller, t_platform_controller & platform_controller, cv::CascadeClassifier &face_classifier, f_log_callback to_log, f_stop_callback stop_function, char* head_window_name, char* LIDAR_window_name);
+int follow_person(t_head_controller *jenny5_head_controller, t_lidar_controller *LIDAR_controller, t_platform_controller * platform_controller, cv::CascadeClassifier *face_classifier, f_log_callback to_log, f_stop_callback stop_function, char* head_window_name, char* LIDAR_window_name);
